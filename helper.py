@@ -5,7 +5,7 @@ import os, sys
 
 import CMS_lumi
 #import tdrstyle
-TGaxis.SetMaxDigits(3)
+#TGaxis.SetMaxDigits(2)
 TH1.SetDefaultSumw2()
 gStyle.SetPaintTextFormat(".5f")
 
@@ -163,7 +163,7 @@ def SaveHisto1D(HIST, region, ivar ,tree , tokens, snorm=1, ratio=0, poisson=Tru
         if 'BkgSum' in key: continue
         if 'DATA' in key: continue
         HIST[bkgsum].Add(val)
-
+        
     #### STYLE
     HIST['DATA_%s_%s'%(region,ivar)].SetMarkerStyle(20)
     HIST['DATA_%s_%s'%(region,ivar)].SetMarkerSize(1.25)
@@ -179,12 +179,19 @@ def SaveHisto1D(HIST, region, ivar ,tree , tokens, snorm=1, ratio=0, poisson=Tru
     HIST['DY_%s_%s'%(region,ivar)].SetLineStyle(1)
     HIST['DY_%s_%s'%(region,ivar)].SetLineWidth(2)
 
+    HIST['FAKE_%s_%s'%(region,ivar)].SetFillColor(921)
+    HIST['FAKE_%s_%s'%(region,ivar)].SetFillStyle(1001)
+    HIST['FAKE_%s_%s'%(region,ivar)].SetLineColor(921)
+    HIST['FAKE_%s_%s'%(region,ivar)].SetLineStyle(1)
+    HIST['FAKE_%s_%s'%(region,ivar)].SetLineWidth(2)
+
     for i, s in enumerate(HIST):
         addOverflow(HIST[s], False) # Add overflow
 
     #Stack
     bkg = THStack('bkg', ";"+HIST[bkgsum].GetXaxis().GetTitle()+";"+HIST[bkgsum].GetYaxis().GetTitle())
-    bkg.Add(HIST['DY_%s_%s'%(region,ivar)]) # ADD ALL BKG
+    for proc in [ 'DY' , 'FAKE' ]:
+        bkg.Add(HIST['%s_%s_%s'%(proc,region,ivar)]) # ADD ALL BKG
 
     #Legend
     n=len(HIST)
@@ -195,6 +202,7 @@ def SaveHisto1D(HIST, region, ivar ,tree , tokens, snorm=1, ratio=0, poisson=Tru
     leg.SetTextSize(0.03)
     leg.AddEntry(HIST['DATA_%s_%s'%(region,ivar)], 'Data', "pl")
     leg.AddEntry(HIST['DY_%s_%s'%(region,ivar)], 'DY', "f")
+    leg.AddEntry(HIST['FAKE_%s_%s'%(region,ivar)], 'Fake', "f")
     c1 = TCanvas("c1", HIST.values()[-1].GetXaxis().GetTitle(), 800, 800 if ratio else 600 )
 
     #Ratio pad
@@ -284,24 +292,26 @@ def SaveRatio( hSS , hOS , _token , _isample , _ivar ):
     hratio.Divide(hOS)
     c1 = TCanvas( 'hratio_%s'%_ivar , 'hratio_%s'%_ivar , 800 , 600 )
     if _ivar=='2d':
+        TGaxis.SetMaxDigits(2)
         fout = TFile.Open( 'plots/%s/Object_studies/Ratio_%s_%s_%s.root' %(_token,_token,_isample,_ivar), 'RECREATE' )
         c1.SetRightMargin(0.2)
-        hratio.SetAxisRange(0.00001,0.01,"Z")                                                                   
-        hratio.GetZaxis().SetTitle('N_SS/N_OS')
+        hratio.SetAxisRange(0.00001,0.01,"Z")
+        hratio.SetTitle('')
+        hratio.GetZaxis().SetTitle('N_SS/N_OS (%s)' %_isample)
         hratio.GetXaxis().SetTitle('Lepton1 eta')
         hratio.GetYaxis().SetTitle('Lepton2 eta')
-        hratio.SetTitle('N_SS/N_OS ratio for %s'%_isample) 
         hratio.Draw('colztextE')
         hratio.Write()
         fout.Close()
-    
         #counter=0
         #for ixbin in range(1,hratio.GetNbinsX()+1):
         #    for iybin in range(1,hratio.GetNbinsY()+1):
         #        print('%s_Z[%s] = %s; %s_Z_err[%s] = %s;' %(_isample , counter , hratio.GetBinContent(ixbin,iybin) , _isample , counter , hratio.GetBinError(ixbin,iybin) ) )
         #        counter+=1
     else:
-        hratio.SetTitle('N_SS/N_OS ratio Dependence for %s'%_isample)
+        #hratio.SetTitle('N_SS/N_OS ratio Dependence for %s'%_isample)
+        hratio.SetTitle('')
+        hratio.GetYaxis().SetTitle('N_SS/N_OS Ratio (%s)' %_isample)
         hratio.Draw('PE')
 
     c1.cd()
@@ -312,7 +322,6 @@ def SaveRatio( hSS , hOS , _token , _isample , _ivar ):
     CMS_lumi.extraText = "Preliminary"
     CMS_lumi.CMS_lumi(c1, 4, 0)
     gPad.RedrawAxis()
-
 
         #c1.cd()
         #if '2016' in _token:
@@ -325,5 +334,6 @@ def SaveRatio( hSS , hOS , _token , _isample , _ivar ):
     
     c1.Print( 'plots/%s/Object_studies/Ratio_%s_%s_%s.png' %(_token,_token,_isample,_ivar) )
     c1.Print( 'plots/%s/Object_studies/Ratio_%s_%s_%s.pdf' %(_token,_token,_isample,_ivar) )
+    TGaxis.SetMaxDigits(5)
 
 pass

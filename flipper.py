@@ -19,12 +19,12 @@ ROOT.TH1.SetDefaultSumw2()
 #gStyle.SetOptStat(0)
 #gStyle.SetPaintTextFormat(".5f")
 
-dir='/home/shoh/works/workbench/chargeflip/siewyan/v3/plots/'
+dir='plots/'
 
 files=[
-    dir+'nanov5_2016/nanov5_2016.root',
+    #dir+'nanov5_2016/nanov5_2016.root',
     dir+'nanov5_2017/nanov5_2017.root',
-    dir+'nanov5_2018/nanov5_2018.root'
+    #dir+'nanov5_2018/nanov5_2018.root'
 ]
 
 epsilon={}
@@ -44,25 +44,32 @@ for ifile in files:
     #convert list of key into key-pair dictionary
     histlist = dict( zip( map(lambda x : x, samples) , map(lambda x : f.Get(x), samples) ) ) ###
     haddlist={}
+    
     for key,ihist in histlist.iteritems():
         for ivar in variables:
             #Hadd according to process
             if 'DY' in key and ivar in key:
+                #print 'DY here: ', key
                 if 'DY_%s_%s'%(key.split('_')[-2],key.split('_')[-1]) not in haddlist: haddlist['DY_%s_%s'%(key.split('_')[-2],key.split('_')[-1])]= ihist.Clone('DY_%s_%s'%(key.split('_')[-2],key.split('_')[-1]))
                 else: haddlist['DY_%s_%s'%(key.split('_')[-2],key.split('_')[-1])].Add(ihist)
-            elif 'DY' not in key and ivar in key:
+            if key.split('_')[-3]=='fake' and ivar in key:
+                #print 'Fake here: ', key
+                print 'FAKE_%s_%s'%(key.split('_')[-2],key.split('_')[-1])
+                if 'FAKE_%s_%s'%(key.split('_')[-2],key.split('_')[-1]) not in haddlist: haddlist['FAKE_%s_%s'%(key.split('_')[-2],key.split('_')[-1])]= ihist.Clone('FAKE_%s_%s'%(key.split('_')[-2],key.split('_')[-1]))
+                else: haddlist['FAKE_%s_%s'%(key.split('_')[-2],key.split('_')[-1])].Add(ihist)
+            elif ( key.split('_')[-3]=='DoubleEG' or key.split('_')[-3]=='SingleElectron' or key.split('_')[-3]=='EGamma') and ivar in key:
+            #    #print 'DATA here: ', key
                 if 'DATA_%s_%s'%(key.split('_')[-2],key.split('_')[-1]) not in haddlist: haddlist['DATA_%s_%s'%(key.split('_')[-2],key.split('_')[-1])]= ihist.Clone('DATA_%s_%s'%(key.split('_')[-2],key.split('_')[-1]))
                 else: haddlist['DATA_%s_%s'%(key.split('_')[-2],key.split('_')[-1])].Add(ihist)
-
-    '''
+    
     #plot 1D kinematics between DATA/MC
     for ireg in [ 'OSnum' , 'SSnum' ]: #NO NEED REGION
         fl1 = filter(lambda x: ireg in x, haddlist)
         for jvar in variables:
             fl2 = filter(lambda x: jvar in x,fl1)
             if jvar=='2d': continue
-            SaveHisto1D( dict( zip( map(lambda x : x, fl2) , map(lambda x : haddlist[x], fl2) ) ) , ireg , jvar, f , token , 0, 4, False , False)
-
+            SaveHisto1D( dict( zip( map(lambda x : x, fl2) , map(lambda x : haddlist[x], fl2) ) ) , ireg , jvar, f , token , 0, 4, False , True if jvar in [ 'lep1pt','lep2pt' ] else False)
+    '''
     #plot ratio SS/OS on 1D kinematics
     for isample in ['DATA','DY']:
         fl1 = filter(lambda x: isample in x, haddlist)
@@ -72,7 +79,7 @@ for ifile in files:
             hSS = map(lambda x: haddlist[x] , filter(lambda x: 'SSnum' in x,fl2))
             hOS = map(lambda x: haddlist[x] , filter(lambda x: 'OSnum' in x,fl2))
             SaveRatio(hSS[0],hOS[0],token,isample,ivar)
-    '''
+    
     #extract ratio from each bins and do fit
     fitvar={};
     for c,isample in enumerate(['DATA','DY']):
@@ -105,3 +112,4 @@ for ifile in files:
         for num, iparam in enumerate(iep):
             print key, ' : epsilon = ', iparam , ' +/- ', epsilon_err[key][num]
         print "\n"
+    '''

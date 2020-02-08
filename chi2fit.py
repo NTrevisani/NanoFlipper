@@ -26,6 +26,7 @@ def model( i , par ):
 pass
 '''
 
+
 def model( i , par ):
 
      if   i == 0:  value = ( par[0] * (1-par[ 0]) + (1-par[ 0]) * par[ 0] ) / ( 1 - ( par[0] * (1-par[ 0]) + (1-par[ 0]) * par[ 0] ) );
@@ -61,6 +62,7 @@ def model( i , par ):
      return value
 pass
 
+
 def fcn( npar , deriv , f , par , iflag):
 
     """ meaning of parametrs:
@@ -88,11 +90,12 @@ def fit(p,perr):
      print nBins
      
      name=['q0','q1','q2','q3','q4']
+     #name=['q0','q1','q2','q3']
      npar=len(name)
      # the initial values
-     vstart = arr( 'd' , ( 0.1 , 0.1 , 0.1 , 0.1 , 0.1 ) )
+     vstart = arr( 'd' , ( 0.1 , 0.1 , 0.1 , 0.1 , 0.1  ) )
      # the initial step size
-     step = arr( 'd' , ( 0.0001 , 0.0001 , 0.0001 , 0.0001 , 0.0001 ) )
+     step = arr( 'd' , ( 0.001 , 0.001 , 0.001 , 0.001 , 0.001 ) )
      
      # --> set up MINUIT
      gMinuit = TMinuit ( npar ) # initialize TMinuit with maximum of npar parameters
@@ -108,7 +111,7 @@ def fit(p,perr):
      for i in range(0,npar):
           # Define the parameters for the fit
           gMinuit.mnparm( i, name[i] , vstart[i] , step[i] , 0, 1, ierflg )
-     arglist [0] = 5000 # Number of calls for FCN before giving up
+     arglist [0] = 500 # Number of calls for FCN before giving up
      arglist [1] = 1 # Tolerance
      gMinuit.mnexcm("MIGRAD" , arglist , 2 , ierflg) # execute the minimisation
 
