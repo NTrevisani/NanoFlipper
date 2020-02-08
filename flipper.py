@@ -22,9 +22,9 @@ ROOT.TH1.SetDefaultSumw2()
 dir='plots/'
 
 files=[
-    #dir+'nanov5_2016/nanov5_2016.root',
+    dir+'nanov5_2016/nanov5_2016.root',
     dir+'nanov5_2017/nanov5_2017.root',
-    #dir+'nanov5_2018/nanov5_2018.root'
+    dir+'nanov5_2018/nanov5_2018.root'
 ]
 
 epsilon={}
@@ -53,7 +53,7 @@ for ifile in files:
                 if 'DY_%s_%s'%(key.split('_')[-2],key.split('_')[-1]) not in haddlist: haddlist['DY_%s_%s'%(key.split('_')[-2],key.split('_')[-1])]= ihist.Clone('DY_%s_%s'%(key.split('_')[-2],key.split('_')[-1]))
                 else: haddlist['DY_%s_%s'%(key.split('_')[-2],key.split('_')[-1])].Add(ihist)
             if key.split('_')[-3]=='fake' and ivar in key:
-                #print 'Fake here: ', key
+                print 'Fake here: ', key
                 print 'FAKE_%s_%s'%(key.split('_')[-2],key.split('_')[-1])
                 if 'FAKE_%s_%s'%(key.split('_')[-2],key.split('_')[-1]) not in haddlist: haddlist['FAKE_%s_%s'%(key.split('_')[-2],key.split('_')[-1])]= ihist.Clone('FAKE_%s_%s'%(key.split('_')[-2],key.split('_')[-1]))
                 else: haddlist['FAKE_%s_%s'%(key.split('_')[-2],key.split('_')[-1])].Add(ihist)

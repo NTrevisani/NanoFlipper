@@ -33,9 +33,9 @@ gStyle.SetPaintTextFormat(".5f")
 ###################
 
 btag=False
-yr=['2017']
+yr=[]
 variables=['lep1eta','lep2eta','lep1pt','lep2pt','mll','2d']
-regions=['region','SSnum','OSnum']
+regions=['SSnum','OSnum']
 
 start_time = time.time()
 
@@ -67,10 +67,6 @@ for i in Dataset:
     fakeCommon=Dataset[i]['fakeW']
 
     ###
-    Nom = 'lep1pt>20 && lep2pt>20 && lep1pt<200 && lep2pt<200'
-    #Zdenom = 'nLepton>=2 && abs(mll-91.2) < 15 && Lepton_pt[0]>25 && Lepton_pt[1]>20 && Lepton_pt[2]<10'
-    #Zdenom = 'abs(mll-91.2) < 15 && ( (nLepton==2 && Lepton_pt[0]>25 && Lepton_pt[1]>20) || (nLepton>=3 && Lepton_pt[0]>25 && Lepton_pt[1]>20 && Lepton_pt[2]<10) )'
-    #Zdenom = 'abs(mll-91.2) < 15 && Alt$(Lepton_pt[0],0)>25 && Alt$(Lepton_pt[1],0)>20 && Alt$(Lepton_pt[2],0)<10'
     SS_num = '(Lepton_pdgId[0]*Lepton_pdgId[1]==11*11)'
     OS_num = '( (Lepton_pdgId[0]*Lepton_pdgId[1]==-11*11) || (Lepton_pdgId[0]*Lepton_pdgId[1]==11*-11) )'
 
@@ -90,45 +86,41 @@ for i in Dataset:
             source=dataDir
         #print '%s : %s/*%s*.root'%(j,source, j.split('_')[0] if 'fake' in j else j )
         DF = ROOT.ROOT.RDataFrame("Events", '%s/*%s*.root'%(source, j.split('_')[0] if 'fake' in j else j ) )
-
+    
         ## apply nominal condition
         histodf={}
-        #Define Denom, array type variable needed defined new column
-        #DYregion = DF.Filter('%s && %s' %(Zdenom,Nom), 'DY process selection for %s' %j)
 
         #Define plotting variable
         DYregion = DF\
-                .Define('lep1eta','Lepton_eta[0]')\
-                .Define('lep2eta','Lepton_eta[1]')\
-                .Define('abslep1eta','abs(Lepton_eta[0])')\
-                .Define('abslep2eta','abs(Lepton_eta[1])')\
-                .Define('lep1pt','Lepton_pt[0]')\
-                .Define('lep2pt','Lepton_pt[1]')\
-                .Define('lep3pt','Lepton_pt[2]')
-                #.Define('evWeight', '%s*%s'  %(mcCommon,Dataset[i]['mcW'][j]) if 'DY' in j else '%s*%s' %(dataCommon,Dataset[i]['Trig'][j.split('_')[0]]) )
+                   .Define('lep1eta','Lepton_eta[0]')\
+                   .Define('lep2eta','Lepton_eta[1]')\
+                   .Define('abslep1eta','abs(Lepton_eta[0])')\
+                   .Define('abslep2eta','abs(Lepton_eta[1])')\
+                   .Define('lep1pt','Lepton_pt[0]')\
+                   .Define('lep2pt','Lepton_pt[1]')\
+                   .Define('lep3pt','Lepton_pt[2]')
 
         #Define Weights
         if 'DY' in j:
-            DYregion = DYregion.Define('evWeight', '%s*%s' %(mcCommon,Dataset[i]['mcW'][j]) )
-            print '%s : %s/*%s*.root'%(j,source, j.split('_')[0] if 'fake' in j else j )
-            #print 'weight: %s*%s' %(mcCommon,Dataset[i]['mcW'][j])
+            DYregion = DYregion.Define('evWeight', '(%s)*(%s)' %(mcCommon,Dataset[i]['mcW'][j]) )
+            print '%s %s : %s/*%s*.root'%(inum,j,source, j.split('_')[0] if 'fake' in j else j )
+            print ' -- > weight: %s*%s' %(mcCommon,Dataset[i]['mcW'][j])
         elif 'fake' in j:
-            DYregion = DYregion.Define('evWeight', '%s*%s' %(fakeCommon,Dataset[i]['Trig'][j]) )
-            print '%s : %s/*%s*.root'%(j,source, j.split('_')[0] if 'fake' in j else j )
-            #print 'weight: %s*%s' %(fakeCommon,Dataset[i]['Trig'][j])
+            DYregion = DYregion.Define('evWeight', '(%s)*(%s)' %(fakeCommon,Dataset[i]['Trig'][j]) )
+            print '%s %s : %s/*%s*.root'%(inum,j,source, j.split('_')[0] if 'fake' in j else j )
+            print ' --> weight: %s*%s' %(fakeCommon,Dataset[i]['Trig'][j])
         else:
-            DYregion = DYregion.Define('evWeight', '%s*%s' %(dataCommon,Dataset[i]['Trig'][j]) )
-            print '%s : %s/*%s*.root'%(j,source, j.split('_')[0] if 'fake' in j else j )
-            #print 'weight: %s*%s' %(dataCommon,Dataset[i]['Trig'][j])
+            DYregion = DYregion.Define('evWeight', '(%s)*(%s)' %(dataCommon,Dataset[i]['Trig'][j]) )
+            print '%s %s : %s/*%s*.root'%(inum,j,source, j.split('_')[0] if 'fake' in j else j )
+            print ' --> weight: %s*%s' %(dataCommon,Dataset[i]['Trig'][j])
 
         #Filter
-        DYregion = DYregion.Filter(Nom,"Lepton pT cuts")
-        DYregion = DYregion.Filter('abs(mll-91.2) < 15 && ( (nLepton==2 && lep1pt>25 && lep2pt>20) || (nLepton==3 && lep1pt>25 && lep2pt>20 && lep3pt<10) )','lepton cut')
+        DYregion = DYregion.Filter('lep1pt>20 && lep2pt>20 && lep1pt<200 && lep2pt<200',"Lepton pT cuts")
+        DYregion = DYregion.Filter('abs(mll-91.2) < 15 && ( (nLepton==2 && lep1pt>25 && lep2pt>20) || (nLepton==3 && lep1pt>25 && lep2pt>20 && lep3pt<10) )','zpeak')
         #Define Selection
-        histodf['%s_%s_region' %(i,j)] = DYregion.Filter('1==1','No cut, DrellYan region')
+        #histodf['%s_%s_region' %(i,j)] = DYregion.Filter('1==1','No cut, DrellYan region')
         histodf['%s_%s_SSnum' %(i,j)] = DYregion.Filter( SS_num , 'SS selection for %s' %j)
         histodf['%s_%s_OSnum' %(i,j)] = DYregion.Filter( OS_num , 'OS selection for %s' %j)
-
 
         #Variable
         for ivar in variables:
@@ -136,7 +128,7 @@ for i in Dataset:
                 if 'eta' in ivar:
                     histo['%s_%s'%(idf,ivar)]  = histodf[idf].Histo1D( ( '%s_%s' %(idf,ivar) , '%s_%s ; %s [GeV]; Events' %(idf,ivar,ivar) , 10 , -2.5 , 2.5 ) , ivar , 'evWeight' )
                 elif 'pt' in ivar:
-                    histo['%s_%s'%(idf,ivar)]  = histodf[idf].Histo1D( ( '%s_%s' %(idf,ivar) , '%s_%s ; %s [GeV]; Events' %(idf,ivar,ivar) , 20 , 0. , 200. ) , ivar , 'evWeight' )
+                    histo['%s_%s'%(idf,ivar)]  = histodf[idf].Histo1D( ( '%s_%s' %(idf,ivar) , '%s_%s ; %s [GeV]; Events' %(idf,ivar,ivar) , 40 , 0. , 200. ) , ivar , 'evWeight' )
                 elif ivar=='mll':
                     histo['%s_%s'%(idf,ivar)]  = histodf[idf].Histo1D( ( '%s_%s' %(idf,ivar) , '%s_%s ; %s [GeV]; Events' %(idf,ivar,ivar) , 80 , 70. , 110. ) , ivar , 'evWeight' )
                 elif ivar=='2d':

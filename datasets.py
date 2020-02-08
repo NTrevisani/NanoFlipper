@@ -50,10 +50,13 @@ Dataset['nanov5_2017'] ={
 Dataset['nanov5_2018'] ={
     'DATA' : '%s/2018/Run2018_102X_nAODv5_Full2018v5/DATAl1loose2018v5__l2loose__l2tightOR2018v5' %DIR,
     'MC'   : '%s/2018/Autumn18_102X_nAODv5_Full2018v5/MCl1loose2018v5__MCCorr2018v5__l2loose__l2tightOR2018v5' %DIR,
+    'FAKE' : '%s/2018/Run2018_102X_nAODv5_Full2018v5/DATAl1loose2018v5__l2loose__fakeW' %DIR,
     'Trig' : {
         'EGamma'         : '!Trigger_ElMu && !Trigger_dblMu && !Trigger_sngMu && (Trigger_sngEl || Trigger_dblEl)',
+        'EGamma_fake'    : '!Trigger_ElMu && !Trigger_dblMu && !Trigger_sngMu && (Trigger_sngEl || Trigger_dblEl)',
     },
     'dataW' : 'METFilter_DATA*LepCut2l__ele_mvaFall17V1Iso_WP90_SS__mu_cut_Tight_HWWW',
+    'fakeW' : 'fakeW2l_ele_mvaFall17V1Iso_WP90_SS_mu_cut_Tight_HWWW*METFilter_DATA',
     'mcW'  : {
         'common' : '59.74*XSWeight*SFweight2l*LepSF2l__ele_mvaFall17V1Iso_WP90_SS__mu_cut_Tight_HWWW*LepCut2l__ele_mvaFall17V1Iso_WP90_SS__mu_cut_Tight_HWWW*GenLepMatch2l*METFilter_MC',
         'DYJetsToLL_M-10to50-LO' : '((0.632927+0.0456956*gen_ptll-0.00154485*gen_ptll*gen_ptll+2.64397e-05*gen_ptll*gen_ptll*gen_ptll-2.19374e-07*gen_ptll*gen_ptll*gen_ptll*gen_ptll+6.99751e-10*gen_ptll*gen_ptll*gen_ptll*gen_ptll*gen_ptll)*(gen_ptll>0)*(gen_ptll<100)+(1.41713-0.00165342*gen_ptll)*(gen_ptll>=100)*(gen_ptll<300)+1*(gen_ptll>=300))',
