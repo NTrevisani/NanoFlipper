@@ -45,17 +45,22 @@ auto DeclareVariables(T &df) {
  */
 
 template <typename T>
-auto AddEventWeight(T &df, const std::string& sample, const std::string& lumi, const std::string& weight1, const std::string& weight2) {
+auto AddEventWeight(T &df, const std::string& path, const std::string& sample, const std::string& lumi, const std::string& weight1, const std::string& weight2) {
   std::string weights;
   if (sample.find("Double") != std::string::npos) {
     //return df.Define("weight", [=](){ return 1.0; });
     //std::string weights =	lumi+"*XSWeight*SFweight2l*LepSF2l__"+weight1+"*LepCut2l__"+weight2+"*PrefireWeight*GenLepMatch2l*METFilter_MC"
-    weights = "METFilter_DATA*LepCut2l__"+weight1;
+    if (path.find("fake") != std::string::npos ){
+      weights = "METFilter_DATA*fakeW2l_"+weight1;
+    }
+    else{
+      weights = "METFilter_DATA*LepCut2l__"+weight1;
+    }
   }
   else {
     weights = lumi+"*XSWeight*SFweight2l*LepSF2l__"+weight1+"*LepCut2l__"+weight1+"*PrefireWeight*GenLepMatch2l*METFilter_MC*("+weight2+")";
-    std::cout<<" weights interpreted : "<<weights<<std::endl;
   }
+  std::cout<<" weights interpreted : "<<weights<<std::endl;
   return df.Define( "weight", weights );
 }
 
@@ -106,7 +111,7 @@ int main(int argc, char **argv) {
     
     // should be applied last step
     auto df3 = DeclareVariables(df2);
-    auto df4 = AddEventWeight(df3 , sample , lumi , weight1 , weight2 );
+    auto df4 = AddEventWeight(df3 , path, sample , lumi , weight1 , weight2 );
 
     auto dfFinal = df4;
     auto report = dfFinal.Report();
