@@ -25,4 +25,4 @@ do
     echo "./skim $INPUT $OUTPUT $SAMPLE $LUMI $WEIGHT1 $WEIGHT2"
     ./skim $INPUT $OUTPUT $SAMPLE $LUMI $WEIGHT1 $WEIGHT2
 #done < test.csv
-done < nano16.csv
+done < skim.csv
