@@ -36,6 +36,8 @@ auto DeclareVariables(T &df) {
            .Define("ele_pt2","(Lepton_electronIdx[1]!=-1)*Lepton_pt[1]")
            .Define("ele_eta1","(Lepton_electronIdx[1]!=-1)*Lepton_eta[0]")
            .Define("ele_eta2","(Lepton_electronIdx[1]!=-1)*Lepton_eta[1]")
+           .Define("absele_eta1","(Lepton_electronIdx[1]!=-1)*abs(Lepton_eta[0])")
+           .Define("absele_eta2","(Lepton_electronIdx[1]!=-1)*abs(Lepton_eta[1])")
            .Define("isOS","( (Lepton_pdgId[0]*Lepton_pdgId[1]==-11*11) || (Lepton_pdgId[0]*Lepton_pdgId[1]==11*-11) )")
            .Define("isSS","(Lepton_pdgId[0]*Lepton_pdgId[1]==11*11)");
 }
@@ -69,7 +71,7 @@ auto AddEventWeight(T &df, const std::string& path, const std::string& sample, c
  * Declare all variables which will end up in the final reduced dataset
  */
 const std::vector<std::string> finalVariables = {
-  "ele_pt1" , "ele_pt2" , "ele_eta1" , "ele_eta2" , "mll" , "weight" , "isOS" , "isSS"
+  "ele_pt1" , "ele_pt2" , "ele_eta1" , "ele_eta2" , "absele_eta1" , "absele_eta2" , "mll" , "weight" , "isOS" , "isSS"
 };
 
 /*

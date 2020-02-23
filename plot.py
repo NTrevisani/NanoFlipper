@@ -16,12 +16,8 @@ labels = {
     "ele_eta1" : "Electron 1 #eta",
     "ele_eta2" : "Electron 2 #eta",
     "mll"      : "M(ll) / GeV",
+    "eta_2d"   : ["Electron 1 |#eta|","Electron 2 |#eta|"]
     }
-
-# Specify the color for each process
-colors = {
-    "DY" : ROOT.TColor.GetColor(418),
-}
 
 # Retrieve a histogram from the input file based on the process and the variable
 # name
@@ -40,7 +36,7 @@ def getHistogram(tfile, name, variable, tag=""):
 # processes defined in simulation and define the remaining part as QCD. Then,
 # this shape is extrapolated into the signal region with a scale factor.
 
-def main(path, output, variable, xlabel, scale, ratio=0, logy=False):
+def histo1D(path, output, variable, xlabel, scale, ratio=0, logy=False):
     tfile = ROOT.TFile(path, "READ")
 
     hist={}
@@ -183,7 +179,50 @@ def main(path, output, variable, xlabel, scale, ratio=0, logy=False):
     
     c1.SaveAs("{}/{}.pdf".format(output, variable))
     c1.SaveAs("{}/{}.png".format(output, variable))
+pass
 
+def histo2D(path, output, variable, xlabel, scale ):
+    tfile = ROOT.TFile(path, "READ")
+
+    hist={}
+    for ireg in [ 'OS' , 'SS' ]:
+        #DY
+        var=variable+"_"+ireg
+        if 'Double' not in path.split('/')[-1]:
+            DY = getHistogram(tfile, "DYJetsToLL_M-10to50-LO", var)
+            DY2 = getHistogram(tfile, "DYJetsToLL_M-50-LO_ext2", var)
+            DY.Add(DY2)
+            hist[var] = DY
+        else:
+            #Data
+            data = getHistogram(tfile, "DoubleEG", var)
+            hist[var] = data
+    
+    hratio = hist["%s_SS" %variable].Clone("ratio_%s_SS" %variable)
+    hratio.Divide(hist["%s_OS" %variable])
+    
+    c1 = TCanvas( "ratio_%s_SS" %variable , "ratio_%s_SS" %variable , 800 , 600 )
+    if variable == 'eta_2d':
+        TGaxis.SetMaxDigits(2)
+        c1.SetRightMargin(0.2)
+        hratio.SetAxisRange(0.00001,0.01,"Z")
+        hratio.SetTitle('N_SS/N_OS ratio of DATA' if 'Double' in path.split('/')[-1] else 'N_SS/N_OS ratio of MC')
+        hratio.GetZaxis().SetTitle('N_SS/N_OS')
+        hratio.GetXaxis().SetTitle(xlabel[0])
+        hratio.GetYaxis().SetTitle(xlabel[1])
+        hratio.Draw('colztextE')
+        c1.cd()
+        c1.SaveAs("{}/Ratio_{}.pdf".format(output, variable))
+        c1.SaveAs("{}/Ratio_{}.png".format(output, variable))
+    else:
+        hratio.SetTitle('N_SS/N_OS ratio of DATA' if 'Double' in path.split('/')[-1] else 'N_SS/N_OS ratio of MC')
+        hratio.GetXaxis().SetTitle(xlabel)
+        hratio.GetYaxis().SetTitle('N_SS/N_OS Ratio')
+        hratio.Draw('PE')
+        c1.cd()
+        c1.SaveAs("{}/Ratio_{}.pdf".format(output, variable))
+        c1.SaveAs("{}/Ratio_{}.png".format(output, variable))
+pass
 
 # Loop over all variable names and make a plot for each
 if __name__ == "__main__":
@@ -192,8 +231,9 @@ if __name__ == "__main__":
     parser.add_argument("output", type=str, help="Output directory for plots")
     parser.add_argument("scale", type=float, help="Scaling of the integrated luminosity")
     args = parser.parse_args()
+
     for variable in labels.keys():
         for reg in ['OS','SS']:
             var = variable+'_%s' %reg
-            main(args.path, args.output, var, labels[variable] , args.scale, 4, True if 'pt' in variable else False )
-        
+            if variable!="eta_2d": histo1D(args.path, args.output, var, labels[variable] , args.scale, 4, True if 'pt' in variable else False )
+            histo2D(args.path, args.output, variable, labels[variable] , args.scale )
