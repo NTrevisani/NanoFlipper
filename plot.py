@@ -182,46 +182,74 @@ def histo1D(path, output, variable, xlabel, scale, ratio=0, logy=False):
 pass
 
 def histo2D(path, output, variable, xlabel, scale ):
+    
     tfile = ROOT.TFile(path, "READ")
 
     hist={}
     for ireg in [ 'OS' , 'SS' ]:
         #DY
         var=variable+"_"+ireg
-        if 'Double' not in path.split('/')[-1]:
-            DY = getHistogram(tfile, "DYJetsToLL_M-10to50-LO", var)
-            DY2 = getHistogram(tfile, "DYJetsToLL_M-50-LO_ext2", var)
-            DY.Add(DY2)
-            hist[var] = DY
-        else:
-            #Data
-            data = getHistogram(tfile, "DoubleEG", var)
-            hist[var] = data
-    
-    hratio = hist["%s_SS" %variable].Clone("ratio_%s_SS" %variable)
-    hratio.Divide(hist["%s_OS" %variable])
+        DY = getHistogram(tfile, "DYJetsToLL_M-10to50-LO", var)
+        DY2 = getHistogram(tfile, "DYJetsToLL_M-50-LO_ext2", var)
+        DY.Add(DY2)
+        hist['DY_%s' %var] = DY
+        
+        #Data
+        data = getHistogram(tfile, "DoubleEG", var)
+        hist['DATA_%s' %var] = data
+
+    #MC 
+    hratio = hist["DY_%s_SS" %variable].Clone("ratio_MC_%s_SS" %variable)
+    hratio.Divide(hist["DY_%s_OS" %variable])
     
     c1 = TCanvas( "ratio_%s_SS" %variable , "ratio_%s_SS" %variable , 800 , 600 )
     if variable == 'eta_2d':
         TGaxis.SetMaxDigits(2)
         c1.SetRightMargin(0.2)
         hratio.SetAxisRange(0.00001,0.01,"Z")
-        hratio.SetTitle('N_SS/N_OS ratio of DATA' if 'Double' in path.split('/')[-1] else 'N_SS/N_OS ratio of MC')
+        hratio.SetTitle('N_SS/N_OS ratio of MC')
         hratio.GetZaxis().SetTitle('N_SS/N_OS')
         hratio.GetXaxis().SetTitle(xlabel[0])
         hratio.GetYaxis().SetTitle(xlabel[1])
         hratio.Draw('colztextE')
         c1.cd()
-        c1.SaveAs("{}/Ratio_{}.pdf".format(output, variable))
-        c1.SaveAs("{}/Ratio_{}.png".format(output, variable))
+        c1.SaveAs("{}/Ratio_MC_{}.pdf".format(output, variable))
+        c1.SaveAs("{}/Ratio_MC_{}.png".format(output, variable))
     else:
-        hratio.SetTitle('N_SS/N_OS ratio of DATA' if 'Double' in path.split('/')[-1] else 'N_SS/N_OS ratio of MC')
+        hratio.SetTitle('N_SS/N_OS ratio of MC')
         hratio.GetXaxis().SetTitle(xlabel)
         hratio.GetYaxis().SetTitle('N_SS/N_OS Ratio')
         hratio.Draw('PE')
         c1.cd()
-        c1.SaveAs("{}/Ratio_{}.pdf".format(output, variable))
-        c1.SaveAs("{}/Ratio_{}.png".format(output, variable))
+        c1.SaveAs("{}/Ratio_MC_{}.pdf".format(output, variable))
+        c1.SaveAs("{}/Ratio_MC_{}.png".format(output, variable))
+
+    #Data
+    h1ratio = hist["DATA_%s_SS" %variable].Clone("ratio_DATA_%s_SS" %variable)
+    h1ratio.Divide(hist["DATA_%s_OS" %variable])
+    
+    c2 = TCanvas( "ratio_%s_SS" %variable , "ratio_%s_SS" %variable , 800 , 600 )
+    if variable == 'eta_2d':
+        TGaxis.SetMaxDigits(2)
+        c2.SetRightMargin(0.2)
+        h1ratio.SetAxisRange(0.00001,0.01,"Z")
+        h1ratio.SetTitle('N_SS/N_OS ratio of DATA')
+        h1ratio.GetZaxis().SetTitle('N_SS/N_OS')
+        h1ratio.GetXaxis().SetTitle(xlabel[0])
+        h1ratio.GetYaxis().SetTitle(xlabel[1])
+        h1ratio.Draw('colztextE')
+        c2.cd()
+        c2.SaveAs("{}/Ratio_DATA_{}.pdf".format(output, variable))
+        c2.SaveAs("{}/Ratio_DATA_{}.png".format(output, variable))
+    else:
+        h1ratio.SetTitle('N_SS/N_OS ratio of DATA')
+        h1ratio.GetXaxis().SetTitle(xlabel)
+        h1ratio.GetYaxis().SetTitle('N_SS/N_OS Ratio')
+        h1ratio.Draw('PE')
+        c2.cd()
+        c2.SaveAs("{}/Ratio_DATA_{}.pdf".format(output, variable))
+        c2.SaveAs("{}/Ratio_DATA_{}.png".format(output, variable))
+
 pass
 
 # Loop over all variable names and make a plot for each
