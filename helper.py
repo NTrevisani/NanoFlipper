@@ -3,8 +3,6 @@ import math
 from ROOT import gPad, TCanvas, TH2D, TH1D, TFile, THStack, TLegend, gSystem, TLatex, TH1, gStyle, TGaxis
 import os, sys
 
-#import CMS_lumi
-#import tdrstyle
 #TGaxis.SetMaxDigits(2)
 TH1.SetDefaultSumw2()
 gStyle.SetPaintTextFormat(".5f")

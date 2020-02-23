@@ -60,6 +60,10 @@ def main(path, output, variable, xlabel, scale, ratio=0, logy=False):
     data = getHistogram(tfile, "DoubleEG", variable)
     hist['DATA'] = data
 
+    # Fake
+    fake = getHistogram(tfile, "DoubleEG_fake", variable)
+    hist['Fake'] = fake
+
     ######################################################################3
     # Plotting style
     #hist['BkgSum'].Reset("MICES")
@@ -83,6 +87,12 @@ def main(path, output, variable, xlabel, scale, ratio=0, logy=False):
     hist['DATA'].SetLineStyle(1)
     hist['DATA'].SetLineWidth(2)
 
+    # fake
+    hist['Fake'].SetFillColor(921)
+    hist['Fake'].SetFillStyle(1001)
+    hist['Fake'].SetLineColor(921)
+    hist['Fake'].SetLineStyle(1)
+    hist['Fake'].SetLineWidth(2)
 
     #############################################################################
 
@@ -91,7 +101,7 @@ def main(path, output, variable, xlabel, scale, ratio=0, logy=False):
 
     # stack
     bkg = THStack('bkg', ";"+xlabel+";"+hist['BkgSum'].GetYaxis().GetTitle())
-    for proc in [ 'DY' ]:
+    for proc in [ 'DY' , 'Fake' ]:
         bkg.Add(hist[proc]) # ADD ALL BKG
 
     #Legend
@@ -103,7 +113,7 @@ def main(path, output, variable, xlabel, scale, ratio=0, logy=False):
     leg.SetTextSize(0.03)
     leg.AddEntry(hist['DATA'], 'Data', "pl")
     leg.AddEntry(hist['DY'], 'DY', "f")
-    #leg.AddEntry(HIST['FAKE_%s_%s'%(region,ivar)], 'Fake', "f")
+    leg.AddEntry(hist['Fake'], 'Fake', "f")
     c1 = TCanvas("c1", list(hist.values())[-1].GetXaxis().GetTitle(), 800, 800 if ratio else 600 )
 
     #Ratio pad

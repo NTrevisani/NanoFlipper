@@ -18,7 +18,12 @@ do
     
     echo ">>> Skim sample ${SAMPLE}"
     INPUT=${INPUT_DIR}${DIR}/
-    OUTPUT=${OUTPUT_DIR}/${SAMPLE}_Skim.root
+
+    if [[ $DIR == *"fake"* ]]; then
+	OUTPUT=${OUTPUT_DIR}/${SAMPLE}_fake_Skim.root
+    else
+	OUTPUT=${OUTPUT_DIR}/${SAMPLE}_Skim.root
+    fi
     echo "./skim $INPUT $OUTPUT $SAMPLE $LUMI $WEIGHT1 $WEIGHT2"
     ./skim $INPUT $OUTPUT $SAMPLE $LUMI $WEIGHT1 $WEIGHT2
 
