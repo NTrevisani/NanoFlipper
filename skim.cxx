@@ -50,11 +50,8 @@ template <typename T>
 auto AddEventWeight(T &df, const std::string& path, const std::string& sample, const std::string& lumi, const std::string& weight1, const std::string& weight2) {
   std::string weights;
   if (sample.find("Double") != std::string::npos) {
-    //return df.Define("weight", [=](){ return 1.0; });
-    //std::string weights =	lumi+"*XSWeight*SFweight2l*LepSF2l__"+weight1+"*LepCut2l__"+weight2+"*PrefireWeight*GenLepMatch2l*METFilter_MC"
     if (path.find("fake") != std::string::npos ){
       weights = "METFilter_DATA*fakeW2l_"+weight1+"*("+weight2+")";
-      //METFilter_DATA*fakeW2l_ele_cut_WP_Tight80X_SS__mu_cut_Tight80x
     }
     else{
       weights = "METFilter_DATA*LepCut2l__"+weight1+"*("+weight2+")";

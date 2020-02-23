@@ -28,6 +28,12 @@ def getHistogram(tfile, name, variable, tag=""):
         raise Exception("Failed to load histogram {}.".format(name))
     return h
 
+# Write a histogram with a given name to the output ROOT file
+def writeHistogram(h, name):
+    h.SetName(name)
+    h.Write()
+pass
+
 # main function of the plotting step
 #
 # The major part of the code below is dedicated to define a nice-looking layout.
@@ -184,7 +190,7 @@ pass
 def histo2D(path, output, variable, xlabel, scale ):
     
     tfile = ROOT.TFile(path, "READ")
-
+    
     hist={}
     for ireg in [ 'OS' , 'SS' ]:
         #DY
@@ -198,7 +204,8 @@ def histo2D(path, output, variable, xlabel, scale ):
         data = getHistogram(tfile, "DoubleEG", var)
         hist['DATA_%s' %var] = data
 
-    #MC 
+    #MC
+    out = ROOT.TFile("{}/prefit.root".format(output), "RECREATE")
     hratio = hist["DY_%s_SS" %variable].Clone("ratio_MC_%s_SS" %variable)
     hratio.Divide(hist["DY_%s_OS" %variable])
     
@@ -249,6 +256,10 @@ def histo2D(path, output, variable, xlabel, scale ):
         c2.cd()
         c2.SaveAs("{}/Ratio_DATA_{}.pdf".format(output, variable))
         c2.SaveAs("{}/Ratio_DATA_{}.png".format(output, variable))
+
+    writeHistogram(hratio  , "prefit_mc")
+    writeHistogram(h1ratio , "prefit_data")
+    out.Close()
 
 pass
 

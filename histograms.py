@@ -6,6 +6,8 @@ import numpy as np
 from ROOT import array
 ROOT.gROOT.SetBatch(True)
 
+ROOT.ROOT.EnableImplicitMT(6)
+
 bins=np.array([ 0. , 0.5 , 1. , 1.5 , 2.0 , 2.5])
 
 # Declare range of the histogram for each variables
