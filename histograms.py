@@ -59,20 +59,37 @@ def main(sample, process, output):
     hists_os = {}
     for variable in variables:
         hists_os[variable] = bookHistogram(df1, variable, ranges[variable], "2d" if variable.split('_')[-1]=="2d" else "1d")
+        #ptbin
+        for ipt in [ 'pt2low1' , 'pt2low2' , 'pt2low3' ]:
+            hists_os['%s_%s' %(variable,ipt)] = bookHistogram(df1.Filter( "is%s" %ipt ,"is%s" %ipt ), variable, ranges[variable], "2d" if variable.split('_')[-1]=="2d" else "1d")
+            
     report1 = df1.Report()
 
     # Book histogram for same sign
     df2 = df.Filter("isSS", "Same sign region")
     hists_ss = {}
     for variable in variables:
+        #nominal
         hists_ss[variable] = bookHistogram(df2, variable, ranges[variable], "2d" if variable.split('_')[-1]=="2d" else "1d")
+        #ptbin
+        for ipt in [ 'pt2low1' , 'pt2low2' , 'pt2low3' ]:
+            hists_ss['%s_%s' %(variable,ipt)] =	bookHistogram(df2.Filter( "is%s" %ipt ,"is%s" %ipt ), variable, ranges[variable], "2d" if variable.split('_')[-1]=="2d" else "1d")
+
     report2 = df2.Report()
 
     # Write histograms to output file
     for variable in variables:
+        #nominal
         writeHistogram(hists_os[variable], "{}_{}_OS".format(process, variable))
+        #ptbin
+        for ipt in [ 'pt2low1' , 'pt2low2' , 'pt2low3' ]:
+            writeHistogram(hists_os['%s_%s' %(variable,ipt)], "{}_{}_{}_OS".format(process, variable, ipt))
     for variable in variables:
         writeHistogram(hists_ss[variable], "{}_{}_SS".format(process, variable))
+        #ptbin
+        for ipt in [ 'pt2low1' , 'pt2low2' , 'pt2low3' ]:
+            writeHistogram(hists_ss['%s_%s' %(variable,ipt)], "{}_{}_{}_SS".format(process, variable, ipt))
+
 
     # Print cut-flow report
     print("Cut-flow report (opposite sign region):")

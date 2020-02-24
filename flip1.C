@@ -49,44 +49,6 @@ Double_t fitfunc1(Int_t i, Double_t *par){
 
 }
 
-Double_t fitfunc2(Int_t i, Double_t *par) {
-
-  Double_t value = 0.0; //par[0] transverse from left to right x axis ; bottom to top y axis
-
-  if (i == 0)      value = ( par[0] * (1-par[ 5]) + (1-par[ 0]) * par[ 5] ) / ( 1 - ( par[0] * (1-par[ 5]) + (1-par[ 0]) * par[ 5] ) );
-  else if (i == 1) value = ( par[0] * (1-par[ 6]) + (1-par[ 0]) * par[ 6] ) / ( 1 - ( par[0] * (1-par[ 6]) + (1-par[ 0]) * par[ 6] ) );
-  else if (i == 2) value = ( par[0] * (1-par[ 7]) + (1-par[ 0]) * par[ 7] ) / ( 1 - ( par[0] * (1-par[ 7]) + (1-par[ 0]) * par[ 7] ) );
-  else if (i == 3) value = ( par[0] * (1-par[ 8]) + (1-par[ 0]) * par[ 8] ) / ( 1 - ( par[0] * (1-par[ 8]) + (1-par[ 0]) * par[ 8] ) );
-  else if (i == 4) value = ( par[0] * (1-par[ 9]) + (1-par[ 0]) * par[ 9] ) / ( 1 - ( par[0] * (1-par[ 9]) + (1-par[ 0]) * par[ 9] ) );
-
-  else if (i == 5) value = ( par[1] * (1-par[ 5]) + (1-par[ 1]) * par[ 5] ) / ( 1 - ( par[1] * (1-par[ 5]) + (1-par[ 1]) * par[ 5] ) );
-  else if (i == 6) value = ( par[1] * (1-par[ 6]) + (1-par[ 1]) * par[ 6] ) / ( 1 - ( par[1] * (1-par[ 6]) + (1-par[ 1]) * par[ 6] ) );
-  else if (i == 7) value = ( par[1] * (1-par[ 7]) + (1-par[ 1]) * par[ 7] ) / ( 1 - ( par[1] * (1-par[ 7]) + (1-par[ 1]) * par[ 7] ) );
-  else if (i == 8) value = ( par[1] * (1-par[ 8]) + (1-par[ 1]) * par[ 8] ) / ( 1 - ( par[1] * (1-par[ 8]) + (1-par[ 1]) * par[ 8] ) );
-  else if (i == 9) value = ( par[1] * (1-par[ 9]) + (1-par[ 1]) * par[ 9] ) / ( 1 - ( par[1] * (1-par[ 9]) + (1-par[ 1]) * par[ 9] ) );
-
-  else if (i == 10) value = ( par[2] * (1-par[ 5]) + (1-par[ 2]) * par[ 5] ) / ( 1 - ( par[2] * (1-par[ 5]) + (1-par[ 2]) * par[ 5] ) );
-  else if (i == 11) value = ( par[2] * (1-par[ 6]) + (1-par[ 2]) * par[ 6] ) / ( 1 - ( par[2] * (1-par[ 6]) + (1-par[ 2]) * par[ 6] ) );
-  else if (i == 12) value = ( par[2] * (1-par[ 7]) + (1-par[ 2]) * par[ 7] ) / ( 1 - ( par[2] * (1-par[ 7]) + (1-par[ 2]) * par[ 7] ) );
-  else if (i == 13) value = ( par[2] * (1-par[ 8]) + (1-par[ 2]) * par[ 8] ) / ( 1 - ( par[2] * (1-par[ 8]) + (1-par[ 2]) * par[ 8] ) );
-  else if (i == 14) value = ( par[2] * (1-par[ 9]) + (1-par[ 2]) * par[ 9] ) / ( 1 - ( par[2] * (1-par[ 9]) + (1-par[ 2]) * par[ 9] ) );
-
-  else if (i == 15) value = ( par[3] * (1-par[ 5]) + (1-par[ 3]) * par[ 5] ) / ( 1 - ( par[3] * (1-par[ 5]) + (1-par[ 3]) * par[ 5] ) );
-  else if (i == 16) value = ( par[3] * (1-par[ 6]) + (1-par[ 3]) * par[ 6] ) / ( 1 - ( par[3] * (1-par[ 6]) + (1-par[ 3]) * par[ 6] ) );
-  else if (i == 17) value = ( par[3] * (1-par[ 7]) + (1-par[ 3]) * par[ 7] ) / ( 1 - ( par[3] * (1-par[ 7]) + (1-par[ 3]) * par[ 7] ) );
-  else if (i == 18) value = ( par[3] * (1-par[ 8]) + (1-par[ 3]) * par[ 8] ) / ( 1 - ( par[3] * (1-par[ 8]) + (1-par[ 3]) * par[ 8] ) );
-  else if (i == 19) value = ( par[3] * (1-par[ 9]) + (1-par[ 3]) * par[ 9] ) / ( 1 - ( par[3] * (1-par[ 9]) + (1-par[ 3]) * par[ 9] ) );
-
-  else if (i == 20) value = ( par[4] * (1-par[ 5]) + (1-par[ 4]) * par[ 5] ) / ( 1 - ( par[4] * (1-par[ 5]) + (1-par[ 4]) * par[ 5] ) );
-  else if (i == 21) value = ( par[4] * (1-par[ 6]) + (1-par[ 4]) * par[ 6] ) / ( 1 - ( par[4] * (1-par[ 6]) + (1-par[ 4]) * par[ 6] ) );
-  else if (i == 22) value = ( par[4] * (1-par[ 7]) + (1-par[ 4]) * par[ 7] ) / ( 1 - ( par[4] * (1-par[ 7]) + (1-par[ 4]) * par[ 7] ) );
-  else if (i == 23) value = ( par[4] * (1-par[ 8]) + (1-par[ 4]) * par[ 8] ) / ( 1 - ( par[4] * (1-par[ 8]) + (1-par[ 4]) * par[ 8] ) );
-  else if (i == 24) value = ( par[4] * (1-par[ 9]) + (1-par[ 4]) * par[ 9] ) / ( 1 - ( par[4] * (1-par[ 9]) + (1-par[ 4]) * par[ 9] ) );
-
-  return value;
-
-}
-
 // minimization function
 void fcnMC(Int_t &npar, Double_t *gin, Double_t &f, Double_t *par, Int_t iflag)
 {

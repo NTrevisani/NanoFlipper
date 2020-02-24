@@ -4,6 +4,8 @@
 
 import argparse
 import ROOT
+from pathlib import Path
+import os
 from helper import *
 ROOT.gROOT.SetBatch(True)
 ROOT.TH1.SetDefaultSumw2()
@@ -187,14 +189,25 @@ def histo1D(path, output, variable, xlabel, scale, ratio=0, logy=False):
     c1.SaveAs("{}/{}.png".format(output, variable))
 pass
 
-def histo2D(path, output, variable, xlabel, scale ):
+
+
+def histo2D(path, output, variable, xlabel, scale, pt=False, cat=None):
     
     tfile = ROOT.TFile(path, "READ")
-    
     hist={}
+    name="prefit"
+    #modified for pt dependent
+    if pt and cat is not None:
+        variable=variable+"_"+cat
+        output=output+"/pt_dependent/"
+        ptdir=Path(output)
+        name=name+'_'+cat
+        if not ptdir.is_dir(): os.mkdir(output)
+        
+    
     for ireg in [ 'OS' , 'SS' ]:
-        #DY
         var=variable+"_"+ireg
+        #DY    
         DY = getHistogram(tfile, "DYJetsToLL_M-10to50-LO", var)
         DY2 = getHistogram(tfile, "DYJetsToLL_M-50-LO_ext2", var)
         DY.Add(DY2)
@@ -205,16 +218,16 @@ def histo2D(path, output, variable, xlabel, scale ):
         hist['DATA_%s' %var] = data
 
     #MC
-    out = ROOT.TFile("{}/prefit.root".format(output), "RECREATE")
+    out = ROOT.TFile("{}/{}.root".format(output,name), "RECREATE")
     hratio = hist["DY_%s_SS" %variable].Clone("ratio_MC_%s_SS" %variable)
     hratio.Divide(hist["DY_%s_OS" %variable])
     
     c1 = TCanvas( "ratio_%s_SS" %variable , "ratio_%s_SS" %variable , 800 , 600 )
-    if variable == 'eta_2d':
+    if 'eta_2d' in variable:
         TGaxis.SetMaxDigits(2)
         c1.SetRightMargin(0.2)
         hratio.SetAxisRange(0.00001,0.01,"Z")
-        hratio.SetTitle('N_SS/N_OS ratio of MC')
+        hratio.SetTitle('N_SS/N_OS ratio of MC (%s)' %cat if pt and cat is not None else 'N_SS/N_OS ratio of MC')
         hratio.GetZaxis().SetTitle('N_SS/N_OS')
         hratio.GetXaxis().SetTitle(xlabel[0])
         hratio.GetYaxis().SetTitle(xlabel[1])
@@ -223,7 +236,7 @@ def histo2D(path, output, variable, xlabel, scale ):
         c1.SaveAs("{}/Ratio_MC_{}.pdf".format(output, variable))
         c1.SaveAs("{}/Ratio_MC_{}.png".format(output, variable))
     else:
-        hratio.SetTitle('N_SS/N_OS ratio of MC')
+        hratio.SetTitle('N_SS/N_OS ratio of MC (%s)' %cat if pt and cat is not None else 'N_SS/N_OS ratio of MC')
         hratio.GetXaxis().SetTitle(xlabel)
         hratio.GetYaxis().SetTitle('N_SS/N_OS Ratio')
         hratio.Draw('PE')
@@ -236,11 +249,11 @@ def histo2D(path, output, variable, xlabel, scale ):
     h1ratio.Divide(hist["DATA_%s_OS" %variable])
     
     c2 = TCanvas( "ratio_%s_SS" %variable , "ratio_%s_SS" %variable , 800 , 600 )
-    if variable == 'eta_2d':
+    if 'eta_2d' in variable:
         TGaxis.SetMaxDigits(2)
         c2.SetRightMargin(0.2)
         h1ratio.SetAxisRange(0.00001,0.01,"Z")
-        h1ratio.SetTitle('N_SS/N_OS ratio of DATA')
+        h1ratio.SetTitle('N_SS/N_OS ratio of DATA (%s)' %cat if pt and cat is not None else 'N_SS/N_OS ratio of DATA')
         h1ratio.GetZaxis().SetTitle('N_SS/N_OS')
         h1ratio.GetXaxis().SetTitle(xlabel[0])
         h1ratio.GetYaxis().SetTitle(xlabel[1])
@@ -249,7 +262,7 @@ def histo2D(path, output, variable, xlabel, scale ):
         c2.SaveAs("{}/Ratio_DATA_{}.pdf".format(output, variable))
         c2.SaveAs("{}/Ratio_DATA_{}.png".format(output, variable))
     else:
-        h1ratio.SetTitle('N_SS/N_OS ratio of DATA')
+        h1ratio.SetTitle('N_SS/N_OS ratio of DATA (%s)' %cat if pt and cat is not None else 'N_SS/N_OS ratio of DATA')
         h1ratio.GetXaxis().SetTitle(xlabel)
         h1ratio.GetYaxis().SetTitle('N_SS/N_OS Ratio')
         h1ratio.Draw('PE')
@@ -275,4 +288,8 @@ if __name__ == "__main__":
         for reg in ['OS','SS']:
             var = variable+'_%s' %reg
             if variable!="eta_2d": histo1D(args.path, args.output, var, labels[variable] , args.scale, 4, True if 'pt' in variable else False )
+            #nominal , no pt dependent
             histo2D(args.path, args.output, variable, labels[variable] , args.scale )
+            #pt dependent
+            for ipt in [ 'pt2low1' , 'pt2low2' , 'pt2low3' ]:
+                histo2D(args.path, args.output, variable, labels[variable] , args.scale , True , ipt )
