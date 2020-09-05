@@ -99,19 +99,18 @@ def fit(filename,ptbin,output):
         count_err[ihis]=w.var("nsig").getError()
     #print(count)
     #print(count_err)
-    fout=ROOT.TFile(output+'/count_'+filename,'recreate')
+    fout=ROOT.TFile(output+'/count_'+ptbin+'_'+filename,'recreate')
     h_ss_sub=ROOT.TH2D()
     h_os_sub=ROOT.TH2D()
     #samples=['DPS','WW_strong','FAKE','VVV','VZ','Vg','WW_EWK','TTV','DATA','DY']
     samples=['DATA','DY']
     ss_plots=[]
     os_plots=[]
-    print count.keys()
+    
+    #print count.keys()
     for isample in samples:
-        #h_ss=ROOT.TH2D('h_ss_'+isample,'h_ss_'+isample,5,0.,2.5,5,0.,2.5)
-        #h_os=ROOT.TH2D('h_os_'+isample,'h_os_'+isample,5,0.,2.5,5,0.,2.5)
-        h_ss=ROOT.TH2D('h_ss_'+isample,'h_ss_'+isample,3,eta_bin_array,3,eta_bin_array)
-        h_os=ROOT.TH2D('h_os_'+isample,'h_os_'+isample,3,eta_bin_array,3,eta_bin_array)
+        h_ss=ROOT.TH2D('h_'+ptbin+'_ss_'+isample,'h_'+ptbin+'_ss_'+isample,3,eta_bin_array,3,eta_bin_array)
+        h_os=ROOT.TH2D('h_'+ptbin+'_os_'+isample,'h_'+ptbin+'_os_'+isample,3,eta_bin_array,3,eta_bin_array)
         for i in ['0','1','2']:
             for j in ['0','1','2']:
                 h_ss.SetBinContent(int(i)+1,int(j)+1,count[isample+'_'+year+'_'+ptbin+"_ss_etabin"+i+"_etabin"+j+"_mll"])
@@ -120,46 +119,41 @@ def fit(filename,ptbin,output):
                 h_os.SetBinError(int(i)+1,int(j)+1,count_err[isample+'_'+year+'_'+ptbin+"_os_etabin"+i+"_etabin"+j+"_mll"])
         if isample=='DATA':
             h_ss_sub=h_ss.Clone()
-            h_ss_sub.SetName('h_ss_DATASUB')
-            h_ss_sub.SetTitle('h_ss_DATASUB')
+            h_ss_sub.SetName('h_'+ptbin+'_ss_DATASUB')
+            h_ss_sub.SetTitle('h_'+ptbin+'_ss_DATASUB')
             h_os_sub=h_os.Clone()
-            h_os_sub.SetName('h_os_DATASUB')
-            h_os_sub.SetTitle('h_os_DATASUB')
+            h_os_sub.SetName('h_'+ptbin+'_os_DATASUB')
+            h_os_sub.SetTitle('h_'+ptbin+'_os_DATASUB')
 
         ss_plots.append(h_ss)
         os_plots.append(h_os)
+    ##???
     for i in range(0,len(ss_plots)):
-        if ss_plots[i].GetName() != 'h_ss_DATA' and ss_plots[i].GetName() != 'h_ss_DY' and ss_plots[i].GetName() != 'h_ss_FAKE':
+        if ss_plots[i].GetName() != 'h_'+ptbin+'_ss_DATA' and ss_plots[i].GetName() != 'h_'+ptbin+'_ss_DY' and ss_plots[i].GetName() != 'h_'+ptbin+'_ss_FAKE':
+            print "ss_plots[i] : ", ss_plots[i]
             h_ss_sub.Add(ss_plots[i],-1)
     for i in range(0,len(os_plots)):
-        if os_plots[i].GetName() != 'h_os_DATA' and os_plots[i].GetName() != 'h_os_DY' and ss_plots[i].GetName() != 'h_os_FAKE':
+        if os_plots[i].GetName() != 'h_'+ptbin+'_os_DATA' and os_plots[i].GetName() != 'h_'+ptbin+'_os_DY' and ss_plots[i].GetName() != 'h_'+ptbin+'_os_FAKE':
             h_os_sub.Add(os_plots[i],-1)
     ss_plots.append(h_ss_sub)
     os_plots.append(h_os_sub)
 
-    for i in range(0,len(ss_plots)):
-        ss_plots[i].Write()
-        os_plots[i].Write()
+    map(lambda x: x.Write() , ss_plots+os_plots)
+
+    #for i in range(0,len(ss_plots)):
+    #    ss_plots[i].Write()
+    #    os_plots[i].Write()
     fout.Close()
 
     #print(count)
     pass
 
-def ratio(filename):
+def ratio(filename,data,ptbin,output):
+    ## ratio DATA
+    year= filename.strip('.root').strip('hist_').split('_')[-1]
     fin=ROOT.TFile.Open(filename)
-    h_ss=fin.Get('h_ss_DATASUB')
-    h_os=fin.Get('h_os_DATASUB')
-    '''
-    h_ratio=ROOT.TH2D('h2','N_{SS}/N_{OS}',5,0.,2.5,5,0.,2.5)
-    for i in range(0,5):
-        for j in range(0,5):
-            ssVal=h_ss.GetBinContent(i+1,j+1)
-            osVal=h_os.GetBinContent(i+1,j+1)
-            ssErr=h_ss.GetBinError(i+1,j+1)
-            osErr=h_os.GetBinError(i+1,j+1)
-            h_ratio.SetBinContent(i+1,j+1,ssVal/osVal)
-            h_ratio.SetBinError(i+1,j+1,sqrt(pow(ssErr*osVal,2)+pow(osErr*ssVal,2)))
-    '''
+    h_ss=fin.Get('h_%s_ss_%s' %(ptbin,data)) # DATASUB
+    h_os=fin.Get('h_%s_os_%s' %(ptbin,data))
     h_ratio=h_ss.Clone()
     h_ratio.Divide(h_os)
     for i in range(0,h_ratio.GetNbinsX()):
@@ -167,9 +161,12 @@ def ratio(filename):
             if h_ss.GetBinContent(i+1,j+1)<10:
                 h_ratio.SetBinContent(i+1,j+1,0)
                 h_ratio.SetBinError(i+1,j+1,0)
-    h_ratio.SetName('h2_DATASUB')
+    h_ratio.SetName('h2_%s' %data)
     h_ratio.SetTitle('N_{SS}/N_{OS}')
-    fout=ROOT.TFile('ratio_DATASUB'+filename,'recreate')
+
+    output+='/%s_mll' %ptbin
+    if not os.path.exists(output): os.system('mkdir -p %s' %output )
+    fout=ROOT.TFile( '%s/ratio_%s_%s_%s_mll.root' %(output,data,year,ptbin),'recreate')
     h_ratio.Write()
     fout.Write()
     fout.Close()
@@ -178,52 +175,27 @@ def ratio(filename):
     ROOT.gStyle.SetOptStat(0)
     ROOT.gStyle.SetPaintTextFormat("1.4f")
     h_ss.Draw("colz texte")
-    c.SaveAs(output+'/h_ss_DATASUB_'+args.year+'_'+args.ptbin+'.png')
+    
+    c.SaveAs( '%s/h_ss_%s_%s_%s_mll.png' %(output,data,year,ptbin))
     c.Clear()
     h_os.Draw("colz texte")
-    c.SaveAs(output+'/h_os_DATASUB_'+args.year+'_'+args.ptbin+'.png')
+    c.SaveAs( '%s/h_os_%s_%s_%s_mll.png' %(output,data,year,ptbin))
     c.Clear()
     h_ratio.Draw("colz texte")
-    c.SaveAs(output+'/h_ratio_DATA_'+args.year+'_'+args.ptbin+'.png')
-
-    h_ss=fin.Get('h_ss_DY')
-    h_os=fin.Get('h_os_DY')
-    h_ratio=h_ss.Clone()
-    h_ratio.Divide(h_os)
-    for i in range(0,3):
-        for j in range(0,3):
-            if h_ss.GetBinContent(i+1,j+1)<10:
-                h_ratio.SetBinContent(i+1,j+1,0)
-                h_ratio.SetBinError(i+1,j+1,0)
-    h_ratio.SetName('h2_DY')
-    h_ratio.SetTitle('N_{SS}/N_{OS}')
-    fout=ROOT.TFile('ratio_DY'+filename,'recreate')
-    h_ratio.Write()
-    fout.Write()
-    fout.Close()
-
-    h_ss.Draw("colz texte")
-    c.SaveAs(output+'/h_ss_DY_'+args.year+'_'+args.ptbin+'.png')
-    c.Clear()
-    h_os.Draw("colz texte")
-    c.SaveAs(output+'/h_os_DY_'+args.year+'_'+args.ptbin+'.png')
-    c.Clear()
-    h_ratio.Draw("colz texte")
-    c.SaveAs(output+'/h_ratio_DY_'+args.year+'_'+args.ptbin+'.png')
+    c.SaveAs( '%s/h_ratio_%s_%s_%s_mll.png'%(output,data,year,ptbin))
     pass
 
 if __name__ == '__main__':
-    if not os.path.exists('plots'): os.mkdir('plots')
     for ifile in os.listdir('.'):
         if ifile.split('_')[0] != 'hist': continue
         name= ifile.strip('.root').strip('hist_')
-        out="plots"
-        if not os.path.exists('plots/%s' %name): os.mkdir('plots/%s' %name)
-        out+="/"+name
-        if not os.path.exists('plots/%s/Zmassfit' %name): os.mkdir('plots/%s/Zmassfit' %name)
-        out+="/Zmassfit"
-        #fit zmass
+        #makdir directory
+        if not os.path.exists('plots/%s/Zmassfit' %name): os.system('mkdir -p plots/%s/Zmassfit' %name)
+        if not os.path.exists('plots/%s/Chflipfit' %name): os.system('mkdir -p plots/%s/Chflipfit' %name)
+        
         for iptbin in ptbin:
-            fit(ifile,iptbin,out)
-        #compute ratio
-        #ratio('count_chargeflip_plots_'+args.year+'_'+args.ptbin+'.root')
+            #fit zmass
+            fit( ifile , iptbin , 'plots/%s/Zmassfit' %name )
+            #compute ratio
+            for idata in ['DATASUB','DY']:
+                ratio( "plots/%s/Zmassfit/count_%s_hist_%s.root" %(name,iptbin,name) , idata , iptbin , 'plots/%s/Chflipfit' %name )

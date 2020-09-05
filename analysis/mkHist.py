@@ -53,7 +53,6 @@ def makeEtaGrid(indf,iterdf,prefix):
     for i in range(len(etagrid)):
         for j in range(len(etagrid[i])):
             prefix_tmp=prefix+"_etabin"+str(i)+"_etabin"+str(j)+"_mll"
-            print prefix_tmp
             dftmp=iterdf.Filter(etagrid[i][j])
             indf[prefix_tmp]=dftmp.Histo1D( ( prefix_tmp , "%s ; mll [GeV] ; Events" %prefix_tmp , 30, 76.2, 106.2 ), "mll","weights")
     pass
