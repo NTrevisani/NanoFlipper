@@ -14,17 +14,22 @@ gROOT.SetBatch(True)
 gStyle.SetOptStat(0)
 gStyle.SetPaintTextFormat(".5f")
 
+from optparse import OptionParser
+usage = "usage: %prog [options]"
+parser = OptionParser(usage)
+parser.add_option("-d","--dataset", action="store", type="string", dest="dataset", default="nanov5_2016")
+(options, args) = parser.parse_args()
+
 DIR = os.getcwd()
-dataset="nanov5_2016" #
+dataset= options.dataset
 variables=['lep1_pt','lep1_eta','lep2_pt','lep2_eta','mll','2d']
 ntupleDIR= DIR+"/../ntuple/results/"+dataset
-bins=np.array([ 0. , 0.5 , 1. , 1.5 , 2.0 , 2.5])
 
 start_time = time.time()
 
 DF= OrderedDict({
     'DY_%s' %(dataset.split('_')[-1]) : ROOT.ROOT.RDataFrame("flipper", ntupleDIR+'/DYJetsToLL_M*.root' ),
-    'DATA_%s' %(dataset.split('_')[-1]) : ROOT.ROOT.RDataFrame("flipper", ntupleDIR+'/Single*.root' )
+    'DATA_%s' %(dataset.split('_')[-1]) : ROOT.ROOT.RDataFrame("flipper", [ ntupleDIR+'/SingleElectron.root' , ntupleDIR+'/DoubleEG.root' ] if dataset != "nanov5_2018" else [ ntupleDIR+'/EGamma.root' ] )
 })
 
 signness= OrderedDict({
@@ -41,13 +46,14 @@ ptbin= OrderedDict({
 })
 
 eta_bin = ['0.','1.0','1.5','2.5']
-#eta_bin = ['0.','0.5','1.0','1.5','2.0','2.5']
-etagrid=np.zeros((3,3),dtype=np.object)
+#eta_bin = [ 0. , 0.5  , 1.0  , 1.5  , 2.0 , 2.5 ]
+etagrid=np.zeros((len(eta_bin)-1,len(eta_bin)-1),dtype=np.object)
 for i in range(len(etagrid)):
     for j in range(len(etagrid[i])):
-        etagrid[i][j]='abs(lep1_eta)>='+eta_bin[i]+' && abs(lep1_eta)<'+eta_bin[i+1]+' && abs(lep2_eta)>='+eta_bin[j]+' && abs(lep2_eta)<'+eta_bin[j+1]
+        etagrid[i][j]='abs(lep1_eta)>='+str(eta_bin[i])+' && abs(lep1_eta)<'+str(eta_bin[i+1])+' && abs(lep2_eta)>='+str(eta_bin[j])+' && abs(lep2_eta)<'+str(eta_bin[j+1])
 
 df2histo= OrderedDict()
+bins=np.array(eta_bin)
 
 def makeEtaGrid(indf,iterdf,prefix):
     for i in range(len(etagrid)):
@@ -74,11 +80,11 @@ if __name__ == '__main__':
                 weight="ptllDYW*SFweight2l*XSWeight*METFilter_MC*LepCut2l__ele_mvaFall17V1Iso_WP90_SS__mu_cut_Tight_HWWW*LepSF2l__ele_mvaFall17V1Iso_WP90_SS__mu_cut_Tight_HWWW*59.74*GenLepMatch2l"
         else:
             if '2016' in idf:
-                weight="METFilter_DATA*LepCut2l__ele_cut_WP_Tight80X_SS__mu_cut_Tight80x*Trigger_dblEl"#*trigger"
+                weight="METFilter_DATA*LepCut2l__ele_cut_WP_Tight80X_SS__mu_cut_Tight80x*trigger"
             elif '2017' in idf:
-                weight="METFilter_DATA*LepCut2l__ele_mvaFall17V1Iso_WP90_SS__mu_cut_Tight_HWWW*Trigger_dblEl"#*trigger"
+                weight="METFilter_DATA*LepCut2l__ele_mvaFall17V1Iso_WP90_SS__mu_cut_Tight_HWWW*trigger"
             elif '2018' in idf:
-                weight="METFilter_DATA*LepCut2l__ele_mvaFall17V1Iso_WP90_SS__mu_cut_Tight_HWWW*Trigger_dblEl"#*trigger"
+                weight="METFilter_DATA*LepCut2l__ele_mvaFall17V1Iso_WP90_SS__mu_cut_Tight_HWWW*trigger"
         DYregion = DF[idf].Define('weights',weight).Define('abslep1eta','abs(lep1_eta)').Define('abslep2eta','abs(lep2_eta)')
     
         #SS/OS
@@ -96,7 +102,7 @@ if __name__ == '__main__':
                         df2histo['%s_%s_%s_%s'%(idf,ireg,iptbin,ivar)]  = tmp_df_2.Histo1D( ( '%s_%s_%s_%s'%(idf,ireg,iptbin,ivar), '%s_%s_%s_%s ; %s [GeV]; Events' %(idf,ireg,iptbin,ivar,ivar) , 30, 76.2, 106.2 ) , ivar , 'weights' )
                         ## mll in different etabins
                         makeEtaGrid(df2histo,tmp_df_2,'%s_%s_%s'%(idf,iptbin,ireg))
-                ################################################################################################################
+                #################################################################################################################
                     elif ivar=='2d':
                         df2histo['%s_%s_%s_%s'%(idf,ireg,iptbin,ivar)] = tmp_df_2.Histo2D( ( '%s_%s_%s_%s'%(idf,ireg,iptbin,ivar) ,' %s_%s_%s_%s ; Lepton eta 1 ; Lepton eta 2 ; Events.' %(idf,ireg,iptbin,ivar), len(bins)-1 , np.asarray(bins,'d') , len(bins)-1 , np.asarray(bins,'d') ) , 'abslep1eta' , 'abslep2eta' , 'weights' )
 

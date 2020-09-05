@@ -6,7 +6,7 @@ import numpy as np
 from array import array
 from math import sqrt
 
-from mkHist import ptbin
+from mkHist import ptbin, eta_bin
 
 ROOT.gROOT.SetBatch(ROOT.kTRUE)
 ROOT.TH1.SetDefaultSumw2()
@@ -24,11 +24,15 @@ zmass = '91.1876'
 def fit(filename,ptbin,output):
     print('>>>>>>>>>>>>>>>>>>>> perform fit')
     year= filename.strip('.root').strip('hist_').split('_')[-1]
-    eta_bin_array = array('f',[0.,1.0,1.5,2.5])
+    eta_bin_array = array('f', eta_bin ) #[0.,1.0,1.5,2.5])
     fin=ROOT.TFile.Open(filename)
     histos=[]
     count={}
     count_err={}
+    
+    output+='/%s_mll' %ptbin
+    if not os.path.exists(output): os.system('mkdir -p %s' %output )
+
     for tkey in fin.GetListOfKeys():
         key=tkey.GetName()
         #print(key)
@@ -82,7 +86,6 @@ def fit(filename,ptbin,output):
             _str=_str.replace(tbox_title_old[i],tbox_title_new[i])
             c.GetPrimitive("model_paramBox").GetLine(i).SetTitle(_str)
         '''
-        
         c.SaveAs(output+'/c_'+ihis+'.png')
         mc = ROOT.RooStats.ModelConfig("ModelConfig_"+ihis,w)
         mc.SetPdf(pdf)
@@ -109,14 +112,14 @@ def fit(filename,ptbin,output):
     
     #print count.keys()
     for isample in samples:
-        h_ss=ROOT.TH2D('h_'+ptbin+'_ss_'+isample,'h_'+ptbin+'_ss_'+isample,3,eta_bin_array,3,eta_bin_array)
-        h_os=ROOT.TH2D('h_'+ptbin+'_os_'+isample,'h_'+ptbin+'_os_'+isample,3,eta_bin_array,3,eta_bin_array)
-        for i in ['0','1','2']:
-            for j in ['0','1','2']:
-                h_ss.SetBinContent(int(i)+1,int(j)+1,count[isample+'_'+year+'_'+ptbin+"_ss_etabin"+i+"_etabin"+j+"_mll"])
-                h_ss.SetBinError(int(i)+1,int(j)+1,count_err[isample+'_'+year+'_'+ptbin+"_ss_etabin"+i+"_etabin"+j+"_mll"])
-                h_os.SetBinContent(int(i)+1,int(j)+1,count[isample+'_'+year+'_'+ptbin+"_os_etabin"+i+"_etabin"+j+"_mll"])
-                h_os.SetBinError(int(i)+1,int(j)+1,count_err[isample+'_'+year+'_'+ptbin+"_os_etabin"+i+"_etabin"+j+"_mll"])
+        h_ss=ROOT.TH2D('h_'+ptbin+'_ss_'+isample,'h_'+ptbin+'_ss_'+isample, len(eta_bin)-1 , eta_bin_array , len(eta_bin)-1 , eta_bin_array )
+        h_os=ROOT.TH2D('h_'+ptbin+'_os_'+isample,'h_'+ptbin+'_os_'+isample, len(eta_bin)-1 , eta_bin_array , len(eta_bin)-1 , eta_bin_array )
+        for i in range(0,len(eta_bin)-1):
+            for j in range(0,len(eta_bin)-1):
+                h_ss.SetBinContent(i+1,j+1,count[isample+'_'+year+'_'+ptbin+"_ss_etabin"+str(i)+"_etabin"+str(j)+"_mll"])
+                h_ss.SetBinError(i+1,j+1,count_err[isample+'_'+year+'_'+ptbin+"_ss_etabin"+str(i)+"_etabin"+str(j)+"_mll"])
+                h_os.SetBinContent(i+1,j+1,count[isample+'_'+year+'_'+ptbin+"_os_etabin"+str(i)+"_etabin"+str(j)+"_mll"])
+                h_os.SetBinError(i+1,j+1,count_err[isample+'_'+year+'_'+ptbin+"_os_etabin"+str(i)+"_etabin"+str(j)+"_mll"])
         if isample=='DATA':
             h_ss_sub=h_ss.Clone()
             h_ss_sub.SetName('h_'+ptbin+'_ss_DATASUB')
@@ -198,4 +201,4 @@ if __name__ == '__main__':
             fit( ifile , iptbin , 'plots/%s/Zmassfit' %name )
             #compute ratio
             for idata in ['DATASUB','DY']:
-                ratio( "plots/%s/Zmassfit/count_%s_hist_%s.root" %(name,iptbin,name) , idata , iptbin , 'plots/%s/Chflipfit' %name )
+                ratio( "plots/%s/Zmassfit/%s_mll/count_%s_hist_%s.root" %(name,iptbin,iptbin,name) , idata , iptbin , 'plots/%s/Chflipfit' %name )
