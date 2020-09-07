@@ -55,12 +55,23 @@ int main(int argc, char **argv) {
       .Define("ptllDYW"    , mycfg.ptllDYW_LO[year]);
   }
   else{
-    outdf = outdf.Define("trigger"    , mycfg.trigger[name] );
+    std::string tname = name;
+    std::string s = "Fake_";
+    std::string::size_type iss = tname.find(s);
+    if (iss != std::string::npos)
+      tname.erase(iss, s.length());
+    //
+    outdf = outdf.Define("trigger"    , mycfg.trigger[tname] );
   }
   
   //ROOT::RDF::SaveGraph(df,"graph_"+sample+".dot");
-    
-  outdf.Snapshot( "flipper", output, mycfg.outBranch[ (mycfg.isMC) ? "mc_"+year : "data_"+year ] );
+  if (name.find("Fake_") != std::string::npos){
+    std::cout<<"Processing fake output"<<std::endl;
+    outdf.Snapshot( "flipper", output, mycfg.outBranch[ "fake_"+year ] );
+  }
+  else{
+    outdf.Snapshot( "flipper", output, mycfg.outBranch[ (mycfg.isMC) ? "mc_"+year : "data_"+year ] );
+  }
   auto report = outdf.Report();
   report->Print();
   time.Stop();

@@ -38,7 +38,23 @@ struct config_t {
     {
       "data_2018",{
 	"run","luminosityBlock","event","Trigger_sngEl","Trigger_sngMu","Trigger_dblEl","Trigger_dblMu","Trigger_ElMu","LepCut2l__ele_mvaFall17V1Iso_WP90_SS__mu_cut_Tight_HWWW","LepCut2l__ele_mvaFall17V2Iso_WP90__mu_cut_Tight_HWWW","METFilter_DATA","LepCut2l__ele_mvaFall17V2Iso_WP90_SS__mu_cut_Tight_HWWW","LepCut2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW","lep1_pt","lep1_eta","lep1_pdgId","lep2_pt","lep2_eta","lep2_pdgId","mll","trigger"}
+    },
+    
+    {
+      "fake_2016",{
+        "run","luminosityBlock","event","Trigger_sngEl","Trigger_sngMu","Trigger_dblEl","Trigger_dblMu","Trigger_ElMu","fakeW2l_ele_mva_90p_Iso2016_mu_cut_Tight80x","METFilter_FAKE","fakeW2l_ele_mva_90p_Iso2016_SS_mu_cut_Tight80x","lep1_pt","lep1_eta","lep1_pdgId","lep2_pt","lep2_eta","lep2_pdgId","mll","trigger"}
+    },
+
+    {
+      "fake_2017",{
+        "run","luminosityBlock","event","Trigger_sngEl","Trigger_sngMu","Trigger_dblEl","Trigger_dblMu","Trigger_ElMu","fakeW2l_ele_mvaFall17V1Iso_WP90_SS_mu_cut_Tight_HWWW","METFilter_FAKE","fakeW2l_ele_mvaFall17V1Iso_WP90_mu_cut_Tight_HWWW","lep1_pt","lep1_eta","lep1_pdgId","lep2_pt","lep2_eta","lep2_pdgId","mll","trigger"}
+    },
+
+    {
+      "fake_2018",{
+        "run","luminosityBlock","event","Trigger_sngEl","Trigger_sngMu","Trigger_dblEl","Trigger_dblMu","Trigger_ElMu","fakeW2l_ele_mvaFall17V1Iso_WP90_SS_mu_cut_Tight_HWWW","METFilter_FAKE","fakeW2l_ele_mvaFall17V1Iso_WP90_mu_cut_Tight_HWWW","lep1_pt","lep1_eta","lep1_pdgId","lep2_pt","lep2_eta","lep2_pdgId","mll","trigger"}
     }
+    
   };
 
 //DY correction
@@ -56,9 +72,9 @@ struct config_t {
 
 //trigger configuration
   std::map< const std::string , const std::string > trigger = {
-    {"MuonEG","Trigger_ElMu"},
-    {"DoubleMuon","!Trigger_ElMu && Trigger_dblMu"},
-    {"SingleMuon","!Trigger_ElMu && !Trigger_dblMu && Trigger_sngMu"},
+    //{"MuonEG","Trigger_ElMu"},
+    //{"DoubleMuon","!Trigger_ElMu && Trigger_dblMu"},
+    //{"SingleMuon","!Trigger_ElMu && !Trigger_dblMu && Trigger_sngMu"},
     {"DoubleEG","!Trigger_ElMu && !Trigger_dblMu && !Trigger_sngMu && Trigger_dblEl"}, // none existent for 2018
     {"SingleElectron","!Trigger_ElMu && !Trigger_dblMu && !Trigger_sngMu && !Trigger_dblEl && Trigger_sngEl"},
     {"EGamma","!Trigger_ElMu && !Trigger_dblMu && !Trigger_sngMu && (Trigger_sngEl || Trigger_dblEl)"} // only 2018
