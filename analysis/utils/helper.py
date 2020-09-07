@@ -123,6 +123,18 @@ def addOverflow(hist, addUnder=True):
         hist.SetBinError(0, 0.)
 pass
 
+def drawRegion(channel, left=False):
+
+    latex = TLatex()
+    latex.SetNDC()
+    latex.SetTextFont(72) #52
+    latex.SetTextSize(0.035)
+    if left: latex.DrawLatex(0.15, 0.75, channel)
+    else:
+        latex.SetTextAlign(22)
+        latex.DrawLatex(0.5, 0.85, channel)
+    pass
+
 def SaveHisto2D(histin,tokens,data=False):
     proc = 'DY' if not data else 'DATA'
     histname=histin.GetName()
@@ -268,11 +280,16 @@ def SaveHisto1D(HIST, suffix , output, snorm=1, ratio=0, poisson=True, logy=Fals
         else: res = None
     c1.cd(1)
     if '2016' in output:
-        drawCMS("35.87", "Object Performance Study")
+        drawCMS("35.87", "Object Study")
     elif '2017' in output:
-        drawCMS("41.53", "Object Performance Study")
+        drawCMS("41.53", "Object Study")
     elif '2018' in output:
-        drawCMS("59.74", "Object Performance Study")
+        drawCMS("59.74", "Object Study")
+
+    if 'os' in suffix:
+        drawRegion('Opposite Sign')
+    elif 'ss' in suffix:
+        drawRegion('Same Sign')
 
     c1.Update()
 
@@ -289,6 +306,15 @@ def SaveRatio( hSS , hOS , idata , suffix , output ):
     name = '%s_%s' %( idata , suffix )
     hratio = hSS.Clone('hratio_%s'%name)
     hratio.Divide(hOS)
+
+    hratio.SetMarkerStyle(20)
+    hratio.SetMarkerSize(1.25)
+    hratio.SetFillColor(418)
+    hratio.SetFillStyle(1001)
+    hratio.SetLineColor(1)
+    hratio.SetLineStyle(1)
+    hratio.SetLineWidth(2)
+
     c1 = TCanvas( 'hratio_%s'%name , 'hratio_%s'%name , 800 , 600 )
     #if _ivar=='2d':
     #    TGaxis.SetMaxDigits(2)
@@ -333,5 +359,4 @@ def SaveRatio( hSS , hOS , idata , suffix , output ):
     c1.Print( '%s/Ratio_%s.png' %(output,name) )
     #c1.Print( '%s/Ratio_%s.pdf' %(output,name) )
     TGaxis.SetMaxDigits(5)
-
 pass

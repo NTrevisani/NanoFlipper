@@ -143,9 +143,8 @@ def mkvalidation(rf,dataset):
         for jvar in variables:
             if jvar=='2d': continue
             regvar = filter( lambda x: jvar in x , ireg )
-            SaveHisto1D(
-                OrderedDict( zip( map(lambda x : x , regvar) , map(lambda x : histlist[x], regvar) ) ) ,
-                regvar[0].strip('%s_' %regvar[0].split('_')[0]) , output , 0, 4, False , True if jvar in [ 'lep1_pt' , 'lep2_pt' ] else False)
+            insitu = OrderedDict( zip( map(lambda x : x , regvar) , map(lambda x : histlist[x], regvar) ) )
+            SaveHisto1D( insitu , regvar[0].strip('%s_' %regvar[0].split('_')[0]) , output , 0, 4, False , True if jvar in [ 'lep1_pt' , 'lep2_pt' ] else False)
 
     #plot 1D kinematics of SS/OS both for MC and Data
     for idata in [ 'DY' , 'DATA' , 'FAKE' ]:
@@ -154,7 +153,7 @@ def mkvalidation(rf,dataset):
 
 if __name__ == '__main__':
 
-    mkplot()
+    #mkplot()
     mkvalidation('hist_%s.root'%(dataset),dataset)
 
     print("--- %s seconds ---" % (time.time() - start_time))
