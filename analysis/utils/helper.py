@@ -295,7 +295,6 @@ def SaveHisto1D(HIST, suffix , output, snorm=1, ratio=0, poisson=True, logy=Fals
 
     c1.Print( '%s/hstack_%s.png' %(output,suffix) )
     #c1.Print( '%s/hstack_%s.pdf' %(output,suffix) )
-    return
 pass
 
 def SaveRatio( hSS , hOS , idata , suffix , output ):

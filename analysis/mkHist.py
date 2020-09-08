@@ -35,17 +35,56 @@ DF= OrderedDict({
     'FAKE_%s' %(dataset.split('_')[-1]) : ROOT.ROOT.RDataFrame("flipper", [ ntupleDIR+'/Fake_SingleElectron.root' , ntupleDIR+'/Fake_DoubleEG.root' ] if dataset != "nanov5_2018" else [ ntupleDIR+'/Fake_EGamma.root' ] )
 })
 
+#DF= OrderedDict({
+#    'DY_%s' %(dataset.split('_')[-1]) : ROOT.ROOT.RDataFrame("flipper", ntupleDIR+'/DYJetsToLL_M*.root' ),
+#    'DATA_%s' %(dataset.split('_')[-1]) : ROOT.ROOT.RDataFrame("flipper", [ ntupleDIR+'/DoubleEG.root' ] if dataset != "nanov5_2018" else [ ntupleDIR+'/EGamma.root' ] ),
+#    'FAKE_%s' %(dataset.split('_')[-1]) : ROOT.ROOT.RDataFrame("flipper", [ ntupleDIR+'/Fake_DoubleEG.root' ] if dataset != "nanov5_2018" else [ ntupleDIR+'/Fake_EGamma.root' ] )
+#})
+
 signness= OrderedDict({
     'os' : 'lep1_pdgId*lep2_pdgId == -11*11',
     'ss' : 'lep1_pdgId*lep2_pdgId == 11*11'
 })
 
+#ptbin= OrderedDict({
+#    'trigpt' : 'lep1_pt > 23 &&  lep2_pt > 23',
+#    'highpt' : 'lep1_pt > 25 &&  lep2_pt > 25',
+#    'lowpt2' : 'lep1_pt > 25 && lep2_pt > 35',
+#    'lowpt1' : 'lep1_pt > 25 &&  lep2_pt <= 35 && lep2_pt > 25',
+#    'lowpt0' : 'lep1_pt > 25 &&  lep2_pt <= 25 && lep2_pt > 12'
+#})
+
 ptbin= OrderedDict({
-    'trigpt' : 'lep1_pt > 23 && lep2_pt > 23',
-    'highpt' : 'lep1_pt > 25 && lep2_pt > 25',
-    'lowpt2' : 'lep1_pt > 25 && lep2_pt > 35',
-    'lowpt1' : 'lep1_pt > 25 && lep2_pt <= 35 && lep2_pt > 25',
-    'lowpt0' : 'lep1_pt > 25 && lep2_pt <= 25 && lep2_pt > 12'
+    'trigpt' : 'lep1_pt > XXX &&  lep2_pt > 23',
+    'highpt' : 'lep1_pt > XXX &&  lep2_pt > 25',
+    'lowpt2' : 'lep1_pt > XXX && lep2_pt > 35',
+    'lowpt1' : 'lep1_pt > XXX &&  lep2_pt <= 35 && lep2_pt > 25',
+    'lowpt0' : 'lep1_pt > XXX &&  lep2_pt <= 25 && lep2_pt > 12'
+})
+
+if '2016' in dataset:
+    ptbin = map(lambda x : ptbin[x].replace('XXX','32') , ptbin )
+elif '2017' in dataset:
+    ptbin = map(lambda x : ptbin[x].replace('XXX','40') , ptbin )
+elif '2018' in dataset:
+    ptbin = map(lambda x : ptbin[x].replace('XXX','37') , ptbin )
+
+# lepton wp couples with sf
+WPs= OrderedDict({
+    '2016' : {
+        'cutBased'   : 'LepCut2l__ele_cut_WP_Tight80X__mu_cut_Tight80x*LepSF2l__ele_cut_WP_Tight80X__mu_cut_Tight80x'       ,
+        'cutBasedSS' : 'LepCut2l__ele_cut_WP_Tight80X_SS__mu_cut_Tight80x*LepSF2l__ele_cut_WP_Tight80X_SS__mu_cut_Tight80x' ,
+        'mvaBased'   : 'LepCut2l__ele_mva_90p_Iso2016__mu_cut_Tight80x*LepSF2l__ele_mva_90p_Iso2016__mu_cut_Tight80x'       ,
+        'mvaBasedSS' : 'LepCut2l__ele_mva_90p_Iso2016_SS__mu_cut_Tight80x*LepSF2l__ele_mva_90p_Iso2016_SS__mu_cut_Tight80x' ,
+    },
+    '2017' : {
+        'mvaBased'   : 'LepCut2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW*LepSF2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW'      ,
+        'mvaBasedSS' : 'LepCut2l__ele_mvaFall17V1Iso_WP90_SS__mu_cut_Tight_HWWW*LepSF2l__ele_mvaFall17V1Iso_WP90_SS__mu_cut_Tight_HWWW',
+    },
+    '2018' : {
+        'mvaBased'   : 'LepCut2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW*LepSF2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW'      ,
+        'mvaBasedSS' : 'LepCut2l__ele_mvaFall17V1Iso_WP90_SS__mu_cut_Tight_HWWW*LepSF2l__ele_mvaFall17V1Iso_WP90_SS__mu_cut_Tight_HWWW',
+    }
 })
 
 eta_bin = [ 0. , 1.0 , 1.5 , 2.5 ]
@@ -71,30 +110,32 @@ def mkplot():
     rf = ROOT.TFile.Open('hist_%s.root'%(dataset),"RECREATE")
 
     for idf in DF:
-
         # weight
         weight='1==1'
         if 'DY' in idf:
+            common="ptllDYW*SFweight2l*XSWeight*METFilter_MC*GenLepMatch2l"
             if '2016' in idf:
-                weight="ptllDYW*SFweight2l*XSWeight*METFilter_MC*LepCut2l__ele_cut_WP_Tight80X__mu_cut_Tight80x*LepSF2l__ele_cut_WP_Tight80X__mu_cut_Tight80x*35.92*GenLepMatch2l"
+                weight="35.92*%s*%s" %(common,WPs['2016']['mvaBased'])
             elif '2017' in idf:
-                weight="ptllDYW*SFweight2l*XSWeight*METFilter_MC*LepCut2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW*LepSF2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW*41.53*GenLepMatch2l"
+                weight="41.53*%s*%s" %(common,WPs['2017']['mvaBased'])
             elif '2018' in idf:
-                weight="ptllDYW*SFweight2l*XSWeight*METFilter_MC*LepCut2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW*LepSF2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW*59.74*GenLepMatch2l"
+                weight="59.74*%s*%s" %(common,WPs['2018']['mvaBased'])
         elif 'DATA' in idf:
+            common="METFilter_DATA*trigger"
             if '2016' in idf:
-                weight="METFilter_DATA*LepCut2l__ele_cut_WP_Tight80X__mu_cut_Tight80x*trigger"
+                weight="%s*%s" %(common,WPs['2016']['mvaBased'].split('*')[0])
             elif '2017' in idf:
-                weight="METFilter_DATA*LepCut2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW*trigger"
+                weight="%s*%s" %(common,WPs['2017']['mvaBased'].split('*')[0])
             elif '2018' in idf:
-                weight="METFilter_DATA*LepCut2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW*trigger"
+                weight="%s*%s" %(common,WPs['2018']['mvaBased'].split('*')[0])
         elif 'FAKE' in idf:
+            common="METFilter_FAKE*trigger"
             if '2016' in idf:
-                weight="METFilter_FAKE*fakeW2l_ele_mva_90p_Iso2016_mu_cut_Tight80x"
+                weight="%s*%s" %(common,WPs['2016']['mvaBased'].split('*')[0].replace('LepCut2l_','fakeW2l').replace('__','_'))
             elif '2017' in idf:
-                weight="METFilter_FAKE*fakeW2l_ele_mvaFall17V1Iso_WP90_mu_cut_Tight_HWWW"
+                weight="%s*%s" %(common,WPs['2017']['mvaBased'].split('*')[0].replace('LepCut2l_','fakeW2l').replace('__','_'))
             elif '2018' in idf:
-                weight="METFilter_FAKE*fakeW2l_ele_mvaFall17V1Iso_WP90_mu_cut_Tight_HWWW"
+                weight="%s*%s" %(common,WPs['2018']['mvaBased'].split('*')[0].replace('LepCut2l_','fakeW2l').replace('__','_'))
         DYregion = DF[idf].Define('weights',weight) #.Define('abslep1eta','abs(lep1_eta)').Define('abslep2eta','abs(lep2_eta)')
 
         #SS/OS
@@ -153,7 +194,7 @@ def mkvalidation(rf,dataset):
 
 if __name__ == '__main__':
 
-    #mkplot()
+    mkplot()
     mkvalidation('hist_%s.root'%(dataset),dataset)
 
     print("--- %s seconds ---" % (time.time() - start_time))

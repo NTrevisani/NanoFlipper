@@ -48,7 +48,8 @@ int main(int argc, char **argv) {
     .Define("lep1_pdgId" , "Lepton_pdgId[0]")
     .Define("lep2_pt"    , "Lepton_pt[1]")
     .Define("lep2_eta"   , "Lepton_eta[1]")
-    .Define("lep2_pdgId" , "Lepton_pdgId[1]");
+    .Define("lep2_pdgId" , "Lepton_pdgId[1]")
+    ;
   
   if (mycfg.isMC){
     outdf = outdf.Define("genmatch" , "Lepton_promptgenmatched[0]*Lepton_promptgenmatched[1]")
