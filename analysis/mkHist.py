@@ -29,23 +29,24 @@ ntupleDIR= DIR+"/../ntuple/results/"+dataset
 
 start_time = time.time()
 
-DF= OrderedDict({
-    'DY_%s' %(dataset.split('_')[-1]) : ROOT.ROOT.RDataFrame("flipper", ntupleDIR+'/DYJetsToLL_M*.root' ),
-    'DATA_%s' %(dataset.split('_')[-1]) : ROOT.ROOT.RDataFrame("flipper", [ ntupleDIR+'/SingleElectron.root' , ntupleDIR+'/DoubleEG.root' ] if dataset != "nanov5_2018" else [ ntupleDIR+'/EGamma.root' ] ),
-    'FAKE_%s' %(dataset.split('_')[-1]) : ROOT.ROOT.RDataFrame("flipper", [ ntupleDIR+'/Fake_SingleElectron.root' , ntupleDIR+'/Fake_DoubleEG.root' ] if dataset != "nanov5_2018" else [ ntupleDIR+'/Fake_EGamma.root' ] )
-})
-
 #DF= OrderedDict({
 #    'DY_%s' %(dataset.split('_')[-1]) : ROOT.ROOT.RDataFrame("flipper", ntupleDIR+'/DYJetsToLL_M*.root' ),
-#    'DATA_%s' %(dataset.split('_')[-1]) : ROOT.ROOT.RDataFrame("flipper", [ ntupleDIR+'/DoubleEG.root' ] if dataset != "nanov5_2018" else [ ntupleDIR+'/EGamma.root' ] ),
-#    'FAKE_%s' %(dataset.split('_')[-1]) : ROOT.ROOT.RDataFrame("flipper", [ ntupleDIR+'/Fake_DoubleEG.root' ] if dataset != "nanov5_2018" else [ ntupleDIR+'/Fake_EGamma.root' ] )
+#    'DATA_%s' %(dataset.split('_')[-1]) : ROOT.ROOT.RDataFrame("flipper", [ ntupleDIR+'/SingleElectron.root' , ntupleDIR+'/DoubleEG.root' ] if dataset != "nanov5_2018" else [ ntupleDIR+'/EGamma.root' ] ),
+#    'FAKE_%s' %(dataset.split('_')[-1]) : ROOT.ROOT.RDataFrame("flipper", [ ntupleDIR+'/Fake_SingleElectron.root' , ntupleDIR+'/Fake_DoubleEG.root' ] if dataset != "nanov5_2018" else [ ntupleDIR+'/Fake_EGamma.root' ] )
 #})
+
+DF= OrderedDict({
+    'DY_%s' %(dataset.split('_')[-1]) : ROOT.ROOT.RDataFrame("flipper", ntupleDIR+'/DYJetsToLL_M*.root' ),
+    'DATA_%s' %(dataset.split('_')[-1]) : ROOT.ROOT.RDataFrame("flipper", [ ntupleDIR+'/DoubleEG.root' ] if dataset != "nanov5_2018" else [ ntupleDIR+'/EGamma.root' ] ),
+    'FAKE_%s' %(dataset.split('_')[-1]) : ROOT.ROOT.RDataFrame("flipper", [ ntupleDIR+'/Fake_DoubleEG.root' ] if dataset != "nanov5_2018" else [ ntupleDIR+'/Fake_EGamma.root' ] )
+})
 
 signness= OrderedDict({
     'os' : 'lep1_pdgId*lep2_pdgId == -11*11',
     'ss' : 'lep1_pdgId*lep2_pdgId == 11*11'
 })
 
+#jie
 #ptbin= OrderedDict({
 #    'trigpt' : 'lep1_pt > 23 &&  lep2_pt > 23',
 #    'highpt' : 'lep1_pt > 25 &&  lep2_pt > 25',
@@ -54,20 +55,39 @@ signness= OrderedDict({
 #    'lowpt0' : 'lep1_pt > 25 &&  lep2_pt <= 25 && lep2_pt > 12'
 #})
 
+# semi template
+#ptbin= OrderedDict({
+#    'trigpt' : 'lep1_pt > XXX && lep2_pt > 23',
+#    'highpt' : 'lep1_pt > XXX && lep2_pt > 25',
+#    'lowpt2' : 'lep1_pt > XXX && lep2_pt > 35',
+#    'lowpt1' : 'lep1_pt > XXX && lep2_pt <= 35 && lep2_pt > 25',
+#    'lowpt0' : 'lep1_pt > XXX && lep2_pt <= 25 && lep2_pt > 12'
+#})
+
+# master thesis
 ptbin= OrderedDict({
-    'trigpt' : 'lep1_pt > XXX &&  lep2_pt > 23',
-    'highpt' : 'lep1_pt > XXX &&  lep2_pt > 25',
-    'lowpt2' : 'lep1_pt > XXX && lep2_pt > 35',
-    'lowpt1' : 'lep1_pt > XXX &&  lep2_pt <= 35 && lep2_pt > 25',
-    'lowpt0' : 'lep1_pt > XXX &&  lep2_pt <= 25 && lep2_pt > 12'
+    'trigpt' : 'lep1_pt > XXX && lep2_pt > 23',
+
+    'ptbin1' : 'lep1_pt > XXX && lep1_pt <= YYY && lep2_pt > 13 && lep2_pt <= 20',
+    'ptbin2' : 'lep1_pt > XXX && lep1_pt <= YYY && lep2_pt > 20 && lep2_pt <= 25',
+    'ptbin3' : 'lep1_pt > XXX && lep1_pt <= YYY && lep2_pt > 25 && lep2_pt <= 35',
+    'ptbin4' : 'lep1_pt > XXX && lep1_pt <= YYY && lep2_pt > 35 && lep2_pt <= 200',
+    
+    'ptbin5' : 'lep1_pt > YYY && lep1_pt <= 200 && lep2_pt > 13 && lep2_pt <= 20',
+    'ptbin6' : 'lep1_pt > YYY && lep1_pt <= 200 && lep2_pt > 20 && lep2_pt <= 25',
+    'ptbin7' : 'lep1_pt > YYY && lep1_pt <= 200 && lep2_pt > 25 && lep2_pt <= 35',
+    'ptbin8' : 'lep1_pt > YYY && lep1_pt <= 200 && lep2_pt > 35 && lep2_pt <= 200',
 })
 
-if '2016' in dataset:
-    ptbin = map(lambda x : ptbin[x].replace('XXX','32') , ptbin )
-elif '2017' in dataset:
-    ptbin = map(lambda x : ptbin[x].replace('XXX','40') , ptbin )
-elif '2018' in dataset:
-    ptbin = map(lambda x : ptbin[x].replace('XXX','37') , ptbin )
+trig_pt=25
+#if '2016' in dataset:
+#    trig_pt=32
+#elif '2017' in dataset:
+#    trig_pt=40
+#elif '2018' in dataset:
+#    trig_pt=37
+
+ptbin = OrderedDict( zip ( map(lambda x : x, ptbin)  , map(lambda x : ptbin[x].replace( 'XXX' ,'%s' %trig_pt).replace( 'YYY' , '%s' %(trig_pt+5) ) , ptbin )) )
 
 # lepton wp couples with sf
 WPs= OrderedDict({
@@ -113,7 +133,18 @@ def mkplot():
         # weight
         weight='1==1'
         if 'DY' in idf:
-            common="ptllDYW*SFweight2l*XSWeight*METFilter_MC*GenLepMatch2l"
+            # SFweight2l = puWeight*TriggerEffWeight_2l*Lepton_RecoSF[0]*Lepton_RecoSF[1]*EMTFbug_veto
+            # XSWeight = baseW*genWeight
+            # METFilter_Common = vent.Flag_goodVertices*\
+            #         event.Flag_globalSuperTightHalo2016Filter*\
+            #         event.Flag_HBHENoiseFilter*\
+            #         event.Flag_HBHENoiseIsoFilter*\
+            #         event.Flag_EcalDeadCellTriggerPrimitiveFilter*\
+            #         event.Flag_BadPFMuonFilter\
+            # GenLepMatch2l = event.Lepton_genmatched[0]*\
+            #                 event.Lepton_genmatched[1] \
+
+            common="ptllDYW*SFweight2l*XSWeight*METFilter_MC*genmatch" #GenLepMatch2l
             if '2016' in idf:
                 weight="35.92*%s*%s" %(common,WPs['2016']['mvaBased'])
             elif '2017' in idf:
@@ -121,7 +152,7 @@ def mkplot():
             elif '2018' in idf:
                 weight="59.74*%s*%s" %(common,WPs['2018']['mvaBased'])
         elif 'DATA' in idf:
-            common="METFilter_DATA*trigger"
+            common="METFilter_DATA*Trigger_dblEl" #"trigger"
             if '2016' in idf:
                 weight="%s*%s" %(common,WPs['2016']['mvaBased'].split('*')[0])
             elif '2017' in idf:
@@ -129,7 +160,7 @@ def mkplot():
             elif '2018' in idf:
                 weight="%s*%s" %(common,WPs['2018']['mvaBased'].split('*')[0])
         elif 'FAKE' in idf:
-            common="METFilter_FAKE*trigger"
+            common="METFilter_FAKE*Trigger_dblEl" #trigger"
             if '2016' in idf:
                 weight="%s*%s" %(common,WPs['2016']['mvaBased'].split('*')[0].replace('LepCut2l_','fakeW2l').replace('__','_'))
             elif '2017' in idf:
@@ -145,7 +176,7 @@ def mkplot():
                 tmp_df_2 = tmp_df_1.Filter( ptbin[iptbin] , '%s selection' %iptbin )
                 for ivar in variables:
                     if 'eta' in ivar:
-                        df2histo['%s_%s_%s_%s'%(idf,ireg,iptbin,ivar)]  = tmp_df_2.Histo1D( ( '%s_%s_%s_%s'%(idf,ireg,iptbin,ivar) , '%s_%s_%s_%s ; %s [GeV]; Events' %(idf,ireg,iptbin,ivar,ivar) , 10 , -2.5 , 2.5 ) , ivar , 'weights' )
+                        df2histo['%s_%s_%s_%s'%(idf,ireg,iptbin,ivar)]  = tmp_df_2.Histo1D( ( '%s_%s_%s_%s'%(idf,ireg,iptbin,ivar) , '%s_%s_%s_%s ; %s; Events' %(idf,ireg,iptbin,ivar,ivar) , 10 , -2.5 , 2.5 ) , ivar , 'weights' )
                     elif 'pt' in ivar:
                         df2histo['%s_%s_%s_%s'%(idf,ireg,iptbin,ivar)]  = tmp_df_2.Histo1D( ( '%s_%s_%s_%s'%(idf,ireg,iptbin,ivar) , '%s_%s_%s_%s ; %s [GeV]; Events' %(idf,ireg,iptbin,ivar,ivar) , 40 , 0. , 200. ) , ivar , 'weights' )
                 #################################################################################################################

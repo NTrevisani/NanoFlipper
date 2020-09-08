@@ -171,10 +171,8 @@ def SaveHisto1D(HIST, suffix , output, snorm=1, ratio=0, poisson=True, logy=Fals
     HIST[bkgsum].SetFillStyle(3003)
     HIST[bkgsum].SetFillColor(1)
     HIST[bkgsum].SetMarkerStyle(0)
-    for key,val in HIST.iteritems():
-        if 'BkgSum' in key: continue
-        if 'DATA' in key: continue
-        HIST[bkgsum].Add(val)
+    for proc in [ 'DY' , 'FAKE' ]:
+        HIST[bkgsum].Add(HIST['%s_%s'%(proc,suffix)])
 
     #### STYLE
     HIST['DATA_%s' %(suffix)].SetMarkerStyle(20)
@@ -215,6 +213,7 @@ def SaveHisto1D(HIST, suffix , output, snorm=1, ratio=0, poisson=True, logy=Fals
     leg.AddEntry(HIST['DATA_%s' %(suffix)], 'Data [%.1f]' %(HIST['DATA_%s' %(suffix)].Integral()), "pl")
     leg.AddEntry(HIST['DY_%s' %(suffix)], 'DY [%.1f]' %(HIST['DY_%s' %(suffix)].Integral()), "f")
     leg.AddEntry(HIST['FAKE_%s' %(suffix)], 'Fake [%.1f]' %(HIST['FAKE_%s' %(suffix)].Integral()), "f")
+    leg.AddEntry(HIST[bkgsum], 'BkgSum [%.1f]' %(HIST[bkgsum].Integral()), "f")
     c1 = TCanvas("c1", HIST.values()[-1].GetXaxis().GetTitle(), 800, 800 if ratio else 600 )
 
     #Ratio pad

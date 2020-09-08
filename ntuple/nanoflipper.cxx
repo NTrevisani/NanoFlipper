@@ -37,7 +37,7 @@ int main(int argc, char **argv) {
   std::ifstream file(input);
   std::string str;
   while (std::getline(file, str)) { infiles.push_back(str); }
-  
+
   ROOT::RDataFrame df("Events", infiles);
   auto outdf=df.Filter("nLepton==2 || (nLepton>2 && Lepton_pt[2]<10)","nlepton cut")
     .Filter("Lepton_pt[0]>25 && Lepton_pt[1]>12","lepton pt cut")
@@ -50,8 +50,9 @@ int main(int argc, char **argv) {
     .Define("lep2_eta"   , "Lepton_eta[1]")
     .Define("lep2_pdgId" , "Lepton_pdgId[1]")
     ;
-  
+
   if (mycfg.isMC){
+    // gen-matching to prompt only (GenLepMatch2l matches to *any* gen lepton)
     outdf = outdf.Define("genmatch" , "Lepton_promptgenmatched[0]*Lepton_promptgenmatched[1]")
       .Define("ptllDYW"    , mycfg.ptllDYW_LO[year]);
   }
@@ -64,7 +65,7 @@ int main(int argc, char **argv) {
     //
     outdf = outdf.Define("trigger"    , mycfg.trigger[tname] );
   }
-  
+
   //ROOT::RDF::SaveGraph(df,"graph_"+sample+".dot");
   if (name.find("Fake_") != std::string::npos){
     std::cout<<"Processing fake output"<<std::endl;
