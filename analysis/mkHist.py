@@ -55,31 +55,16 @@ signness= OrderedDict({
 #    'lowpt0' : 'lep1_pt > 25 &&  lep2_pt <= 25 && lep2_pt > 12'
 #})
 
-# semi template
-#ptbin= OrderedDict({
-#    'trigpt' : 'lep1_pt > XXX && lep2_pt > 23',
-#    'highpt' : 'lep1_pt > XXX && lep2_pt > 25',
-#    'lowpt2' : 'lep1_pt > XXX && lep2_pt > 35',
-#    'lowpt1' : 'lep1_pt > XXX && lep2_pt <= 35 && lep2_pt > 25',
-#    'lowpt0' : 'lep1_pt > XXX && lep2_pt <= 25 && lep2_pt > 12'
-#})
 
-# master thesis
 ptbin= OrderedDict({
     'trigpt' : 'lep1_pt > XXX && lep2_pt > 23',
-
-    'ptbin1' : 'lep1_pt > XXX && lep1_pt <= YYY && lep2_pt > 13 && lep2_pt <= 20',
-    'ptbin2' : 'lep1_pt > XXX && lep1_pt <= YYY && lep2_pt > 20 && lep2_pt <= 25',
-    'ptbin3' : 'lep1_pt > XXX && lep1_pt <= YYY && lep2_pt > 25 && lep2_pt <= 35',
-    'ptbin4' : 'lep1_pt > XXX && lep1_pt <= YYY && lep2_pt > 35 && lep2_pt <= 200',
-    
-    'ptbin5' : 'lep1_pt > YYY && lep1_pt <= 200 && lep2_pt > 13 && lep2_pt <= 20',
-    'ptbin6' : 'lep1_pt > YYY && lep1_pt <= 200 && lep2_pt > 20 && lep2_pt <= 25',
-    'ptbin7' : 'lep1_pt > YYY && lep1_pt <= 200 && lep2_pt > 25 && lep2_pt <= 35',
-    'ptbin8' : 'lep1_pt > YYY && lep1_pt <= 200 && lep2_pt > 35 && lep2_pt <= 200',
+    'highpt' : 'lep1_pt > XXX && lep2_pt > 35',
+    'lowpt2' : 'lep1_pt > XXX && lep2_pt > 25',
+    'lowpt1' : 'lep1_pt > XXX && lep2_pt > 25 && lep2_pt <= 35',
+    'lowpt0' : 'lep1_pt > XXX && lep2_pt > 12 && lep2_pt <= 25'
 })
 
-trig_pt=25
+trig_pt=28
 #if '2016' in dataset:
 #    trig_pt=32
 #elif '2017' in dataset:
@@ -107,8 +92,8 @@ WPs= OrderedDict({
     }
 })
 
-eta_bin = [ 0. , 1.0 , 1.5 , 2.5 ]
-#eta_bin = [ 0. , 0.5  , 1.0  , 1.5  , 2.0 , 2.5 ]
+#eta_bin = [ 0. , 1.0 , 1.5 , 2.5 ]
+eta_bin = [ 0. , 0.5  , 1.0  , 1.5  , 2.0 , 2.5 ]
 etagrid=np.zeros((len(eta_bin)-1,len(eta_bin)-1),dtype=np.object)
 for i in range(len(etagrid)):
     for j in range(len(etagrid[i])):
@@ -206,9 +191,9 @@ def mkvalidation(rf,dataset):
     # 1.) plot 1D kinematics DATA/MC
     # 2.) plot 1D N_SS/N_OS on kinematics?
     # trigpt default
-
-    oskeys = filter(lambda x : 'etabin' not in x and 'trigpt' in x and 'os' in x , histkeys)
-    sskeys = filter(lambda x : 'etabin' not in x and 'trigpt' in x and 'ss' in x , histkeys)
+    ptregion='lowpt2' #'trigpt'
+    oskeys = filter(lambda x : 'etabin' not in x and ptregion in x and 'os' in x , histkeys)
+    sskeys = filter(lambda x : 'etabin' not in x and ptregion in x and 'ss' in x , histkeys)
 
     #plot 1D STACK kinematics between DATA/MC
     for ireg in [ sskeys , oskeys ]:

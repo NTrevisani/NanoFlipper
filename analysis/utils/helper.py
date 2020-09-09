@@ -200,7 +200,7 @@ def SaveHisto1D(HIST, suffix , output, snorm=1, ratio=0, poisson=True, logy=Fals
 
     #Stack
     bkg = THStack('bkg', ";"+HIST[bkgsum].GetXaxis().GetTitle()+";"+HIST[bkgsum].GetYaxis().GetTitle())
-    for proc in [ 'DY' , 'FAKE' ]:
+    for proc in [ 'FAKE' , 'DY' ]:
         bkg.Add(HIST['%s_%s'%(proc,suffix)]) # ADD ALL BKG
 
     #Legend

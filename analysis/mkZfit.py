@@ -35,7 +35,7 @@ def fit(filename,ptbin,output):
 
     for tkey in fin.GetListOfKeys():
         key=tkey.GetName()
-        #print(key)
+        if 'FAKE' in key: continue
         histos.append(key)
     for ihis in histos:
         if 'mll' not in ihis: continue
