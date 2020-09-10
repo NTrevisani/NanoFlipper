@@ -179,7 +179,7 @@ def mkplot():
 
 def mkvalidation(rf,dataset):
     f = ROOT.TFile.Open(rf,"READ")
-    output='plots/%s/validPlot' %dataset
+    output='plots/%s/mkHist_validation' %dataset
     if not os.path.exists(output): os.system('mkdir -p %s' %output)
 
     # convert list of branch into key-branch dictionary

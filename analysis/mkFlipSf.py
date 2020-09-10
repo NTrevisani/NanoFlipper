@@ -1,10 +1,24 @@
 import os, sys
 from math import sqrt
-from ROOT import TMinuit , TFile
+from ROOT import TMinuit , TFile , TCanvas , TH2D, gROOT, gStyle
+import ROOT
 import numpy as np
 from array import array as arr
 from collections import OrderedDict
 from  ctypes import c_double, c_int
+from mkHist import ptbin, eta_bin
+import random
+
+gROOT.SetBatch(True)
+gStyle.SetOptStat(0)
+#gStyle.SetPaintTextFormat("4.2f")
+gStyle.SetPalette(ROOT.kArmy)
+#gStyle.SetPalette(ROOT.kAquamarine)
+gStyle.SetPadRightMargin(0.2)
+gStyle.SetPadBottomMargin(0.13)
+gStyle.SetPadLeftMargin(0.1)
+
+eta_bin_array = arr('f', eta_bin )
 
 # 5x5 eta bin scheme
 def model( i , par ):
@@ -50,7 +64,7 @@ par:  the array of parameters
 iflag: internal flag: 1 at first call, 3 at the last, 4 during minimisation
 """
 
-def chisq( npar , deriv , f , par , iflag):
+def fcn( npar , deriv , f , par , iflag):
 
     chisq=0.0
     for i in range(0, nBins):
@@ -61,26 +75,12 @@ def chisq( npar , deriv , f , par , iflag):
     f.value = chisq
     pass
 
-def leastsq( npar , deriv , f , par , iflag):
-
-    leastsq=0.0
-    for i in range(0, nBins):
-        delta = ( model( i, par ) - val[i] ) / err[i]
-        leastsq += delta*delta
-
-    #f[0] = chisq                                                                                                                        
-    f.value = leastsq
-    pass
-
-
 def fit( p , perr ):
 
      global val, err, nBins
      val = p
      err = perr
      nBins=len(val)
-
-     print nBins
 
      name=['q0','q1','q2','q3','q4']
      npar=len(name)
@@ -91,7 +91,7 @@ def fit( p , perr ):
 
      # --> set up MINUIT
      gMinuit = TMinuit ( npar ) # initialize TMinuit with maximum of npar parameters
-     gMinuit.SetFCN( chisq ) # set function to minimize
+     gMinuit.SetFCN( fcn ) # set function to minimize
      arglist = arr( 'd' , npar*[0.01] ) # set error definition
      ierflg = c_int(0)
 
@@ -157,31 +157,101 @@ def flatten2D(h2d):
             errs.append( h2d.GetBinError(i,j) )
     return [ bins , errs ]
 
+def mkSf(ptbin):
+     fitted_prob = OrderedDict()
+     h4val=OrderedDict()
+     out=OrderedDict()
+     for ifile in os.listdir('plots/'):
+          h_ratio={}
+          year=ifile.split('_')[-1]
+          h_data = TFile.Open("plots/%s/Chflipfit/%s_mll/ratio_DATASUB_%s_%s_mll.root" %(ifile,ptbin,year,ptbin) ,"READ")
+          h_mc   = TFile.Open("plots/%s/Chflipfit/%s_mll/ratio_DY_%s_%s_mll.root" %(ifile,ptbin,year,ptbin) ,"READ")
+          # fit
+          fitted_prob[year]={}
+          h4val[year]={}
+          for ids in [ 'DATA' , 'MC' ]:
+              h4val[year][ids] = flatten2D( h_data.Get('h2_DATASUB') if ids=='DATA' else h_mc.Get('h2_DY') )
+              fitted_prob[year][ids] = fit( arr( 'f' , h4val[year][ids][0] ) , arr( 'f' , h4val[year][ids][1] ) ) # fit( value, error )
+          out[year] = map( lambda x , y : [ x[0]/y[0] , sqrt( (x[1]*x[1])/(x[0]*x[0]) + (y[1]*y[1])/(y[0]*y[0]) ) ]  , fitted_prob[year]['DATA'] , fitted_prob[year]['MC'] )
+
+     return [ fitted_prob , h4val , out ]
+
+def mk2DHisto(bins_in , name , bins_error_in=None , ztitle="charge flip probability"):
+
+    h_ratio_create=TH2D( name , '%s ; lepton 1 Eta ; lepton 2 Eta' %name , len(eta_bin)-1 , eta_bin_array , len(eta_bin)-1 , eta_bin_array )
+    counter=0
+    for i in range(0,len(eta_bin)-1):
+        for j in range(0,len(eta_bin)-1):
+            h_ratio_create.SetBinContent( i+1 , j+1 , bins_in[counter])
+            if bins_error_in is not None: h_ratio_create.SetBinError( i+1 , j+1 , bins_error_in[counter])
+            counter+=1
+    h_ratio_create.GetZaxis().SetTitle(ztitle)
+    h_ratio_create.SetMarkerSize(1.5)
+    return h_ratio_create
+
+def mkValidation(flipPro,h_val,ptbin):
+    # flipPro : dict[year][ids][ [val,err] , [], ...  ]
+    # h_val : faltten 2D bins , ranging to 25
+    for ifile in os.listdir('plots/'):
+        output='plots/%s/postfit_validation/%s' %(ifile,ptbin)
+        if not os.path.exists(output): os.system('mkdir -p %s' %output)
+
+        c = TCanvas( 'c' , 'ratio_postfit_validation' , 1200 , 800 )
+        c.Divide(2,2)
+        year=ifile.split('_')[-1]
+        for ids in ['DATA','MC']:
+            dim = len(h_val[year][ids][0]) # infers dimension
+            flipper = map(lambda x: x[0], flipPro[year][ids]) # extract the fitted value (mischarge probability)
+
+            bins_postfit = map( lambda x: model(x,flipper) , list(range(0,dim)) ) # reproduce the ratio
+            bins_prefit = h_val[year][ids][0]
+            bins_diff = map(lambda x : (abs(bins_prefit[x] - bins_postfit[x])/bins_prefit[x])*100. , list(range(0,dim)) )
+
+            c.cd(1) ; h_prefit  = mk2DHisto( bins_prefit , 'h_ratio_prefit_%s' %ids ) ; h_prefit.Draw("Colz TEXT45")
+            c.cd(2) ; h_postfit = mk2DHisto( bins_postfit , 'h_ratio_postfit_%s' %ids ) ; h_postfit.Draw("Colz TEXT45")
+            c.cd(3) ; h_diff    = mk2DHisto( bins_diff , 'h_ratio_diff_%s' %ids , None , 'rel. Difference in percent' ) ; h_diff.Draw("Colz TEXT45")
+            c.Update()
+            c.Print( "%s/val_ratio_postprefit_%s.png" %(output,ids) )
+    pass
+
+# input the five dummy parameters
+
+def mkToy(dim):
+    #toy
+    print "Running on Toy"
+    zA = arr( 'f' , [ random.uniform(0,0.01) for i in range(dim) ] ) ; errorzA = arr( 'f' , [ 0.0025 for i in range(dim) ] )
+    zB = arr( 'f' , [ random.uniform(0,0.01) for i in range(dim) ] ) ; errorzB = arr( 'f' , [ 0.0025 for i in range(dim) ] )
+
+    c = TCanvas( 'c' , 'ratio_fit_toy' , 1200 , 800 )
+    c.Divide(2,2)
+
+    c.cd(1) ; h_A_prefit_toy = mk2DHisto( zA , 'h_ratio_prefit_toy_A' , errorzA , 'toy A N_{ss}/N_{os}' ) ; h_A_prefit_toy.Draw("Colz TEXTE")
+    c.cd(2) ; h_B_prefit_toy = mk2DHisto( zB , 'h_ratio_prefit_toy_B' , errorzB , 'toy B N_{ss}/N_{os}' ) ; h_B_prefit_toy.Draw("Colz TEXTE")
+    fit_A_param = map( lambda x : x[0] , fit( zA , errorzA ) ) ; fit_A_toy = map( lambda x: model(x,fit_A_param) , list(range(0,dim)) )
+    fit_B_param = map( lambda x : x[0] , fit( zB , errorzB ) ) ; fit_B_toy = map( lambda x: model(x,fit_B_param) , list(range(0,dim)) )
+    c.cd(3) ; h_A_postfit_toy = mk2DHisto( fit_A_toy , 'h_ratio_postfit_toy_A' , None , 'toy A N_{ss}/N_{os}' ) ; h_A_postfit_toy.Draw("Colz TEXTE")
+    c.cd(4) ; h_B_postfit_toy = mk2DHisto( fit_B_toy , 'h_ratio_postfit_toy_B' , None , 'toy A N_{ss}/N_{os}' ) ; h_A_postfit_toy.Draw("Colz TEXTE")
+    c.Update()
+    c.Print( "toy.png" )
+    pass
 
 if __name__ == "__main__":
-
-     ptbin="lowpt2"
 
      if not os.path.exists( 'plots/' ):
           print("Error, path folder does not exist")
           sys.exit()
 
-     epsilon=OrderedDict()
-     for ifile in os.listdir('plots/'):
-          h_ratio={}
-          year=ifile.split('_')[-1]
-          print year
-          h_data = TFile.Open("plots/nanov5_%s/Chflipfit/%s_mll/ratio_DATASUB_%s_%s_mll.root" %(year,ptbin,year,ptbin) ,"READ")
-          h_mc   = TFile.Open("plots/nanov5_%s/Chflipfit/%s_mll/ratio_DY_%s_%s_mll.root" %(year,ptbin,year,ptbin) ,"READ")
-          h_ratio['DATA'] = flatten2D(h_data.Get('h2_DATASUB'))
-          h_ratio['MC'] = flatten2D(h_mc.Get('h2_DY'))
-          # fit
-          fitted=OrderedDict()
-          for ids in [ 'DATA' , 'MC' ]: fitted[ids] = fit( arr( 'f' , h_ratio[ids][0] ) , arr( 'f' , h_ratio[ids][1] ) )
-          epsilon[year] = map( lambda x , y : [ x[0]/y[0] , sqrt( (x[1]*x[1])/(x[0]*x[0]) + (y[1]*y[1])/(y[0]*y[0]) ) ]  , fitted['DATA'] , fitted['MC'] )
-     
+     ptbin="lowpt2"
+     ########################################################################
+     mkToy( (len(eta_bin)-1)*(len(eta_bin)-1) )
+     ########################################################################
+     fitted = mkSf( ptbin )
+     mischarge = fitted[0] ; histo_val = fitted[1] ; epsilon = fitted[2]
+
      for year in epsilon:
-         print " ===> ", year
-         for num , iparam in enumerate(epsilon[year]):
-             print 'q' , num , ' : epsilon = ', iparam[0] , ' +/- ', iparam[1]
-         print ""
+          print " ===> scale factor DATA/MC for ", year
+          for num , iparam in enumerate(epsilon[year]):
+               print "q%s SF : epsilon = %.6f +/- %.6f ; relative error : %.2f %%" %( num , iparam[0] , iparam[1] , (iparam[1]/iparam[0])*100 )
+          print ""
+     ##########################################################################
+     mkValidation( mischarge , histo_val , ptbin )
