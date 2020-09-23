@@ -40,9 +40,9 @@ int main(int argc, char **argv) {
 
   ROOT::RDataFrame df("Events", infiles);
   auto outdf=df.Filter("nLepton==2 || (nLepton>2 && Lepton_pt[2]<10)","nlepton cut")
-    .Filter("Lepton_pt[0]>25 && Lepton_pt[1]>12","lepton pt cut")
+    .Filter("Lepton_pt[0]>23 && Lepton_pt[1]>12","lepton pt cut")
     .Filter("abs(Lepton_pdgId[0]*Lepton_pdgId[1])==11*11","ee channel")
-    .Filter("abs(mll-91.2)<15","mll cut")
+    .Define("isZpole"    , "abs(mll-91.2)<15")
     .Define("lep1_pt"    , "Lepton_pt[0]")
     .Define("lep1_eta"   , "Lepton_eta[0]")
     .Define("lep1_pdgId" , "Lepton_pdgId[0]")

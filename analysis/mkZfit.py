@@ -29,7 +29,7 @@ def fit(filename,ptbin,output):
     histos=[]
     count={}
     count_err={}
-    
+
     output+='/%s_mll' %ptbin
     if not os.path.exists(output): os.system('mkdir -p %s' %output )
 
@@ -109,7 +109,7 @@ def fit(filename,ptbin,output):
     samples=['DATA','DY']
     ss_plots=[]
     os_plots=[]
-    
+
     #print count.keys()
     for isample in samples:
         h_ss=ROOT.TH2D('h_'+ptbin+'_ss_'+isample,'h_'+ptbin+'_ss_'+isample, len(eta_bin)-1 , eta_bin_array , len(eta_bin)-1 , eta_bin_array )
@@ -178,7 +178,7 @@ def ratio(filename,data,ptbin,output):
     ROOT.gStyle.SetOptStat(0)
     ROOT.gStyle.SetPaintTextFormat("1.4f")
     h_ss.Draw("colz texte")
-    
+
     c.SaveAs( '%s/h_ss_%s_%s_%s_mll.png' %(output,data,year,ptbin))
     c.Clear()
     h_os.Draw("colz texte")
@@ -195,10 +195,11 @@ if __name__ == '__main__':
         #makdir directory
         if not os.path.exists('plots/%s/Zmassfit' %name): os.system('mkdir -p plots/%s/Zmassfit' %name)
         if not os.path.exists('plots/%s/Chflipfit' %name): os.system('mkdir -p plots/%s/Chflipfit' %name)
-        
-        for iptbin in ptbin:
-            #fit zmass
-            fit( ifile , iptbin , 'plots/%s/Zmassfit' %name )
-            #compute ratio
-            for idata in ['DATASUB','DY']:
-                ratio( "plots/%s/Zmassfit/%s_mll/count_%s_hist_%s.root" %(name,iptbin,iptbin,name) , idata , iptbin , 'plots/%s/Chflipfit' %name )
+
+        #for iptbin in ptbin:
+        #fit zmass
+        iptbin="lowpt2"
+        fit( ifile , iptbin , 'plots/%s/Zmassfit' %name )
+        #compute ratio
+        for idata in ['DATASUB','DY']:
+            ratio( "plots/%s/Zmassfit/%s_mll/count_%s_hist_%s.root" %(name,iptbin,iptbin,name) , idata , iptbin , 'plots/%s/Chflipfit' %name )

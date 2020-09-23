@@ -82,7 +82,7 @@ def drawKolmogorov(data, bkg):
     latex.SetTextFont(62)
     latex.SetTextSize(0.08)
     #latex.DrawLatex(0.55, 0.85, "#chi^{2}/ndf = %.2f,   K-S = %.3f" % (data.Chi2Test(bkg, "CHI2/NDF"), data.KolmogorovTest(bkg)))
-    latex.DrawLatex(0.45, 0.85, "#chi^{2}/ndf = %.2f,   K-S = %.3f" % (data.Chi2Test(bkg, "CHI2/NDF"), data.KolmogorovTest(bkg)))
+    latex.DrawLatex(0.45, 0.85, "#chi^{2}/ndf = %.2f,   K-S = %.3f" % (data.Chi2Test(bkg, "CHI2/NDF"), data.KolmogorovTest(bkg , 'N')))
 pass
 
 def drawRelativeYield(data,bkg):
@@ -163,7 +163,9 @@ def SaveHisto2D(histin,tokens,data=False):
     return
 pass
 
-def SaveHisto1D(HIST, suffix , output, snorm=1, ratio=0, poisson=True, logy=False):
+def SaveHisto1D(HIST, suffix , output, snorm=1, ratio=0, poisson=True, logy=False, isVal=False):
+    
+    isFake = any( 'FAKE' in key for key in HIST.keys() )
 
     bkgsum='BkgSum_%s' %(suffix)
     HIST[bkgsum] = HIST['DATA_%s' %(suffix)].Clone("BkgSum") if 'DATA_%s' %(suffix) in HIST else HIST['DY_%s' %(suffix)].Clone("BkgSum")
@@ -171,10 +173,14 @@ def SaveHisto1D(HIST, suffix , output, snorm=1, ratio=0, poisson=True, logy=Fals
     HIST[bkgsum].SetFillStyle(3003)
     HIST[bkgsum].SetFillColor(1)
     HIST[bkgsum].SetMarkerStyle(0)
-    for proc in [ 'DY' , 'FAKE' ]:
-        HIST[bkgsum].Add(HIST['%s_%s'%(proc,suffix)])
+    for proc in [ 'DY' , 'FAKE' ] if isFake else [ 'DY' ]:
+        HIST[bkgsum].Add( HIST['%s_%s'%(proc,suffix)] )
 
     #### STYLE
+    #print HIST.keys()
+    #print HIST['DATA_%s' %(suffix)]
+    #print type(HIST['DATA_%s' %(suffix)])
+
     HIST['DATA_%s' %(suffix)].SetMarkerStyle(20)
     HIST['DATA_%s' %(suffix)].SetMarkerSize(1.25)
     HIST['DATA_%s' %(suffix)].SetFillColor(418)
@@ -189,18 +195,19 @@ def SaveHisto1D(HIST, suffix , output, snorm=1, ratio=0, poisson=True, logy=Fals
     HIST['DY_%s' %(suffix)].SetLineStyle(1)
     HIST['DY_%s' %(suffix)].SetLineWidth(2)
 
-    HIST['FAKE_%s' %(suffix)].SetFillColor(921)
-    HIST['FAKE_%s' %(suffix)].SetFillStyle(1001)
-    HIST['FAKE_%s' %(suffix)].SetLineColor(921)
-    HIST['FAKE_%s' %(suffix)].SetLineStyle(1)
-    HIST['FAKE_%s' %(suffix)].SetLineWidth(2)
+    if isFake:
+        HIST['FAKE_%s' %(suffix)].SetFillColor(921)
+        HIST['FAKE_%s' %(suffix)].SetFillStyle(1001)
+        HIST['FAKE_%s' %(suffix)].SetLineColor(921)
+        HIST['FAKE_%s' %(suffix)].SetLineStyle(1)
+        HIST['FAKE_%s' %(suffix)].SetLineWidth(2)
 
     for i, s in enumerate(HIST):
         addOverflow(HIST[s], False) # Add overflow
 
     #Stack
     bkg = THStack('bkg', ";"+HIST[bkgsum].GetXaxis().GetTitle()+";"+HIST[bkgsum].GetYaxis().GetTitle())
-    for proc in [ 'FAKE' , 'DY' ]:
+    for proc in [ 'FAKE' , 'DY' ] if isFake else [ 'DY' ]:
         bkg.Add(HIST['%s_%s'%(proc,suffix)]) # ADD ALL BKG
 
     #Legend
@@ -212,7 +219,9 @@ def SaveHisto1D(HIST, suffix , output, snorm=1, ratio=0, poisson=True, logy=Fals
     leg.SetTextSize(0.03)
     leg.AddEntry(HIST['DATA_%s' %(suffix)], 'Data [%.1f]' %(HIST['DATA_%s' %(suffix)].Integral()), "pl")
     leg.AddEntry(HIST['DY_%s' %(suffix)], 'DY [%.1f]' %(HIST['DY_%s' %(suffix)].Integral()), "f")
-    leg.AddEntry(HIST['FAKE_%s' %(suffix)], 'Fake [%.1f]' %(HIST['FAKE_%s' %(suffix)].Integral()), "f")
+
+    if isFake: leg.AddEntry(HIST['FAKE_%s' %(suffix)], 'Fake [%.1f]' %(HIST['FAKE_%s' %(suffix)].Integral()), "f")
+
     leg.AddEntry(HIST[bkgsum], 'BkgSum [%.1f]' %(HIST[bkgsum].Integral()), "f")
     c1 = TCanvas("c1", HIST.values()[-1].GetXaxis().GetTitle(), 800, 800 if ratio else 600 )
 
@@ -296,11 +305,14 @@ def SaveHisto1D(HIST, suffix , output, snorm=1, ratio=0, poisson=True, logy=Fals
     #c1.Print( '%s/hstack_%s.pdf' %(output,suffix) )
 pass
 
-def SaveRatio( hSS , hOS , idata , suffix , output ):
+def SaveRatio( hSS , hOS , process , output ):
 
-    #CMS_lumi.lumi_13TeV = "35.9 fb^{-1}"
-    #CMS_lumi.writeExtraText = 1
-    #CMS_lumi.extraText = "Preliminary"
+    idata=process.split('_')[0]
+    suffix=process.split('_ss_')[-1]
+
+    #print "hSS : " , hSS
+    #print "hOS : " , hOS
+
     name = '%s_%s' %( idata , suffix )
     hratio = hSS.Clone('hratio_%s'%name)
     hratio.Divide(hOS)
@@ -314,28 +326,20 @@ def SaveRatio( hSS , hOS , idata , suffix , output ):
     hratio.SetLineWidth(2)
 
     c1 = TCanvas( 'hratio_%s'%name , 'hratio_%s'%name , 800 , 600 )
-    #if _ivar=='2d':
-    #    TGaxis.SetMaxDigits(2)
-    #    fout = TFile.Open( 'plots/%s/Object_studies/Ratio_%s_%s_%s.root' %(_token,_token,_isample,_ivar), 'RECREATE' )
-    #    c1.SetRightMargin(0.2)
-    #    hratio.SetAxisRange(0.00001,0.01,"Z")
-    #    hratio.SetTitle('')
-    #    hratio.GetZaxis().SetTitle('N_SS/N_OS (%s)' %_isample)
-    #    hratio.GetXaxis().SetTitle('Lepton1 eta')
-    #    hratio.GetYaxis().SetTitle('Lepton2 eta')
-    #    hratio.Draw('colztextE')
-    #    hratio.Write()
-    #    fout.Close()
-    #    #counter=0
-    #    #for ixbin in range(1,hratio.GetNbinsX()+1):
-    #    #    for iybin in range(1,hratio.GetNbinsY()+1):
-    #    #        print('%s_Z[%s] = %s; %s_Z_err[%s] = %s;' %(_isample , counter , hratio.GetBinContent(ixbin,iybin) , _isample , counter , hratio.GetBinError(ixbin,iybin) ) )
-    #    #        counter+=1
-    #else:
-    #hratio.SetTitle('N_SS/N_OS ratio Dependence for %s'%_isample)
-    hratio.SetTitle('')
-    hratio.GetYaxis().SetTitle('N_SS/N_OS Ratio (%s)' %idata)
-    hratio.Draw('PE')
+    if suffix.split('_')[-1]=='2d':
+        TGaxis.SetMaxDigits(2)
+        #fout = TFile.Open( 'plots/%s/Object_studies/Ratio_%s_%s_%s.root' %(_token,_token,_isample,_ivar), 'RECREATE' )
+        c1.SetRightMargin(0.2)
+        hratio.SetAxisRange(0.00001,0.01,"Z")
+        hratio.SetTitle('')
+        hratio.GetZaxis().SetTitle('N_SS/N_OS (%s)' %idata )
+        hratio.GetXaxis().SetTitle('Lepton1 eta')
+        hratio.GetYaxis().SetTitle('Lepton2 eta')
+        hratio.Draw('colztextE')
+    else:
+        hratio.SetTitle('')
+        hratio.GetYaxis().SetTitle('N_SS/N_OS Ratio (%s)' %idata )
+        hratio.Draw('PE')
 
     c1.cd()
     if '2016' in output: CMS_lumi.lumi_13TeV = "35.87 fb^{-1}"
