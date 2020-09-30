@@ -257,7 +257,7 @@ def mkSf( ifile_ , ptbin_ , outcsv_=True):
      out[year] = map( lambda x , y : [ x[0]/y[0] , sqrt( (x[1]*x[1])/(x[0]*x[0]) + (y[1]*y[1])/(y[0]*y[0]) ) ]  , fitted_prob[year]['DATA'] , fitted_prob[year]['MC'] )
 
      # save sf csv
-     outFormat( ifile , eta_bin , [20,200] , fitted_prob[year] , out[year] , outcsv_ )
+     outFormat( ifile , eta_bin , [25,200] , fitted_prob[year] , out[year] , outcsv_ ) ## HERE
      mk2Dfromcsv( ifile )
 
      return [ fitted_prob , h4val , out ]

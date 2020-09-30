@@ -256,24 +256,23 @@ if __name__ == '__main__':
 
         # point to ntuple
         ntupleDIR='%s/../ntuple/results/%s' %( os.getcwd() , dataset )
-        DF_val= OrderedDict({
-            'DY_%s' %(dataset.split('_')[-1]) : ROOT.ROOT.RDataFrame("flipper", ntupleDIR+'/DYJetsToLL_M*.root' ),
-            'DATA_%s' %(dataset.split('_')[-1]) : ROOT.ROOT.RDataFrame("flipper", [ ntupleDIR+'/SingleElectron.root' , ntupleDIR+'/DoubleEG.root' ] if dataset != "nanov5_2018" else [ ntupleDIR+'/EGamma.root' ] ),
-            #'FAKE_%s' %(dataset.split('_')[-1]) : ROOT.ROOT.RDataFrame("flipper", [ ntupleDIR+'/Fake_SingleElectron.root' , ntupleDIR+'/Fake_DoubleEG.root' ] if dataset != "nanov5_2018" else [ ntupleDIR+'/Fake_EGamma.root' ] )
-        })
-
-        #DF_val = OrderedDict({
-        #    'DY_%s' %(dataset.split('_')[-1]) : ROOT.ROOT.RDataFrame("flipper", '%s/../ntuple/results/%s/DYJetsToLL_M*.root' %( os.getcwd() , dataset ) ),
-        #    'DATA_%s' %(dataset.split('_')[-1]) : ROOT.ROOT.RDataFrame("flipper", [ '%s/../ntuple/results/%s/DoubleEG.root' %( os.getcwd() , dataset ) ]\
-        #    if dataset != "nanov5_2018" else [ '%s/../ntuple/results/%s/EGamma.root' %( os.getcwd() , dataset ) ] ),
-        #    #'FAKE_%s' %(dataset_.split('_')[-1]) : ROOT.ROOT.RDataFrame("flipper", [ ntupleDIR+'/Fake_DoubleEG.root' ] if dataset_ != "nanov5_2018" else [ ntupleDIR+'/Fake_EGamma.root' ] )
+        #DF_val= OrderedDict({
+        #    'DY_%s' %(dataset.split('_')[-1]) : ROOT.ROOT.RDataFrame("flipper", ntupleDIR+'/DYJetsToLL_M*.root' ),
+        #    'DATA_%s' %(dataset.split('_')[-1]) : ROOT.ROOT.RDataFrame("flipper", [ ntupleDIR+'/SingleElectron.root' , ntupleDIR+'/DoubleEG.root' ] if dataset != "nanov5_2018" else [ ntupleDIR+'/EGamma.root' ] ),
+        #    'FAKE_%s' %(dataset.split('_')[-1]) : ROOT.ROOT.RDataFrame("flipper", [ ntupleDIR+'/Fake_SingleElectron.root' , ntupleDIR+'/Fake_DoubleEG.root' ] if dataset != "nanov5_2018" else [ ntupleDIR+'/Fake_EGamma.root' ] )
         #})
 
+        DF_val = OrderedDict({
+            'DY_%s' %(dataset.split('_')[-1]) : ROOT.ROOT.RDataFrame("flipper", '%s/../ntuple/results/%s/DYJetsToLL_M*.root' %( os.getcwd() , dataset ) ),
+            'DATA_%s' %(dataset.split('_')[-1]) : ROOT.ROOT.RDataFrame("flipper", [ '%s/../ntuple/results/%s/DoubleEG.root' %( os.getcwd() , dataset ) ] if dataset != "nanov5_2018" else [ '%s/../ntuple/results/%s/EGamma.root' %( os.getcwd() , dataset ) ] ),
+            #'FAKE_%s' %(dataset_.split('_')[-1]) : ROOT.ROOT.RDataFrame("flipper", [ ntupleDIR+'/Fake_DoubleEG.root' ] if dataset_ != "nanov5_2018" else [ ntupleDIR+'/Fake_EGamma.root' ] )
+        })
+
         # test 1 ; 2 ; 3 ; 4
-        CR_OS = mkplot( dataset , ptbin , True , DF_val , 1 )
-        CR_SS = mkplot( dataset , ptbin , True , DF_val , 0 )
+        CR = mkplot( dataset , ptbin , True , DF_val )
+        #CR_SS = mkplot( dataset , ptbin , True , DF_val )
         for i in range(4):
             i+=1
             #if i!=1: continue
-            mkval_postfit( dataset , CR_OS , ptbin , output , i )
+            mkval_postfit( dataset , CR , ptbin , output , i )
     pass

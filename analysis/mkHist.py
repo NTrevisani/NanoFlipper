@@ -48,7 +48,8 @@ signness= OrderedDict({
 ptbin= OrderedDict({
     #'trigpt' : 'lep1_pt >= XXX && lep2_pt > 23',
     #'highpt' : 'lep1_pt >= XXX && lep2_pt > 35',
-    'lowpt2' : 'lep1_pt >= XXX && lep2_pt >= 20 && lep2_pt < 200',
+    #'lowpt2' : 'lep1_pt >= XXX && lep2_pt >= 20 && lep2_pt < 200',
+    'lowpt2' : 'lep1_pt >= XXX && lep1_pt < 200 && lep2_pt >= 25 && lep2_pt < 200',
     #'lowpt1' : 'lep1_pt >= XXX && lep2_pt > 25 && lep2_pt <= 35',
     #'lowpt0' : 'lep1_pt >= XXX && lep2_pt > 12 && lep2_pt <= 25'
 })
@@ -63,21 +64,27 @@ trig_pt=25
 
 ptbin = OrderedDict( zip ( map(lambda x : x, ptbin)  , map(lambda x : ptbin[x].replace( 'XXX' ,'%s' %trig_pt).replace( 'YYY' , '%s' %(trig_pt+5) ) , ptbin )) )
 
+print ptbin
+
 # lepton wp couples with sf
 WPs= OrderedDict({
     '2016' : {
-        'cutBased'   : 'LepCut2l__ele_cut_WP_Tight80X__mu_cut_Tight80x*LepSF2l__ele_cut_WP_Tight80X__mu_cut_Tight80x'       ,
-        'cutBasedSS' : 'LepCut2l__ele_cut_WP_Tight80X_SS__mu_cut_Tight80x*LepSF2l__ele_cut_WP_Tight80X_SS__mu_cut_Tight80x' ,
-        'mvaBased'   : 'LepCut2l__ele_mva_90p_Iso2016__mu_cut_Tight80x*LepSF2l__ele_mva_90p_Iso2016__mu_cut_Tight80x'       ,
-        'mvaBasedSS' : 'LepCut2l__ele_mva_90p_Iso2016_SS__mu_cut_Tight80x*LepSF2l__ele_mva_90p_Iso2016_SS__mu_cut_Tight80x' ,
+        'mvaBased'            : 'LepCut2l__ele_mva_90p_Iso2016__mu_cut_Tight80x*LepSF2l__ele_mva_90p_Iso2016__mu_cut_Tight80x'       ,
+        'mvaBased_tthmva'     : 'LepCut2l__ele_mva_90p_Iso2016__mu_cut_Tight80x*LepCut2l_ttHMVA*LepSF2l_ttHMVA',
+        'fake_mvaBased'       : 'fakeW2l_ele_mva_90p_Iso2016_mu_cut_Tight80x' ,
+        'fake_mvaBased_tthmva': 'fakeW2l_ele_mva_90p_Iso2016_tthmva_70_mu_cut_Tight80x_tthmva_80'
     },
     '2017' : {
-        'mvaBased'   : 'LepCut2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW*LepSF2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW'      ,
-        'mvaBasedSS' : 'LepCut2l__ele_mvaFall17V1Iso_WP90_SS__mu_cut_Tight_HWWW*LepSF2l__ele_mvaFall17V1Iso_WP90_SS__mu_cut_Tight_HWWW',
+        'mvaBased'            : 'LepCut2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW*LepSF2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW'      ,
+        'mvaBased_tthmva'     : 'LepCut2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW*LepCut2l_ttHMVA*LepSF2l_ttHMVA',
+        'fake_mvaBased'       : 'fakeW2l_ele_mvaFall17V1Iso_WP90_mu_cut_Tight_HWWW',
+        'fake_mvaBased_tthmva': 'fakeW2l_ele_mvaFall17V1Iso_WP90_tthmva_70_mu_cut_Tight_HWWW_tthmva_80'
     },
     '2018' : {
-        'mvaBased'   : 'LepCut2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW*LepSF2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW'      ,
-        'mvaBasedSS' : 'LepCut2l__ele_mvaFall17V1Iso_WP90_SS__mu_cut_Tight_HWWW*LepSF2l__ele_mvaFall17V1Iso_WP90_SS__mu_cut_Tight_HWWW',
+        'mvaBased'            : 'LepCut2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW*LepSF2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW'      ,
+        'mvaBased_tthmva'     : 'LepCut2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW*LepCut2l_ttHMVA*LepSF2l_ttHMVA' ,
+        'fake_mvaBased'       :	'fakeW2l_ele_mvaFall17V1Iso_WP90_mu_cut_Tight_HWWW',
+        'fake_mvaBased_tthmva':	'fakeW2l_ele_mvaFall17V1Iso_WP90_tthmva_70_mu_cut_Tight_HWWW_tthmva_80'
     }
 })
 
@@ -98,16 +105,13 @@ def makeEtaGrid(indf,iterdf,prefix):
             indf[prefix_tmp]=dftmp.Histo1D( ( prefix_tmp , "%s ; mll [GeV] ; Events" %prefix_tmp , 30, 76.2, 106.2 ), "mll","weights")
     pass
 
-def addWeights( df_in , name , CR_ ):
+def addWeights( df_in , name ):
 
     dfout = df_in[name]
 
-    if CR_:
-        dfout = dfout.Filter( 'isZpole == 1' , 'mll cuts OS' )
-    else:
-        dfout = dfout.Filter( 'isZpole == 0' , 'mll cuts SS' )
-
     weight='1==1'
+
+    wp = 'mvaBased_tthmva';
 
     if 'DY' in name:
         # SFweight2l = puWeight*TriggerEffWeight_2l*Lepton_RecoSF[0]*Lepton_RecoSF[1]*EMTFbug_veto
@@ -121,33 +125,33 @@ def addWeights( df_in , name , CR_ ):
         # GenLepMatch2l = event.Lepton_genmatched[0]*\
         #                 event.Lepton_genmatched[1] \
 
-        common="ptllDYW*SFweight2l*XSWeight*METFilter_MC*genmatch" #GenLepMatch2l
+        common="ptllDYW*SFweight2l*XSWeight*METFilter_MC*GenLepMatch2l" #*genmatch" #GenLepMatch2l
         if '2016' in name:
-            weight="35.92*%s*%s" %(common,WPs['2016']['mvaBased'])
+            weight="35.92*%s*%s" %( common , WPs['2016'][wp] )
         elif '2017' in name:
-            weight="41.53*%s*%s" %(common,WPs['2017']['mvaBased'])
+            weight="41.53*%s*%s" %(common,WPs['2017'][wp])
         elif '2018' in name:
-            weight="59.74*%s*%s" %(common,WPs['2018']['mvaBased'])
+            weight="59.74*%s*%s" %(common,WPs['2018'][wp])
     elif 'DATA' in name:
-        common="METFilter_DATA*trigger" #Trigger_dblEl"
+        common="METFilter_DATA*Trigger_dblEl"
         if '2016' in name:
-            weight="%s*%s" %(common,WPs['2016']['mvaBased'].split('*')[0])
+            weight="%s*%s" %( common , WPs['2016'][wp].replace( WPs['2016'][wp].split('*')[-1], "(1==1)" ) )
         elif '2017' in name:
-            weight="%s*%s" %(common,WPs['2017']['mvaBased'].split('*')[0])
+            weight="%s*%s" %(common ,  WPs['2017'][wp].replace( WPs['2017'][wp].split('*')[-1], "(1==1)" ) )
         elif '2018' in name:
-            weight="%s*%s" %(common,WPs['2018']['mvaBased'].split('*')[0])
+            weight="%s*%s" %(common ,  WPs['2018'][wp].replace( WPs['2018'][wp].split('*')[-1], "(1==1)" ) )
     elif 'FAKE' in name:
-        common="METFilter_FAKE*trigger" #Trigger_dblEl"
+        common="METFilter_FAKE*Trigger_dblEl"
         if '2016' in name:
-            weight="%s*%s" %(common,WPs['2016']['mvaBased'].split('*')[0].replace('LepCut2l_','fakeW2l').replace('__','_'))
+            weight="%s*%s" %( common , WPs['2016']['fake_'+wp] )
         elif '2017' in name:
-            weight="%s*%s" %(common,WPs['2017']['mvaBased'].split('*')[0].replace('LepCut2l_','fakeW2l').replace('__','_'))
+            weight="%s*%s" %( common , WPs['2017']['fake_'+wp] )
         elif '2018' in name:
-            weight="%s*%s" %(common,WPs['2018']['mvaBased'].split('*')[0].replace('LepCut2l_','fakeW2l').replace('__','_'))
+            weight="%s*%s" %( common , WPs['2018']['fake_'+wp] )
 
     return dfout.Define('weights',weight).Define('abslep1eta','abs(lep1_eta)').Define('abslep2eta','abs(lep2_eta)')
 
-def mkplot( dataset_ , ptbin_ , val=False , DFS=None , CR=1 ):
+def mkplot( dataset_ , ptbin_ , val=False , DFS=None ):
 
     if not val: rf = ROOT.TFile.Open('hist_%s.root'%(dataset_),"RECREATE")
 
@@ -156,7 +160,7 @@ def mkplot( dataset_ , ptbin_ , val=False , DFS=None , CR=1 ):
     df2histo= OrderedDict()
 
     for idf in DFS:
-        DYregion = addWeights( DFS , idf , CR )
+        DYregion = addWeights( DFS , idf )
 
         #SS/OS
         for ireg in signness:
@@ -225,17 +229,26 @@ if __name__ == '__main__':
 
     ptbin__use = 'lowpt2'
 
+    # use both dataset
     # DF loaded here
-    DF= OrderedDict({
-        'DY_%s' %(dataset.split('_')[-1]) : ROOT.ROOT.RDataFrame("flipper", ntupleDIR+'/DYJetsToLL_M*.root' ),
-        'DATA_%s' %(dataset.split('_')[-1]) : ROOT.ROOT.RDataFrame("flipper", [ ntupleDIR+'/SingleElectron.root' , ntupleDIR+'/DoubleEG.root' ] if dataset != "nanov5_2018" else [ ntupleDIR+'/EGamma.root' ] ),
-        'FAKE_%s' %(dataset.split('_')[-1]) : ROOT.ROOT.RDataFrame("flipper", [ ntupleDIR+'/Fake_SingleElectron.root' , ntupleDIR+'/Fake_DoubleEG.root' ] if dataset != "nanov5_2018" else [ ntupleDIR+'/Fake_EGamma.root' ] )
-    })
-
     #DF= OrderedDict({
     #    'DY_%s' %(dataset.split('_')[-1]) : ROOT.ROOT.RDataFrame("flipper", ntupleDIR+'/DYJetsToLL_M*.root' ),
-    #    'DATA_%s' %(dataset.split('_')[-1]) : ROOT.ROOT.RDataFrame("flipper", [ ntupleDIR+'/DoubleEG.root' ] if dataset != "nanov5_2018" else [ ntupleDIR+'/EGamma.root' ] ),
-    #    'FAKE_%s' %(dataset.split('_')[-1]) : ROOT.ROOT.RDataFrame("flipper", [ ntupleDIR+'/Fake_DoubleEG.root' ] if dataset != "nanov5_2018" else [ ntupleDIR+'/Fake_EGamma.root' ] )
+    #    'DATA_%s' %(dataset.split('_')[-1]) : ROOT.ROOT.RDataFrame("flipper", [ ntupleDIR+'/SingleElectron.root' , ntupleDIR+'/DoubleEG.root' ] if dataset != "nanov5_2018" else [ ntupleDIR+'/EGamma.root' ] ),
+    #    'FAKE_%s' %(dataset.split('_')[-1]) : ROOT.ROOT.RDataFrame("flipper", [ ntupleDIR+'/Fake_SingleElectron.root' , ntupleDIR+'/Fake_DoubleEG.root' ] if dataset != "nanov5_2018" else [ ntupleDIR+'/Fake_EGamma.root' ] )
+    #})
+
+    # use doubleEle
+    DF= OrderedDict({
+        'DY_%s' %(dataset.split('_')[-1]) : ROOT.ROOT.RDataFrame("flipper", ntupleDIR+'/DYJetsToLL_M*.root' ),
+        'DATA_%s' %(dataset.split('_')[-1]) : ROOT.ROOT.RDataFrame("flipper", [ ntupleDIR+'/DoubleEG.root' ] if dataset != "nanov5_2018" else [ ntupleDIR+'/EGamma.root' ] ),
+        'FAKE_%s' %(dataset.split('_')[-1]) : ROOT.ROOT.RDataFrame("flipper", [ ntupleDIR+'/Fake_DoubleEG.root' ] if dataset != "nanov5_2018" else [ ntupleDIR+'/Fake_EGamma.root' ] )
+    })
+
+    # use singleElectron
+    #DF= OrderedDict({
+    #    'DY_%s' %(dataset.split('_')[-1]) : ROOT.ROOT.RDataFrame("flipper", ntupleDIR+'/DYJetsToLL_M*.root' ),
+    #    'DATA_%s' %(dataset.split('_')[-1]) : ROOT.ROOT.RDataFrame("flipper", [ ntupleDIR+'/SingleElectron.root' ] if dataset != "nanov5_2018" else [ ntupleDIR+'/EGamma.root' ] ),
+    #    'FAKE_%s' %(dataset.split('_')[-1]) : ROOT.ROOT.RDataFrame("flipper", [ ntupleDIR+'/Fake_SingleElectron.root' ] if dataset != "nanov5_2018" else [ ntupleDIR+'/Fake_EGamma.root' ] )
     #})
 
     mkplot( dataset , ptbin__use , False , DF ); # mk
