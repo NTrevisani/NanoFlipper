@@ -1,5 +1,6 @@
 #include "interface/helper.h"
 #include "interface/config.h"
+#include "interface/SF_maker.h"
 
 int main(int argc, char **argv) {
 
@@ -38,22 +39,50 @@ int main(int argc, char **argv) {
   std::string str;
   while (std::getline(file, str)) { infiles.push_back(str); }
 
+  // load txt into histogram
+  std::string base = std::getenv("PWD");
+
+  nested_dict SF_files_map;
+
+  // wp SF                                                                                                                                                                                                 
+  //SF_files_map["electron"]["TightObjWP"]["2016"]["wpSF"]   = { base + "/data/HWW_SF/egammaEffi_passingMVA80Xwp90Iso16.txt" };
+  //SF_files_map["electron"]["TightObjWP"]["2017"]["wpSF"]   = { base + "/data/HWW_SF/egammaEffi_passingMVA102Xwp90isoHWWiso0p06_2017RunB.txt",
+  //							       base + "/data/HWW_SF/egammaEffi_passingMVA102Xwp90isoHWWiso0p06_2017RunCD.txt",
+  //							       base + "/data/HWW_SF/egammaEffi_passingMVA102Xwp90isoHWWiso0p06_2017RunE.txt",
+  //							       base + "/data/HWW_SF/egammaEffi_passingMVA102Xwp90isoHWWiso0p06_2017RunF.txt"
+  //} ;
+  //SF_files_map["electron"]["TightObjWP"]["2018"]["wpSF"]   = { base + "/data/HWW_SF/egammaEffi_passingMVA102Xwp90isoHWWiso0p06_2018.txt" };
+
+  // ttHMVA SF
+  SF_files_map["electron"]["TightObjWP"]["2016"]["ttHMVA"] = { base + "/data/ttHMVA_SF/egammaEffi_TightHWW_ttHMVA_0p7_SFs_2016.txt" };
+  SF_files_map["electron"]["TightObjWP"]["2017"]["ttHMVA"] = { base + "/data/ttHMVA_SF/egammaEffi_TightHWW_ttHMVA_0p7_SFs_2017RunB.txt",
+							       base + "/data/ttHMVA_SF/egammaEffi_TightHWW_ttHMVA_0p7_SFs_2017RunCD.txt",
+							       base + "/data/ttHMVA_SF/egammaEffi_TightHWW_ttHMVA_0p7_SFs_2017RunE.txt",
+							       base + "/data/ttHMVA_SF/egammaEffi_TightHWW_ttHMVA_0p7_SFs_2017RunF.txt"
+  };
+  SF_files_map["electron"]["TightObjWP"]["2018"]["ttHMVA"] = { base + "/data/ttHMVA_SF/egammaEffi_TightHWW_ttHMVA_0p7_SFs_2018.txt" };
+  
+  //makeSF_ele( SF_files_map["electron"]["TightObjWP"][year]["wpSF"]   , mycfg.h_SF_ele        ); //, mycfg.h_SF_ele_err        , mycfg.h_SF_ele_sys        );
+  if (mycfg.isMC) makeSF_ele( SF_files_map["electron"]["TightObjWP"][year]["ttHMVA"] , mycfg.h_SF_ele_ttHMVA ); //, mycfg.h_SF_ele_ttHMVA_err , mycfg.h_SF_ele_ttHMVA_sys );
+  mycfg.listSize = SF_files_map["electron"]["TightObjWP"][year]["ttHMVA"].size();
+
   ROOT::RDataFrame df("Events", infiles);
-  auto outdf=df.Filter("nLepton==2 || (nLepton>2 && Lepton_pt[2]<10)","nlepton cut")
+  auto pre_outdf = df.Filter("nLepton==2 || ( nLepton>=3 && Lepton_pt[2]<10 )","nlepton cut")
     .Filter("Lepton_pt[0]>23 && Lepton_pt[1]>12","lepton pt cut")
     .Filter("abs(Lepton_pdgId[0]*Lepton_pdgId[1])==11*11","ee channel")
-    .Define("isZpole"    , "abs(mll-91.2)<15")
+    .Filter("abs(mll-91.2)<15" , "DY region")
     .Define("lep1_pt"    , "Lepton_pt[0]")
     .Define("lep1_eta"   , "Lepton_eta[0]")
     .Define("lep1_pdgId" , "Lepton_pdgId[0]")
     .Define("lep2_pt"    , "Lepton_pt[1]")
     .Define("lep2_eta"   , "Lepton_eta[1]")
-    .Define("lep2_pdgId" , "Lepton_pdgId[1]")
-    ;
+    .Define("lep2_pdgId" , "Lepton_pdgId[1]");
+
+  auto outdf = hww_tthmva_sf( pre_outdf , mycfg ); 
 
   if (mycfg.isMC){
     // gen-matching to prompt only (GenLepMatch2l matches to *any* gen lepton)
-    outdf = outdf.Define("genmatch" , "Lepton_promptgenmatched[0]*Lepton_promptgenmatched[1]")
+    outdf = outdf.Define("gen_promptmatch" , "Lepton_promptgenmatched[0]*Lepton_promptgenmatched[1]")
       .Define("ptllDYW"    , mycfg.ptllDYW_LO[year]);
   }
   else{

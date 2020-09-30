@@ -23,4 +23,6 @@
 #include "TRandom3.h"
 #include "TLorentzVector.h"
 
+typedef std::map<std::string, std::map<std::string, std::map<std::string, std::map<std::string, std::list<std::string>>>>> nested_dict;
+
 #endif
