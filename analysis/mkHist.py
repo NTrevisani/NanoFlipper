@@ -98,7 +98,8 @@ def addWeights( df_in , name ):
 
     weight='1==1'
 
-    wp = 'mvaBased_tthmva';
+    #wp = 'mvaBased_tthmva';
+    wp = 'mvaBased' ;
 
     if 'DY' in name:
         # SFweight2l = puWeight*TriggerEffWeight_2l*Lepton_RecoSF[0]*Lepton_RecoSF[1]*EMTFbug_veto
@@ -124,9 +125,9 @@ def addWeights( df_in , name ):
         if '2016' in name:
             weight="%s*%s" %( common , WPs['2016'][wp].replace( WPs['2016'][wp].split('*')[-1], "(1==1)" ) )
         elif '2017' in name:
-            weight="%s*%s" %(common ,  WPs['2017'][wp].replace( WPs['2017'][wp].split('*')[-1], "(1==1)" ) )
+            weight="%s*%s" %( common ,  WPs['2017'][wp].replace( WPs['2017'][wp].split('*')[-1], "(1==1)" ) )
         elif '2018' in name:
-            weight="%s*%s" %(common ,  WPs['2018'][wp].replace( WPs['2018'][wp].split('*')[-1], "(1==1)" ) )
+            weight="%s*%s" %( common ,  WPs['2018'][wp].replace( WPs['2018'][wp].split('*')[-1], "(1==1)" ) )
     elif 'FAKE' in name:
         common="METFilter_FAKE*Trigger_dblEl"
         if '2016' in name:

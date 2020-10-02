@@ -5,3 +5,6 @@ do
     echo "python mkHist.py -d $idata"
     python mkHist.py -d $idata
 done
+
+#python mkZfit.py
+#python mkFlipSf.py
