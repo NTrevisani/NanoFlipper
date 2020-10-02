@@ -21,7 +21,8 @@ gStyle.SetPadLeftMargin(0.1)
 eta_bin_array = arr('f', eta_bin )
 
 # 5x5 eta bin scheme
-def model( i , par ):
+#eta_bin = [ 0. , 0.5  , 1.0  , 1.5  , 2.0 , 2.5 ]
+def model_5x5( i , par ):
 
      if   i == 0:  value = ( par[0] * (1-par[ 0]) + (1-par[ 0]) * par[ 0] ) / ( 1 - ( par[0] * (1-par[ 0]) + (1-par[ 0]) * par[ 0] ) )
      elif i == 1:  value = ( par[0] * (1-par[ 1]) + (1-par[ 0]) * par[ 1] ) / ( 1 - ( par[0] * (1-par[ 1]) + (1-par[ 0]) * par[ 1] ) )
@@ -56,6 +57,50 @@ def model( i , par ):
      return value
 pass
 
+# 4x4 eta bin scheme
+#eta_bin = [ 0. , 1.0  , 1.5 , 2.0 , 2.5 ]
+def model_4x4( i , par ):
+
+     if   i == 0:  value = ( par[0] * (1-par[ 0]) + (1-par[ 0]) * par[ 0] ) / ( 1 - ( par[0] * (1-par[ 0]) + (1-par[ 0]) * par[ 0] ) )
+     elif i == 1:  value = ( par[0] * (1-par[ 1]) + (1-par[ 0]) * par[ 1] ) / ( 1 - ( par[0] * (1-par[ 1]) + (1-par[ 0]) * par[ 1] ) )
+     elif i == 2:  value = ( par[0] * (1-par[ 2]) + (1-par[ 0]) * par[ 2] ) / ( 1 - ( par[0] * (1-par[ 2]) + (1-par[ 0]) * par[ 2] ) )
+     elif i == 3:  value = ( par[0] * (1-par[ 3]) + (1-par[ 0]) * par[ 3] ) / ( 1 - ( par[0] * (1-par[ 3]) + (1-par[ 0]) * par[ 3] ) )
+
+     elif i == 4:  value = ( par[1] * (1-par[ 0]) + (1-par[ 1]) * par[ 0] ) / ( 1 - ( par[1] * (1-par[ 0]) + (1-par[ 1]) * par[ 0] ) )
+     elif i == 5:  value = ( par[1] * (1-par[ 1]) + (1-par[ 1]) * par[ 1] ) / ( 1 - ( par[1] * (1-par[ 1]) + (1-par[ 1]) * par[ 1] ) )
+     elif i == 6:  value = ( par[1] * (1-par[ 2]) + (1-par[ 1]) * par[ 2] ) / ( 1 - ( par[1] * (1-par[ 2]) + (1-par[ 1]) * par[ 2] ) )
+     elif i == 7:  value = ( par[1] * (1-par[ 3]) + (1-par[ 1]) * par[ 3] ) / ( 1 - ( par[1] * (1-par[ 3]) + (1-par[ 1]) * par[ 3] ) )
+
+     elif i == 8: value = ( par[2] * (1-par[ 0]) + (1-par[ 2]) * par[ 0] ) / ( 1 - ( par[2] * (1-par[ 0]) + (1-par[ 2]) * par[ 0] ) )
+     elif i == 9: value = ( par[2] * (1-par[ 1]) + (1-par[ 2]) * par[ 1] ) / ( 1 - ( par[2] * (1-par[ 1]) + (1-par[ 2]) * par[ 1] ) )
+     elif i == 10: value = ( par[2] * (1-par[ 2]) + (1-par[ 2]) * par[ 2] ) / ( 1 - ( par[2] * (1-par[ 2]) + (1-par[ 2]) * par[ 2] ) )
+     elif i == 11: value = ( par[2] * (1-par[ 3]) + (1-par[ 2]) * par[ 3] ) / ( 1 - ( par[2] * (1-par[ 3]) + (1-par[ 2]) * par[ 3] ) )
+
+     elif i == 12: value = ( par[3] * (1-par[ 0]) + (1-par[ 3]) * par[ 0] ) / ( 1 - ( par[3] * (1-par[ 0]) + (1-par[ 3]) * par[ 0] ) )
+     elif i == 13: value = ( par[3] * (1-par[ 1]) + (1-par[ 3]) * par[ 1] ) / ( 1 - ( par[3] * (1-par[ 1]) + (1-par[ 3]) * par[ 1] ) )
+     elif i == 14: value = ( par[3] * (1-par[ 2]) + (1-par[ 3]) * par[ 2] ) / ( 1 - ( par[3] * (1-par[ 2]) + (1-par[ 3]) * par[ 2] ) )
+     elif i == 15: value = ( par[3] * (1-par[ 3]) + (1-par[ 3]) * par[ 3] ) / ( 1 - ( par[3] * (1-par[ 3]) + (1-par[ 3]) * par[ 3] ) )
+
+     return value
+pass
+
+def model_3x3( i , par ):
+
+     if   i == 0:  value = ( par[0] * (1-par[ 0]) + (1-par[ 0]) * par[ 0] ) / ( 1 - ( par[0] * (1-par[ 0]) + (1-par[ 0]) * par[ 0] ) )
+     elif i == 1:  value = ( par[0] * (1-par[ 1]) + (1-par[ 0]) * par[ 1] ) / ( 1 - ( par[0] * (1-par[ 1]) + (1-par[ 0]) * par[ 1] ) )
+     elif i == 2:  value = ( par[0] * (1-par[ 2]) + (1-par[ 0]) * par[ 2] ) / ( 1 - ( par[0] * (1-par[ 2]) + (1-par[ 0]) * par[ 2] ) )
+
+     elif i == 3:  value = ( par[1] * (1-par[ 0]) + (1-par[ 1]) * par[ 0] ) / ( 1 - ( par[1] * (1-par[ 0]) + (1-par[ 1]) * par[ 0] ) )
+     elif i == 4:  value = ( par[1] * (1-par[ 1]) + (1-par[ 1]) * par[ 1] ) / ( 1 - ( par[1] * (1-par[ 1]) + (1-par[ 1]) * par[ 1] ) )
+     elif i == 5:  value = ( par[1] * (1-par[ 2]) + (1-par[ 1]) * par[ 2] ) / ( 1 - ( par[1] * (1-par[ 2]) + (1-par[ 1]) * par[ 2] ) )
+
+     elif i == 6: value = ( par[2] * (1-par[ 0]) + (1-par[ 2]) * par[ 0] ) / ( 1 - ( par[2] * (1-par[ 0]) + (1-par[ 2]) * par[ 0] ) )
+     elif i == 7: value = ( par[2] * (1-par[ 1]) + (1-par[ 2]) * par[ 1] ) / ( 1 - ( par[2] * (1-par[ 1]) + (1-par[ 2]) * par[ 1] ) )
+     elif i == 8: value = ( par[2] * (1-par[ 2]) + (1-par[ 2]) * par[ 2] ) / ( 1 - ( par[2] * (1-par[ 2]) + (1-par[ 2]) * par[ 2] ) )
+
+     return value
+pass
+
 """ meaning of parametrs:
 npar:  number of parameters
 deriv: aray of derivatives df/dp_i (x), optional
@@ -65,6 +110,10 @@ iflag: internal flag: 1 at first call, 3 at the last, 4 during minimisation
 """
 
 def fcn( npar , deriv , f , par , iflag):
+
+    #model = model_5x5;
+    model = model_4x4;
+    #model = model_3x3
 
     chisq=0.0
     for i in range(0, nBins):
@@ -82,7 +131,10 @@ def fit( p , perr ):
      err = perr
      nBins=len(val)
 
-     name=['q0','q1','q2','q3','q4']
+     #name=['q0','q1','q2','q3','q4']
+     name=['q0','q1','q2','q3']
+     #name=['q0','q1','q2']
+
      npar=len(name)
      # the initial values
      vstart = arr( 'd' , npar*[0.1] )
@@ -159,18 +211,21 @@ def flatten2D(h2d):
 
 def outFormat(ifile_,eta_bin_,pt_bin_,fitted_prob_,out_,useCsv=True):
 
-    outfile = open( "data/chargeFlip_%s_SF.txt" %( ifile_ ) if not useCsv else 'data/chargeFlip_%s_SF.csv' %( ifile_ ) , "w" )
+    pt_lo = float(ptbin[pt_bin_].split(" && ")[-2].split(' ')[-1])
+    pt_hi = float(ptbin[pt_bin_].split(" && ")[-1].split(' ')[-1])
+    print pt_bin_
+
+    outfile = open( "data/chargeFlip_%s_%s_SF.txt" %( ifile_ , pt_bin_ ) if not useCsv else 'data/chargeFlip_%s_%s_SF.csv' %( ifile_ , pt_bin_ ) , "w" )
 
     row_list=[]
+
     for i, ieta in enumerate(eta_bin):
         row=""
         if i==(len(eta_bin)-1): continue
         row='{:.1f} , {:.1f} , '.format( ieta , eta_bin[i+1] )
-        for j, jpt in enumerate(pt_bin_):
-             if j==1: continue
-             row+='{:.1f} , {:.1f} , {:.3e} , {:.3e} , {:.3e} , {:.3e} , {:.3e} , {:.3e}'\
-             .format( jpt , pt_bin_[j+1] , fitted_prob_['DATA'][i][0] , fitted_prob_['DATA'][i][1] , fitted_prob_['MC'][i][0] , fitted_prob_['MC'][i][1] , out_[i][0] , out_[i][1] )
-             row_list.append( row if not useCsv else [row] )
+        row+='{:.1f} , {:.1f} , {:.3e} , {:.3e} , {:.3e} , {:.3e} , {:.3e} , {:.3e}'\
+                .format( pt_lo , pt_hi , fitted_prob_['DATA'][i][0] , fitted_prob_['DATA'][i][1] , fitted_prob_['MC'][i][0] , fitted_prob_['MC'][i][1] , out_[i][0] , out_[i][1] )
+        row_list.append( row if not useCsv else [row] )
     #print row_list
     #sys.exit()
     # preprocess
@@ -191,28 +246,42 @@ def outFormat(ifile_,eta_bin_,pt_bin_,fitted_prob_,out_,useCsv=True):
             writer.writerows( fout )
     pass
 
-def mk2Dfromcsv( ifile_ ):
+def mk2Dfromcsv( ifile_ , pt_bin_ ):
+
+    ptlist=[]
+    for idict in pt_bin_:
+        pt_lo = float(pt_bin_[idict].split(" && ")[-2].split(' ')[-1])
+        pt_hi = float(pt_bin_[idict].split(" && ")[-1].split(' ')[-1])
+        ptlist.append(pt_lo);
+        ptlist.append(pt_hi);
+
+    ptlist =  sorted(list(dict.fromkeys(ptlist)))
+
+    #pt_lo = float(ptbin[pt_bin_].split(" && ")[-2].split(' ')[-1])
+    #pt_hi = float(ptbin[pt_bin_].split(" && ")[-1].split(' ')[-1])
 
     # initialize csv
     dcsv=OrderedDict()
-    with open( "data/chargeFlip_%s_SF.csv" %( ifile_ ) , 'r' ) as f:
-        for x, line in enumerate(csv.DictReader(f)):
-            dcsv[x] = line
-
+    c=0
+    for i, ikey in enumerate(pt_bin_.keys()):
+        with open( "data/chargeFlip_%s_%s_SF.csv" %( ifile_ , ikey ) , 'r' ) as f:
+            for x , line in enumerate(csv.DictReader(f)):
+                dcsv[c] = line
+                c+=1
     # initialize mischarge probability h2d
     sf_hist= OrderedDict()
     for ihist in [ 'data' , 'data_sys' , 'mc' , 'mc_sys' , 'sf' , 'sf_sys' ]:
-        sf_hist[ihist] = TH2D( ihist , 'charge flipping rate %s ; eta bin ; pt bin' %ihist , len(eta_bin)-1 , arr( 'f' , eta_bin ) , 1 , arr( 'f' ,[28.,200.]) )
+        sf_hist[ihist] = TH2D( ihist , 'charge flipping rate %s ; eta bin ; pt bin' %ihist , len(eta_bin)-1 , arr( 'f' , eta_bin ) , len(ptlist)-1 , arr( 'f' , ptlist ) )
 
     h_dummy = sf_hist['data']
     for ibinX in range(1,h_dummy.GetNbinsX()+1):
+        eta = h_dummy.GetXaxis().GetBinCenter(ibinX)
         for ibinY in range(1,h_dummy.GetNbinsY()+1):
-            eta = h_dummy.GetXaxis().GetBinCenter(ibinX)
             pt =  h_dummy.GetYaxis().GetBinCenter(ibinY)
 
             # looking for correct eta , pt bin
             for num , ibn in dcsv.items():
-                if eta >= float(ibn['etaDown']) and eta <= float(ibn['etaUp']) and pt >= float(ibn['ptDown']) and pt <= float(ibn['ptUp']):
+                if eta >= float(ibn['etaDown']) and eta < float(ibn['etaUp']) and pt >= float(ibn['ptDown']) and pt < float(ibn['ptUp']):
 
                     data_flip = float(ibn['DATA']) ; data_flip_sys = float(ibn['DATAerr'])
                     mc_flip = float(ibn['MC']) ; mc_flip_sys = float(ibn['MCerr'])
@@ -225,11 +294,12 @@ def mk2Dfromcsv( ifile_ ):
                     sf_hist['sf'].SetBinContent( ibinX , ibinY , sf_flip )
                     sf_hist['sf_sys'].SetBinContent( ibinX , ibinY , sf_flip_sys )
 
-                    break;
+                    #break;
     # save it
     h_fileout = TFile.Open( "data/chargeFlip_%s_SF.root" %( ifile_ ) , "RECREATE" )
     map(lambda x: sf_hist[x].Write() , sf_hist)
     h_fileout.Close()
+    pass
 
     # verify.
     #for ihistkey in sf_hist:
@@ -245,20 +315,24 @@ def mkSf( ifile_ , ptbin_ , outcsv_=True):
      h_ratio={}
 
      year=ifile_.split('_')[-1]
-     h_data = TFile.Open("plots/%s/Chflipfit/%s_mll/ratio_DATASUB_%s_%s_mll.root" %(ifile_,ptbin,year,ptbin_) ,"READ")
-     h_mc   = TFile.Open("plots/%s/Chflipfit/%s_mll/ratio_DY_%s_%s_mll.root" %(ifile_,ptbin,year,ptbin_) ,"READ")
+     h_data = TFile.Open("plots/%s/Chflipfit/%s_mll/ratio_DATASUB_%s_%s_mll.root" %(ifile_,ptbin_,year,ptbin_) ,"READ")
+     h_mc   = TFile.Open("plots/%s/Chflipfit/%s_mll/ratio_DY_%s_%s_mll.root" %(ifile_,ptbin_,year,ptbin_) ,"READ")
 
+     print year
+     print ptbin_
+     # here
      # fit
      fitted_prob[year]={}
      h4val[year]={}
      for ids in [ 'DATA' , 'MC' ]:
+          print ids
           h4val[year][ids] = flatten2D( h_data.Get('h2_DATASUB') if ids=='DATA' else h_mc.Get('h2_DY') )
           fitted_prob[year][ids] = fit( arr( 'f' , h4val[year][ids][0] ) , arr( 'f' , h4val[year][ids][1] ) ) # fit( value, error )
      out[year] = map( lambda x , y : [ x[0]/y[0] , sqrt( (x[1]*x[1])/(x[0]*x[0]) + (y[1]*y[1])/(y[0]*y[0]) ) ]  , fitted_prob[year]['DATA'] , fitted_prob[year]['MC'] )
 
      # save sf csv
-     outFormat( ifile , eta_bin , [25,200] , fitted_prob[year] , out[year] , outcsv_ ) ## HERE
-     mk2Dfromcsv( ifile )
+     outFormat( ifile , eta_bin , ptbin_ , fitted_prob[year] , out[year] , outcsv_ ) ## HERE
+     #mk2Dfromcsv( ifile , ptbin_ )
 
      return [ fitted_prob , h4val , out ]
 
@@ -275,10 +349,10 @@ def mk2DHisto(bins_in , name , bins_error_in=None , ztitle="charge flip probabil
     h_ratio_create.SetMarkerSize(1.5)
     return h_ratio_create
 
-def mkValidation(ifile_,flipPro,h_val,ptbin):
+def mkValidation(ifile_,flipPro,h_val,ptbin_):
      # flipPro : dict[year][ids][ [val,err] , [], ...  ]
      # h_val : faltten 2D bins , ranging to 25
-     output='plots/%s/postfit_validation/%s' %(ifile_,ptbin)
+     output='plots/%s/postfit_validation/%s' %(ifile_,ptbin_)
      if not os.path.exists(output): os.system('mkdir -p %s' %output)
 
      c = TCanvas( 'c' , 'ratio_postfit_validation' , 1200 , 800 )
@@ -288,7 +362,7 @@ def mkValidation(ifile_,flipPro,h_val,ptbin):
           dim = len(h_val[year][ids][0]) # infers dimension
           flipper = map(lambda x: x[0], flipPro[year][ids]) # extract the fitted value (mischarge probability)
 
-          bins_postfit = map( lambda x: model(x,flipper) , list(range(0,dim)) ) # reproduce the ratio
+          bins_postfit = map( lambda x: model_4x4(x,flipper) , list(range(0,dim)) ) # reproduce the ratio
           bins_prefit = h_val[year][ids][0]
           bins_diff = map(lambda x : (abs(bins_prefit[x] - bins_postfit[x])/bins_prefit[x])*100. , list(range(0,dim)) )
 
@@ -312,8 +386,8 @@ def mkToy(dim):
 
     c.cd(1) ; h_A_prefit_toy = mk2DHisto( zA , 'h_ratio_prefit_toy_A' , errorzA , 'toy A N_{ss}/N_{os}' ) ; h_A_prefit_toy.Draw("Colz TEXTE")
     c.cd(2) ; h_B_prefit_toy = mk2DHisto( zB , 'h_ratio_prefit_toy_B' , errorzB , 'toy B N_{ss}/N_{os}' ) ; h_B_prefit_toy.Draw("Colz TEXTE")
-    fit_A_param = map( lambda x : x[0] , fit( zA , errorzA ) ) ; fit_A_toy = map( lambda x: model(x,fit_A_param) , list(range(0,dim)) )
-    fit_B_param = map( lambda x : x[0] , fit( zB , errorzB ) ) ; fit_B_toy = map( lambda x: model(x,fit_B_param) , list(range(0,dim)) )
+    fit_A_param = map( lambda x : x[0] , fit( zA , errorzA ) ) ; fit_A_toy = map( lambda x: model_4x4(x,fit_A_param) , list(range(0,dim)) )
+    fit_B_param = map( lambda x : x[0] , fit( zB , errorzB ) ) ; fit_B_toy = map( lambda x: model_4x4(x,fit_B_param) , list(range(0,dim)) )
     c.cd(3) ; h_A_postfit_toy = mk2DHisto( fit_A_toy , 'h_ratio_postfit_toy_A' , None , 'toy A N_{ss}/N_{os}' ) ; h_A_postfit_toy.Draw("Colz TEXTE")
     c.cd(4) ; h_B_postfit_toy = mk2DHisto( fit_B_toy , 'h_ratio_postfit_toy_B' , None , 'toy A N_{ss}/N_{os}' ) ; h_B_postfit_toy.Draw("Colz TEXTE")
     c.Update()
@@ -326,31 +400,37 @@ if __name__ == "__main__":
           print("Error, path folder does not exist")
           sys.exit()
 
-     ptbin="lowpt2"
+     #ptbin="lowpt2"
 
      # toy
-     mkToy( (len(eta_bin)-1)*(len(eta_bin)-1) )
+     #mkToy( (len(eta_bin)-1)*(len(eta_bin)-1) )
 
-     # fit, validate
-     summary = open( "data/fit_summary.txt" , "w" )
-     fpout=[] ;
-     for ifile in os.listdir('plots/'):
-          fitted = mkSf( ifile , ptbin , True ) # output sf file in csv
-          mischarge = fitted[0] ; histo_val = fitted[1] ; epsilon = fitted[2]
+     for iptbin in ptbin:
+          # fit, validate
+          summary = open( "data/fit_summary_%s.txt" %iptbin , "w" )
+          fpout=[] ;
+          for ifile in os.listdir('plots/'):
+               fitted = mkSf( ifile , iptbin , True ) # output sf file in csv
+               mischarge = fitted[0] ; histo_val = fitted[1] ; epsilon = fitted[2]
 
-          for year in epsilon:
-               fpout.append(" ===> scale factor DATA/MC for %s" %year)
-               for num, isf in enumerate(epsilon[year]):
-                    fpout.append('q{} data : {:.3e} +/- {:.3e} ; mc : {:.3e} +/- {:.3e} ; SF : {:.3e} +/- {:.3e} ( rel.error : {:.2f} % )'\
-                         .format( num , mischarge[year]['DATA'][num][0] , mischarge[year]['DATA'][num][1] , mischarge[year]['MC'][num][0] , mischarge[year]['MC'][num][1] , isf[0] , isf[1] , (isf[1]/isf[0])*100 ) )
+               for year in epsilon:
+                    fpout.append(" ===> scale factor DATA/MC for %s" %year)
+                    for num, isf in enumerate(epsilon[year]):
+                         fpout.append('q{} data : {:.3e} +/- {:.3e} ; mc : {:.3e} +/- {:.3e} ; SF : {:.3e} +/- {:.3e} ( rel.error : {:.2f} % )'\
+                                      .format( num , mischarge[year]['DATA'][num][0] , mischarge[year]['DATA'][num][1] , mischarge[year]['MC'][num][0] , mischarge[year]['MC'][num][1] , isf[0] , isf[1] , (isf[1]/isf[0])*100 ) )
                #print ""
-          # on the fly diagnostics
-          mkValidation( ifile , mischarge , histo_val , ptbin )
+               # on the fly diagnostics
+               mkValidation( ifile , mischarge , histo_val , iptbin )
 
-     ### diagnositics
-     with summary as out_handling:
-          for listitem in fpout:
-               out_handling.write( '%s\n' %listitem )
-     os.system('cat data/fit_summary.txt')
+          ### diagnositics
+          with summary as out_handling:
+               for listitem in fpout:
+                    out_handling.write( '%s\n' %listitem )
+          os.system( 'cat data/fit_summary_%s.txt' %iptbin )
+
+     # make histogram from CSV
+     for ifile in [ 'nanov5_2016' , 'nanov5_2017' , 'nanov5_2018' ] :
+         mk2Dfromcsv( ifile , ptbin )
+
 
      pass

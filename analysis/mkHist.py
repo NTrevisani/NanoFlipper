@@ -35,37 +35,6 @@ signness= OrderedDict({
     'ss' : 'lep1_pdgId*lep2_pdgId == 11*11'
 })
 
-#jie
-#ptbin= OrderedDict({
-#    'trigpt' : 'lep1_pt > 23 &&  lep2_pt > 23',
-#    'highpt' : 'lep1_pt > 25 &&  lep2_pt > 25',
-#    'lowpt2' : 'lep1_pt > 25 && lep2_pt > 35',
-#    'lowpt1' : 'lep1_pt > 25 &&  lep2_pt <= 35 && lep2_pt > 25',
-#    'lowpt0' : 'lep1_pt > 25 &&  lep2_pt <= 25 && lep2_pt > 12'
-#})
-
-
-ptbin= OrderedDict({
-    #'trigpt' : 'lep1_pt >= XXX && lep2_pt > 23',
-    #'highpt' : 'lep1_pt >= XXX && lep2_pt > 35',
-    #'lowpt2' : 'lep1_pt >= XXX && lep2_pt >= 20 && lep2_pt < 200',
-    'lowpt2' : 'lep1_pt >= XXX && lep1_pt < 200 && lep2_pt >= 25 && lep2_pt < 200',
-    #'lowpt1' : 'lep1_pt >= XXX && lep2_pt > 25 && lep2_pt <= 35',
-    #'lowpt0' : 'lep1_pt >= XXX && lep2_pt > 12 && lep2_pt <= 25'
-})
-
-trig_pt=25
-#if '2016' in dataset:
-#    trig_pt=32
-#elif '2017' in dataset:
-#    trig_pt=40
-#elif '2018' in dataset:
-#    trig_pt=37
-
-ptbin = OrderedDict( zip ( map(lambda x : x, ptbin)  , map(lambda x : ptbin[x].replace( 'XXX' ,'%s' %trig_pt).replace( 'YYY' , '%s' %(trig_pt+5) ) , ptbin )) )
-
-print ptbin
-
 # lepton wp couples with sf
 WPs= OrderedDict({
     '2016' : {
@@ -88,8 +57,26 @@ WPs= OrderedDict({
     }
 })
 
+#fix
+ptbin= OrderedDict({
+    'lowpt'  : 'lep1_pt >= 30 && lep1_pt < 200 && lep2_pt >= 13 && lep2_pt < 30',
+    'highpt' : 'lep1_pt >= 30 && lep1_pt < 200 && lep2_pt >= 30 && lep2_pt < 200',
+    })
+
+# bin1 has negative value on DY
+# eta_bin = [ 0. , 1.0 , 1.5 , 2.5 ]
+#ptbin= OrderedDict({
+#    'bin1'  : 'lep1_pt >= 25 && lep1_pt < 45 && lep2_pt >= 13 && lep2_pt < 45',
+#    'bin2'  : 'lep1_pt >= 45 && lep1_pt < 200 && lep2_pt >= 13 && lep2_pt < 45',
+#    'bin3'  : 'lep1_pt >= 45 && lep1_pt < 200 && lep2_pt >= 45 && lep2_pt < 200',
+#})
+
+print ptbin
+
 #eta_bin = [ 0. , 1.0 , 1.5 , 2.5 ]
-eta_bin = [ 0. , 0.5  , 1.0  , 1.5  , 2.0 , 2.5 ]
+#eta_bin = [ 0. , 0.5  , 1.0  , 1.5  , 2.0 , 2.5 ]
+eta_bin = [ 0. , 1.0  , 1.5  , 2.0 , 2.5 ]
+
 etagrid=np.zeros((len(eta_bin)-1,len(eta_bin)-1),dtype=np.object)
 for i in range(len(etagrid)):
     for j in range(len(etagrid[i])):
@@ -151,9 +138,9 @@ def addWeights( df_in , name ):
 
     return dfout.Define('weights',weight).Define('abslep1eta','abs(lep1_eta)').Define('abslep2eta','abs(lep2_eta)')
 
-def mkplot( dataset_ , ptbin_ , val=False , DFS=None ):
+def mkplot( dataset_ , DFS ):
 
-    if not val: rf = ROOT.TFile.Open('hist_%s.root'%(dataset_),"RECREATE")
+    rf = ROOT.TFile.Open('hist_%s.root'%(dataset_),"RECREATE")
 
     # this is for validation
     dfval={}
@@ -161,41 +148,36 @@ def mkplot( dataset_ , ptbin_ , val=False , DFS=None ):
 
     for idf in DFS:
         DYregion = addWeights( DFS , idf )
+        # trigger threshold
+        #DYregion = DYregion.Filter("lep1_pt > 25","Trigger Threshold")
 
         #SS/OS
         for ireg in signness:
             tmp_df_1 = DYregion.Filter( signness[ireg] , '%s selection' %ireg )
-            for iptbin in ptbin:
-                if iptbin != ptbin_: continue
-                tmp_df_2 = tmp_df_1.Filter( ptbin[iptbin] , '%s selection' %iptbin )
-                for ivar in variables:
-                    # save df for post-fit validation
-                    if val: dfval['val_%s_%s_%s'%(idf,ireg,iptbin)] = tmp_df_2
-                    #
-                    if 'eta' in ivar:
-                        df2histo['%s_%s_%s_%s'%(idf,ireg,iptbin,ivar)]  = tmp_df_2.Histo1D( ( '%s_%s_%s_%s'%(idf,ireg,iptbin,ivar) , '%s_%s_%s_%s ; %s; Events' %(idf,ireg,iptbin,ivar,ivar) , 50 , -2.5 , 2.5 ) , ivar , 'weights' )
-                    elif 'pt' in ivar:
-                        df2histo['%s_%s_%s_%s'%(idf,ireg,iptbin,ivar)]  = tmp_df_2.Histo1D( ( '%s_%s_%s_%s'%(idf,ireg,iptbin,ivar) , '%s_%s_%s_%s ; %s [GeV]; Events' %(idf,ireg,iptbin,ivar,ivar) , 40 , 0. , 200. ) , ivar , 'weights' )
+            for ivar in variables:
+                if 'eta' in ivar:
+                    df2histo['%s_%s_%s'%(idf,ireg,ivar)]  = tmp_df_1.Histo1D( ( '%s_%s_%s'%(idf,ireg,ivar) , '%s_%s_%s ; %s; Events' %(idf,ireg,ivar,ivar) , 10 , -2.5 , 2.5 ) , ivar , 'weights' )
+                elif 'pt' in ivar:
+                    df2histo['%s_%s_%s'%(idf,ireg,ivar)]  = tmp_df_1.Histo1D( ( '%s_%s_%s'%(idf,ireg,ivar) , '%s_%s_%s ; %s [GeV]; Events' %(idf,ireg,ivar,ivar) , 40 , 0. , 200. ) , ivar , 'weights' )
                 #################################################################################################################
-                    elif ivar=='mll':
-                        df2histo['%s_%s_%s_%s'%(idf,ireg,iptbin,ivar)]  = tmp_df_2.Histo1D( ( '%s_%s_%s_%s'%(idf,ireg,iptbin,ivar), '%s_%s_%s_%s ; %s [GeV]; Events' %(idf,ireg,iptbin,ivar,ivar) , 30, 76.2, 106.2 ) , ivar , 'weights' )
-                        ## mll in different etabins
-                        makeEtaGrid(df2histo,tmp_df_2,'%s_%s_%s'%(idf,iptbin,ireg))
-                #################################################################################################################
-                    elif ivar=='2d':
-                        df2histo['%s_%s_%s_%s'%(idf,ireg,iptbin,ivar)] = tmp_df_2.Histo2D( ( '%s_%s_%s_%s'%(idf,ireg,iptbin,ivar) ,' %s_%s_%s_%s ; Lepton eta 1 ; Lepton eta 2 ; Events.' %(idf,ireg,iptbin,ivar), len(bins)-1 , np.asarray(bins,'d') , len(bins)-1 , np.asarray(bins,'d') ) , 'abslep1eta' , 'abslep2eta' , 'weights' )
+                elif ivar=='2d':
+                    df2histo['%s_%s_%s'%(idf,ireg,ivar)] = tmp_df_1.Histo2D( ( '%s_%s_%s'%(idf,ireg,ivar) ,' %s_%s_%s ; Lepton eta 1 ; Lepton eta 2 ; Events.' %(idf,ireg,ivar), len(bins)-1 , np.asarray(bins,'d') , len(bins)-1 , np.asarray(bins,'d') ) , 'abslep1eta' , 'abslep2eta' , 'weights' )
+                elif ivar=='mll':
+                    df2histo['%s_%s_%s'%(idf,ireg,ivar)]  = tmp_df_1.Histo1D( ( '%s_%s_%s'%(idf,ireg,ivar), '%s_%s_%s ; %s [GeV]; Events' %(idf,ireg,ivar,ivar) , 30, 76.2, 106.2 ) , ivar , 'weights' )
+                    ## mll in different etabins and ptbins
+                    for iptbin in ptbin:
+                        tmp_df_2 = tmp_df_1.Filter( ptbin[iptbin] , '%s selection' %iptbin )
+		        makeEtaGrid( df2histo , tmp_df_2 , 'analysis_%s_%s_%s'%(idf,iptbin,ireg) )
 
-    if not val:
-        map(lambda x: df2histo[x].Write() , df2histo)
-        rf.Close()
-    else:
-        return dfval
+    map(lambda x: df2histo[x].Write() , df2histo)
+    rf.Close()
+
     pass
 
-def mkval_prefit( rf , ptbin_ , plotFake ):
+def mkval_prefit( rf , plotFake ):
 
     f = ROOT.TFile.Open(rf,"READ")
-    output= 'plots/%s/mkHist_validation/%s/noFake' %( dataset , ptbin_ ) if not plotFake else 'plots/%s/mkHist_validation/%s/withFake' %( dataset , ptbin_ )
+    output= 'plots/%s/mkHist_validation/noFake' %( dataset ) if not plotFake else 'plots/%s/mkHist_validation/withFake' %( dataset )
     if not os.path.exists(output): os.system('mkdir -p %s' %output)
 
     # convert list of branch into key-branch dictionary
@@ -204,8 +186,8 @@ def mkval_prefit( rf , ptbin_ , plotFake ):
 
     #####################
 
-    oskeys = filter(lambda x : 'etabin' not in x and ptbin_ in x and 'os' in x , histkeys)
-    sskeys = filter(lambda x : 'etabin' not in x and ptbin_ in x and 'ss' in x , histkeys)
+    oskeys = filter(lambda x : 'etabin' not in x and 'os' in x , histkeys)
+    sskeys = filter(lambda x : 'etabin' not in x and 'ss' in x , histkeys)
     if not plotFake:
         oskeys = filter(lambda x : 'FAKE' not in x , oskeys)
         sskeys = filter(lambda x : 'FAKE' not in x , sskeys)
@@ -227,7 +209,7 @@ def mkval_prefit( rf , ptbin_ , plotFake ):
 
 if __name__ == '__main__':
 
-    ptbin__use = 'lowpt2'
+    #ptbin__use =
 
     # use both dataset
     # DF loaded here
@@ -246,14 +228,14 @@ if __name__ == '__main__':
 
     # use singleElectron
     #DF= OrderedDict({
-    #    'DY_%s' %(dataset.split('_')[-1]) : ROOT.ROOT.RDataFrame("flipper", ntupleDIR+'/DYJetsToLL_M*.root' ),
-    #    'DATA_%s' %(dataset.split('_')[-1]) : ROOT.ROOT.RDataFrame("flipper", [ ntupleDIR+'/SingleElectron.root' ] if dataset != "nanov5_2018" else [ ntupleDIR+'/EGamma.root' ] ),
-    #    'FAKE_%s' %(dataset.split('_')[-1]) : ROOT.ROOT.RDataFrame("flipper", [ ntupleDIR+'/Fake_SingleElectron.root' ] if dataset != "nanov5_2018" else [ ntupleDIR+'/Fake_EGamma.root' ] )
-    #})
+        #'DY_%s' %(dataset.split('_')[-1]) : ROOT.ROOT.RDataFrame("flipper", ntupleDIR+'/DYJetsToLL_M*.root' ),
+        #'DATA_%s' %(dataset.split('_')[-1]) : ROOT.ROOT.RDataFrame("flipper", [ ntupleDIR+'/SingleElectron.root' ] if dataset != "nanov5_2018" else [ ntupleDIR+'/EGamma.root' ] ),
+        #'FAKE_%s' %(dataset.split('_')[-1]) : ROOT.ROOT.RDataFrame("flipper", [ ntupleDIR+'/Fake_SingleElectron.root' ] if dataset != "nanov5_2018" else [ ntupleDIR+'/Fake_EGamma.root' ] )
+        #})
 
-    mkplot( dataset , ptbin__use , False , DF ); # mk
-    mkval_prefit( 'hist_%s.root'%(dataset) , ptbin__use , False ) #toggle Fake
-    mkval_prefit( 'hist_%s.root'%(dataset) , ptbin__use , True ) #toggle Fake
+    mkplot( dataset , DF ); # mk
+    mkval_prefit( 'hist_%s.root'%(dataset) , False ) #toggle Fake
+    mkval_prefit( 'hist_%s.root'%(dataset) , True ) #toggle Fake
 
     print("--- %s seconds ---" % (time.time() - start_time))
     print("--- %s minutes ---" % ( (time.time() - start_time)/60. ))

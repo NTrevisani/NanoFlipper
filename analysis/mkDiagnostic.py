@@ -4,7 +4,7 @@ import csv, sys, os
 from collections import OrderedDict
 from array import array as arr
 
-from mkHist import ptbin, eta_bin, mkplot
+from mkHist import ptbin, eta_bin, signness, addWeights
 from utils.helper import *
 
 ROOT.gInterpreter.Declare(
@@ -54,13 +54,13 @@ double getFlip( const double pt1_in , const double eta1_in , const double pt2_in
     flip2_sys = SFmap[ SFmapKey+"_sys" ]->GetBinContent( SFmap[ SFmapKey+"_sys" ]->FindBin( abs(eta2_in) , pt2_in ));
 
     // opposite sign , either one is flip
-    if ( pdgId1*pdgId2 == -11*11){
-        commonW = flip1 * ( 1. - flip2 ) + flip2 * ( 1. - flip1 );
-    }
+    //if ( pdgId1*pdgId2 == -11*11){
+    commonW = flip1 * ( 1. - flip2 ) + flip2 * ( 1. - flip1 );
+    //}
     // both are flip
-    else if ( pdgId1*pdgId2 == -11*13 ){
-        commonW = flip1 + flip2;
-    }
+    //else if ( pdgId1*pdgId2 == -11*13 ){
+    //    commonW = flip1 + flip2;
+    //}
     // the same sign region, get the SF
     //else if ( pdgId1*pdgId2 == 11*11 || pdgId1*pdgId2 == 11*13 ){
     //}
@@ -71,10 +71,10 @@ double getFlip( const double pt1_in , const double eta1_in , const double pt2_in
 double getSF( const double pt1_in , const double eta1_in , const double pt2_in , const double eta2_in , const int pdgId1 , const int pdgId2 )
 {
     double sf1=1.; double sf2=1.; double SF=1.;
-    if ( pdgId1*pdgId2 == 11*11 || pdgId1*pdgId2 == 11*13 ){
-        sf1 = SFmap["sf"]->GetBinContent( SFmap["sf"]->FindBin( abs(eta1_in) , pt1_in ) );
-        sf2 = SFmap["sf"]->GetBinContent( SFmap["sf"]->FindBin( abs(eta2_in) , pt2_in ) );
-    }
+    //if ( pdgId1*pdgId2 == 11*11 || pdgId1*pdgId2 == 11*13 ){
+    sf1 = SFmap["sf"]->GetBinContent( SFmap["sf"]->FindBin( abs(eta1_in) , pt1_in ) );
+    sf2 = SFmap["sf"]->GetBinContent( SFmap["sf"]->FindBin( abs(eta2_in) , pt2_in ) );
+    //}
     SF = sf1*sf2;
 
     return SF;
@@ -82,6 +82,18 @@ double getSF( const double pt1_in , const double eta1_in , const double pt2_in ,
 
 '''
 )
+
+def mkValplot( DFS ):
+
+    dfval= OrderedDict()
+
+    for idf in DFS:
+        DYregion = addWeights( DFS , idf )
+        #SS/OS
+        for ireg in signness:
+            dfval['val_%s_%s'%(idf,ireg)] = DYregion.Filter( signness[ireg] , '%s selection' %ireg )
+    return dfval
+    pass
 
 def drawChi2(data, bkg):
     latex = TLatex()
@@ -103,7 +115,7 @@ def drawMean( hist_ , name_ , xpos , ypos ):
 pass
 
 
-def mkval_postfit( dataset_ , rdflist , ptbin_ , output_ , test=1 ):
+def mkval_postfit( dataset_ , rdflist , output_ , test=1 ):
 
     #rdf_CR_OS = rdflist[0]
     #rdf_CR_SS = rdflist[1]
@@ -111,8 +123,8 @@ def mkval_postfit( dataset_ , rdflist , ptbin_ , output_ , test=1 ):
     #gStyle.SetOptStat(0);
 
     # looking at mll variable
-    h_os_keys = filter(lambda x : 'etabin' not in x and 'FAKE' not in x and ptbin_ in x and 'os' in x , rdflist )
-    h_ss_keys = filter(lambda x : 'etabin' not in x and 'FAKE' not in x and ptbin_ in x and 'ss' in x , rdflist )
+    h_os_keys = filter(lambda x : 'etabin' not in x and 'FAKE' not in x and 'os' in x , rdflist )
+    h_ss_keys = filter(lambda x : 'etabin' not in x and 'FAKE' not in x and 'ss' in x , rdflist )
 
     # list
     k_N_os_mc   = filter(lambda x : 'DY' in x   , h_os_keys )[0]
@@ -129,18 +141,18 @@ def mkval_postfit( dataset_ , rdflist , ptbin_ , output_ , test=1 ):
 
         # f_mc x N_os_mc
         df_N_os_mc = rdflist[k_N_os_mc].Define( 'f_mc' , 'getFlip( lep1_pt , lep1_eta , lep2_pt , lep2_eta , lep1_pdgId , lep2_pdgId , 0 )' ).Define( 'totalW' , 'f_mc*weights' )
-        hlist_L['h_N_os_mc_mll']      = df_N_os_mc.Histo1D( ( 'N_os_mc_mll'      , 'f_mc x N_os_mc != N_ss_mc %s %s ; mll [GeV]     ; Events' %( dataset_ , ptbin_ ) , 30, 76.2, 106.2 ) , 'mll'      , 'totalW' )
-        hlist_L['h_N_os_mc_lep1_eta'] = df_N_os_mc.Histo1D( ( 'N_os_mc_lep1_eta' , 'f_mc x N_os_mc != N_ss_mc %s %s ; lep1_eta      ; Events' %( dataset_ , ptbin_ ) , 50 , -2.5 , 2.5 ) , 'lep1_eta' , 'totalW' )
-        hlist_L['h_N_os_mc_lep2_eta'] = df_N_os_mc.Histo1D( ( 'N_os_mc_lep2_eta' , 'f_mc x N_os_mc != N_ss_mc %s %s ; lep2_eta      ; Events' %( dataset_ , ptbin_ ) , 50 , -2.5 , 2.5 ) , 'lep2_eta' , 'totalW' )
-        hlist_L['h_N_os_mc_lep1_pt']  = df_N_os_mc.Histo1D( ( 'N_os_mc_lep1_pt'  , 'f_mc x N_os_mc != N_ss_mc %s %s ; lep1_pt [GeV] ; Events' %( dataset_ , ptbin_ ) , 40 , 0. , 200.  ) , 'lep1_pt'  , 'totalW' )
-        hlist_L['h_N_os_mc_lep2_pt']  = df_N_os_mc.Histo1D( ( 'N_os_mc_lep2_pt'  , 'f_mc x N_os_mc != N_ss_mc %s %s ; lep2_pt [GeV] ; Events' %( dataset_ , ptbin_ ) , 40 , 0. , 200.  ) , 'lep2_pt'  , 'totalW' )
+        hlist_L['h_N_os_mc_mll']      = df_N_os_mc.Histo1D( ( 'N_os_mc_mll'      , 'f_mc x N_os_mc != N_ss_mc %s ; mll [GeV]     ; Events' %( dataset_ ) , 30, 76.2, 106.2 ) , 'mll'      , 'totalW' )
+        hlist_L['h_N_os_mc_lep1_eta'] = df_N_os_mc.Histo1D( ( 'N_os_mc_lep1_eta' , 'f_mc x N_os_mc != N_ss_mc %s ; lep1_eta      ; Events' %( dataset_ ) , 10 , -2.5 , 2.5 ) , 'lep1_eta' , 'totalW' )
+        hlist_L['h_N_os_mc_lep2_eta'] = df_N_os_mc.Histo1D( ( 'N_os_mc_lep2_eta' , 'f_mc x N_os_mc != N_ss_mc %s ; lep2_eta      ; Events' %( dataset_ ) , 10 , -2.5 , 2.5 ) , 'lep2_eta' , 'totalW' )
+        hlist_L['h_N_os_mc_lep1_pt']  = df_N_os_mc.Histo1D( ( 'N_os_mc_lep1_pt'  , 'f_mc x N_os_mc != N_ss_mc %s ; lep1_pt [GeV] ; Events' %( dataset_ ) , 40 , 0. , 200.  ) , 'lep1_pt'  , 'totalW' )
+        hlist_L['h_N_os_mc_lep2_pt']  = df_N_os_mc.Histo1D( ( 'N_os_mc_lep2_pt'  , 'f_mc x N_os_mc != N_ss_mc %s ; lep2_pt [GeV] ; Events' %( dataset_ ) , 40 , 0. , 200.  ) , 'lep2_pt'  , 'totalW' )
         # N_ss_mc
         df_N_ss_mc = rdflist[k_N_ss_mc].Define( 'totalW' , 'weights')
-        hlist_R['h_N_ss_mc_mll']      = df_N_ss_mc.Histo1D( ( 'N_ss_mc_mll'      , 'f_mc x N_os_mc != N_ss_mc %s %s ; mll [GeV]     ; Events' %( dataset_ , ptbin_ ) , 30, 76.2, 106.2 ) , 'mll'      , 'totalW' )
-        hlist_R['h_N_ss_mc_lep1_eta'] = df_N_ss_mc.Histo1D( ( 'N_ss_mc_lep1_eta' , 'f_mc x N_os_mc != N_ss_mc %s %s ; lep1_eta      ; Events' %( dataset_ , ptbin_ ) , 50 , -2.5 , 2.5 ) , 'lep1_eta' , 'totalW' )
-        hlist_R['h_N_ss_mc_lep2_eta'] = df_N_ss_mc.Histo1D( ( 'N_ss_mc_lep2_eta' , 'f_mc x N_os_mc != N_ss_mc %s %s ; lep2_eta      ; Events' %( dataset_ , ptbin_ ) , 50 , -2.5 , 2.5 ) , 'lep2_eta' , 'totalW' )
-        hlist_R['h_N_ss_mc_lep1_pt']  = df_N_ss_mc.Histo1D( ( 'N_ss_mc_lep1_pt'  , 'f_mc x N_os_mc != N_ss_mc %s %s ; lep1_pt [GeV] ; Events' %( dataset_ , ptbin_ ) , 40 , 0. , 200.  ) , 'lep1_pt'  , 'totalW' )
-        hlist_R['h_N_ss_mc_lep2_pt']  = df_N_ss_mc.Histo1D( ( 'N_ss_mc_lep2_pt'  , 'f_mc x N_os_mc != N_ss_mc %s %s ; lep2_pt [GeV] ; Events' %( dataset_ , ptbin_ ) , 40 , 0. , 200.  ) , 'lep2_pt'  , 'totalW' )
+        hlist_R['h_N_ss_mc_mll']      = df_N_ss_mc.Histo1D( ( 'N_ss_mc_mll'      , 'f_mc x N_os_mc != N_ss_mc %s ; mll [GeV]     ; Events' %( dataset_ ) , 30, 76.2, 106.2 ) , 'mll'      , 'totalW' )
+        hlist_R['h_N_ss_mc_lep1_eta'] = df_N_ss_mc.Histo1D( ( 'N_ss_mc_lep1_eta' , 'f_mc x N_os_mc != N_ss_mc %s ; lep1_eta      ; Events' %( dataset_ ) , 10 , -2.5 , 2.5 ) , 'lep1_eta' , 'totalW' )
+        hlist_R['h_N_ss_mc_lep2_eta'] = df_N_ss_mc.Histo1D( ( 'N_ss_mc_lep2_eta' , 'f_mc x N_os_mc != N_ss_mc %s ; lep2_eta      ; Events' %( dataset_ ) , 10 , -2.5 , 2.5 ) , 'lep2_eta' , 'totalW' )
+        hlist_R['h_N_ss_mc_lep1_pt']  = df_N_ss_mc.Histo1D( ( 'N_ss_mc_lep1_pt'  , 'f_mc x N_os_mc != N_ss_mc %s ; lep1_pt [GeV] ; Events' %( dataset_ ) , 40 , 0. , 200.  ) , 'lep1_pt'  , 'totalW' )
+        hlist_R['h_N_ss_mc_lep2_pt']  = df_N_ss_mc.Histo1D( ( 'N_ss_mc_lep2_pt'  , 'f_mc x N_os_mc != N_ss_mc %s ; lep2_pt [GeV] ; Events' %( dataset_ ) , 40 , 0. , 200.  ) , 'lep2_pt'  , 'totalW' )
 
         for ihist in hlist_L: hlist_L[ihist].SetLineColor(ROOT.kGreen)
         for ihist in hlist_R: hlist_R[ihist].SetLineColor(ROOT.kRed)
@@ -165,18 +177,18 @@ def mkval_postfit( dataset_ , rdflist , ptbin_ , output_ , test=1 ):
 
         # SF x N_ss_mc
         df_N_ss_mc = rdflist[k_N_ss_mc].Define( 'SF' , 'getSF( lep1_pt , lep1_eta , lep2_pt , lep2_eta , lep1_pdgId , lep2_pdgId )' ).Define( 'totalW' , 'SF*weights' )
-        hlist_L['h_N_ss_mc_mll']      = df_N_ss_mc.Histo1D( ( 'N_ss_mc_mll'      , 'SF x N_ss_mc != N_ss_data %s %s ; mll [GeV]     ; Events' %( dataset_ , ptbin_ ) , 30, 76.2, 106.2 ) , 'mll'      , 'totalW' )
-        hlist_L['h_N_ss_mc_lep1_eta'] = df_N_ss_mc.Histo1D( ( 'N_ss_mc_lep1_eta' , 'SF x N_ss_mc != N_ss_data %s %s ; lep1_eta      ; Events' %( dataset_ , ptbin_ ) , 50 , -2.5 , 2.5 ) , 'lep1_eta' , 'totalW' )
-        hlist_L['h_N_ss_mc_lep2_eta'] = df_N_ss_mc.Histo1D( ( 'N_ss_mc_lep2_eta' , 'SF x N_ss_mc != N_ss_data %s %s ; lep2_eta      ; Events' %( dataset_ , ptbin_ ) , 50 , -2.5 , 2.5 ) , 'lep2_eta' , 'totalW' )
-        hlist_L['h_N_ss_mc_lep1_pt']  = df_N_ss_mc.Histo1D( ( 'N_ss_mc_lep1_pt'  , 'SF x N_ss_mc != N_ss_data %s %s ; lep1_pt [GeV] ; Events' %( dataset_ , ptbin_ ) , 40 , 0. , 200.  ) , 'lep1_pt'  , 'totalW' )
-        hlist_L['h_N_ss_mc_lep2_pt']  = df_N_ss_mc.Histo1D( ( 'N_ss_mc_lep2_pt'  , 'SF x N_ss_mc != N_ss_data %s %s ; lep2_pt [GeV] ; Events' %( dataset_ , ptbin_ ) , 40 , 0. , 200.  ) , 'lep2_pt'  , 'totalW' )
+        hlist_L['h_N_ss_mc_mll']      = df_N_ss_mc.Histo1D( ( 'N_ss_mc_mll'      , 'SF x N_ss_mc != N_ss_data %s ; mll [GeV]     ; Events' %( dataset_ ) , 30, 76.2, 106.2 ) , 'mll'      , 'totalW' )
+        hlist_L['h_N_ss_mc_lep1_eta'] = df_N_ss_mc.Histo1D( ( 'N_ss_mc_lep1_eta' , 'SF x N_ss_mc != N_ss_data %s ; lep1_eta      ; Events' %( dataset_ ) , 10 , -2.5 , 2.5 ) , 'lep1_eta' , 'totalW' )
+        hlist_L['h_N_ss_mc_lep2_eta'] = df_N_ss_mc.Histo1D( ( 'N_ss_mc_lep2_eta' , 'SF x N_ss_mc != N_ss_data %s ; lep2_eta      ; Events' %( dataset_ ) , 10 , -2.5 , 2.5 ) , 'lep2_eta' , 'totalW' )
+        hlist_L['h_N_ss_mc_lep1_pt']  = df_N_ss_mc.Histo1D( ( 'N_ss_mc_lep1_pt'  , 'SF x N_ss_mc != N_ss_data %s ; lep1_pt [GeV] ; Events' %( dataset_ ) , 40 , 0. , 200.  ) , 'lep1_pt'  , 'totalW' )
+        hlist_L['h_N_ss_mc_lep2_pt']  = df_N_ss_mc.Histo1D( ( 'N_ss_mc_lep2_pt'  , 'SF x N_ss_mc != N_ss_data %s ; lep2_pt [GeV] ; Events' %( dataset_ ) , 40 , 0. , 200.  ) , 'lep2_pt'  , 'totalW' )
         # N_ss_data
         df_N_ss_data = rdflist[k_N_ss_data].Define( 'totalW' , 'weights')
-        hlist_R['h_N_ss_data_mll']      = df_N_ss_data.Histo1D( ( 'N_ss_data_mll'      , 'SF x N_ss_mc != N_ss_data %s %s ; mll [GeV]     ; Events' %( dataset_ , ptbin_ ) , 30, 76.2, 106.2 ) , 'mll'      , 'totalW' )
-        hlist_R['h_N_ss_data_lep1_eta'] = df_N_ss_data.Histo1D( ( 'N_ss_data_lep1_eta' , 'SF x N_ss_mc != N_ss_data %s %s ; lep1_eta      ; Events' %( dataset_ , ptbin_ ) , 50 , -2.5 , 2.5 ) , 'lep1_eta' , 'totalW' )
-        hlist_R['h_N_ss_data_lep2_eta'] = df_N_ss_data.Histo1D( ( 'N_ss_data_lep2_eta' , 'SF x N_ss_mc != N_ss_data %s %s ; lep2_eta      ; Events' %( dataset_ , ptbin_ ) , 50 , -2.5 , 2.5 ) , 'lep2_eta' , 'totalW' )
-        hlist_R['h_N_ss_data_lep1_pt']  = df_N_ss_data.Histo1D( ( 'N_ss_data_lep1_pt'  , 'SF x N_ss_mc != N_ss_data %s %s ; lep1_pt [GeV] ; Events' %( dataset_ , ptbin_ ) , 40 , 0. , 200.  ) , 'lep1_pt'  , 'totalW' )
-        hlist_R['h_N_ss_data_lep2_pt']  = df_N_ss_data.Histo1D( ( 'N_ss_data_lep2_pt'  , 'SF x N_ss_mc != N_ss_data %s %s ; lep2_pt [GeV] ; Events' %( dataset_ , ptbin_ ) , 40 , 0. , 200.  ) , 'lep2_pt'  , 'totalW' )
+        hlist_R['h_N_ss_data_mll']      = df_N_ss_data.Histo1D( ( 'N_ss_data_mll'      , 'SF x N_ss_mc != N_ss_data %s ; mll [GeV]     ; Events' %( dataset_ ) , 30, 76.2, 106.2 ) , 'mll'      , 'totalW' )
+        hlist_R['h_N_ss_data_lep1_eta'] = df_N_ss_data.Histo1D( ( 'N_ss_data_lep1_eta' , 'SF x N_ss_mc != N_ss_data %s ; lep1_eta      ; Events' %( dataset_ ) , 10 , -2.5 , 2.5 ) , 'lep1_eta' , 'totalW' )
+        hlist_R['h_N_ss_data_lep2_eta'] = df_N_ss_data.Histo1D( ( 'N_ss_data_lep2_eta' , 'SF x N_ss_mc != N_ss_data %s ; lep2_eta      ; Events' %( dataset_ ) , 10 , -2.5 , 2.5 ) , 'lep2_eta' , 'totalW' )
+        hlist_R['h_N_ss_data_lep1_pt']  = df_N_ss_data.Histo1D( ( 'N_ss_data_lep1_pt'  , 'SF x N_ss_mc != N_ss_data %s ; lep1_pt [GeV] ; Events' %( dataset_ ) , 40 , 0. , 200.  ) , 'lep1_pt'  , 'totalW' )
+        hlist_R['h_N_ss_data_lep2_pt']  = df_N_ss_data.Histo1D( ( 'N_ss_data_lep2_pt'  , 'SF x N_ss_mc != N_ss_data %s ; lep2_pt [GeV] ; Events' %( dataset_ ) , 40 , 0. , 200.  ) , 'lep2_pt'  , 'totalW' )
 
         #plot 1D STACK kinematics between DATA/MC
         for hist_l , hist_r in zip( hlist_L , hlist_R ):
@@ -191,18 +203,18 @@ def mkval_postfit( dataset_ , rdflist , ptbin_ , output_ , test=1 ):
 
         # f_data x N_os_mc
         df_N_os_mc = rdflist[k_N_os_mc].Define( 'f_data' , 'getFlip( lep1_pt , lep1_eta , lep2_pt , lep2_eta , lep1_pdgId , lep2_pdgId , 1 )' ).Define( 'totalW' , 'f_data*weights' )
-        hlist_L['h_N_os_mc_mll']      = df_N_os_mc.Histo1D( ( 'N_os_mc_mll'      , 'f_data x N_os_mc != N_ss_data %s %s ; mll [GeV]     ; Events' %( dataset_ , ptbin_ ) , 30, 76.2, 106.2 ) , 'mll'      , 'totalW' )
-        hlist_L['h_N_os_mc_lep1_eta'] = df_N_os_mc.Histo1D( ( 'N_os_mc_lep1_eta' , 'f_data x N_os_mc != N_ss_data %s %s ; lep1_eta      ; Events' %( dataset_ , ptbin_ ) , 50 , -2.5 , 2.5 ) , 'lep1_eta' , 'totalW' )
-        hlist_L['h_N_os_mc_lep2_eta'] = df_N_os_mc.Histo1D( ( 'N_os_mc_lep2_eta' , 'f_data x N_os_mc != N_ss_data %s %s ; lep2_eta      ; Events' %( dataset_ , ptbin_ ) , 50 , -2.5 , 2.5 ) , 'lep2_eta' , 'totalW' )
-        hlist_L['h_N_os_mc_lep1_pt']  = df_N_os_mc.Histo1D( ( 'N_os_mc_lep1_pt'  , 'f_data x N_os_mc != N_ss_data %s %s ; lep1_pt [GeV] ; Events' %( dataset_ , ptbin_ ) , 40 , 0. , 200.  ) , 'lep1_pt'  , 'totalW' )
-        hlist_L['h_N_os_mc_lep2_pt']  = df_N_os_mc.Histo1D( ( 'N_os_mc_lep2_pt'  , 'f_data x N_os_mc != N_ss_data %s %s ; lep2_pt [GeV] ; Events' %( dataset_ , ptbin_ ) , 40 , 0. , 200.  ) , 'lep2_pt'  , 'totalW' )
+        hlist_L['h_N_os_mc_mll']      = df_N_os_mc.Histo1D( ( 'N_os_mc_mll'      , 'f_data x N_os_mc != N_ss_data %s ; mll [GeV]     ; Events' %( dataset_ ) , 30, 76.2, 106.2 ) , 'mll'      , 'totalW' )
+        hlist_L['h_N_os_mc_lep1_eta'] = df_N_os_mc.Histo1D( ( 'N_os_mc_lep1_eta' , 'f_data x N_os_mc != N_ss_data %s ; lep1_eta      ; Events' %( dataset_ ) , 10 , -2.5 , 2.5 ) , 'lep1_eta' , 'totalW' )
+        hlist_L['h_N_os_mc_lep2_eta'] = df_N_os_mc.Histo1D( ( 'N_os_mc_lep2_eta' , 'f_data x N_os_mc != N_ss_data %s ; lep2_eta      ; Events' %( dataset_ ) , 10 , -2.5 , 2.5 ) , 'lep2_eta' , 'totalW' )
+        hlist_L['h_N_os_mc_lep1_pt']  = df_N_os_mc.Histo1D( ( 'N_os_mc_lep1_pt'  , 'f_data x N_os_mc != N_ss_data %s ; lep1_pt [GeV] ; Events' %( dataset_ ) , 40 , 0. , 200.  ) , 'lep1_pt'  , 'totalW' )
+        hlist_L['h_N_os_mc_lep2_pt']  = df_N_os_mc.Histo1D( ( 'N_os_mc_lep2_pt'  , 'f_data x N_os_mc != N_ss_data %s ; lep2_pt [GeV] ; Events' %( dataset_ ) , 40 , 0. , 200.  ) , 'lep2_pt'  , 'totalW' )
         # N_ss_data
         df_N_ss_data = rdflist[k_N_ss_data].Define( 'totalW' , 'weights')
-        hlist_R['h_N_ss_data_mll']      = df_N_ss_data.Histo1D( ( 'N_ss_data_mll'      , 'f_data x N_os_mc != N_ss_data %s %s ; mll [GeV]     ; Events' %( dataset_ , ptbin_ ) , 30, 76.2, 106.2 ) , 'mll'      , 'totalW' )
-        hlist_R['h_N_ss_data_lep1_eta'] = df_N_ss_data.Histo1D( ( 'N_ss_data_lep1_eta' , 'f_data x N_os_mc != N_ss_data %s %s ; lep1_eta      ; Events' %( dataset_ , ptbin_ ) , 50 , -2.5 , 2.5 ) , 'lep1_eta' , 'totalW' )
-        hlist_R['h_N_ss_data_lep2_eta'] = df_N_ss_data.Histo1D( ( 'N_ss_data_lep2_eta' , 'f_data x N_os_mc != N_ss_data %s %s ; lep2_eta      ; Events' %( dataset_ , ptbin_ ) , 50 , -2.5 , 2.5 ) , 'lep2_eta' , 'totalW' )
-        hlist_R['h_N_ss_data_lep1_pt']  = df_N_ss_data.Histo1D( ( 'N_ss_data_lep1_pt'  , 'f_data x N_os_mc != N_ss_data %s %s ; lep1_pt [GeV] ; Events' %( dataset_ , ptbin_ ) , 40 , 0. , 200.  ) , 'lep1_pt'  , 'totalW' )
-        hlist_R['h_N_ss_data_lep2_pt']  = df_N_ss_data.Histo1D( ( 'N_ss_data_lep2_pt'  , 'f_data x N_os_mc != N_ss_data %s %s ; lep2_pt [GeV] ; Events' %( dataset_ , ptbin_ ) , 40 , 0. , 200.  ) , 'lep2_pt'  , 'totalW' )
+        hlist_R['h_N_ss_data_mll']      = df_N_ss_data.Histo1D( ( 'N_ss_data_mll'      , 'f_data x N_os_mc != N_ss_data %s ; mll [GeV]     ; Events' %( dataset_ ) , 30, 76.2, 106.2 ) , 'mll'      , 'totalW' )
+        hlist_R['h_N_ss_data_lep1_eta'] = df_N_ss_data.Histo1D( ( 'N_ss_data_lep1_eta' , 'f_data x N_os_mc != N_ss_data %s ; lep1_eta      ; Events' %( dataset_ ) , 10 , -2.5 , 2.5 ) , 'lep1_eta' , 'totalW' )
+        hlist_R['h_N_ss_data_lep2_eta'] = df_N_ss_data.Histo1D( ( 'N_ss_data_lep2_eta' , 'f_data x N_os_mc != N_ss_data %s ; lep2_eta      ; Events' %( dataset_ ) , 10 , -2.5 , 2.5 ) , 'lep2_eta' , 'totalW' )
+        hlist_R['h_N_ss_data_lep1_pt']  = df_N_ss_data.Histo1D( ( 'N_ss_data_lep1_pt'  , 'f_data x N_os_mc != N_ss_data %s ; lep1_pt [GeV] ; Events' %( dataset_ ) , 40 , 0. , 200.  ) , 'lep1_pt'  , 'totalW' )
+        hlist_R['h_N_ss_data_lep2_pt']  = df_N_ss_data.Histo1D( ( 'N_ss_data_lep2_pt'  , 'f_data x N_os_mc != N_ss_data %s ; lep2_pt [GeV] ; Events' %( dataset_ ) , 40 , 0. , 200.  ) , 'lep2_pt'  , 'totalW' )
 
         for ihist in hlist_L: hlist_L[ihist].SetLineColor(ROOT.kGreen)
         for ihist in hlist_R: hlist_R[ihist].SetLineColor(ROOT.kRed)
@@ -265,14 +277,14 @@ if __name__ == '__main__':
         DF_val = OrderedDict({
             'DY_%s' %(dataset.split('_')[-1]) : ROOT.ROOT.RDataFrame("flipper", '%s/../ntuple/results/%s/DYJetsToLL_M*.root' %( os.getcwd() , dataset ) ),
             'DATA_%s' %(dataset.split('_')[-1]) : ROOT.ROOT.RDataFrame("flipper", [ '%s/../ntuple/results/%s/DoubleEG.root' %( os.getcwd() , dataset ) ] if dataset != "nanov5_2018" else [ '%s/../ntuple/results/%s/EGamma.root' %( os.getcwd() , dataset ) ] ),
-            #'FAKE_%s' %(dataset_.split('_')[-1]) : ROOT.ROOT.RDataFrame("flipper", [ ntupleDIR+'/Fake_DoubleEG.root' ] if dataset_ != "nanov5_2018" else [ ntupleDIR+'/Fake_EGamma.root' ] )
+            'FAKE_%s' %(dataset.split('_')[-1]) : ROOT.ROOT.RDataFrame("flipper", [ ntupleDIR+'/Fake_DoubleEG.root' ] if dataset != "nanov5_2018" else [ ntupleDIR+'/Fake_EGamma.root' ] )
         })
 
         # test 1 ; 2 ; 3 ; 4
-        CR = mkplot( dataset , ptbin , True , DF_val )
+        CR = mkValplot( DF_val )
         #CR_SS = mkplot( dataset , ptbin , True , DF_val )
         for i in range(4):
             i+=1
             #if i!=1: continue
-            mkval_postfit( dataset , CR , ptbin , output , i )
+            mkval_postfit( dataset , CR , output , i )
     pass

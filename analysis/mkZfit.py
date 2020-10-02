@@ -116,10 +116,10 @@ def fit(filename,ptbin,output):
         h_os=ROOT.TH2D('h_'+ptbin+'_os_'+isample,'h_'+ptbin+'_os_'+isample, len(eta_bin)-1 , eta_bin_array , len(eta_bin)-1 , eta_bin_array )
         for i in range(0,len(eta_bin)-1):
             for j in range(0,len(eta_bin)-1):
-                h_ss.SetBinContent(i+1,j+1,count[isample+'_'+year+'_'+ptbin+"_ss_etabin"+str(i)+"_etabin"+str(j)+"_mll"])
-                h_ss.SetBinError(i+1,j+1,count_err[isample+'_'+year+'_'+ptbin+"_ss_etabin"+str(i)+"_etabin"+str(j)+"_mll"])
-                h_os.SetBinContent(i+1,j+1,count[isample+'_'+year+'_'+ptbin+"_os_etabin"+str(i)+"_etabin"+str(j)+"_mll"])
-                h_os.SetBinError(i+1,j+1,count_err[isample+'_'+year+'_'+ptbin+"_os_etabin"+str(i)+"_etabin"+str(j)+"_mll"])
+                h_ss.SetBinContent(i+1,j+1,count['analysis_'+isample+'_'+year+'_'+ptbin+"_ss_etabin"+str(i)+"_etabin"+str(j)+"_mll"])
+                h_ss.SetBinError(i+1,j+1,count_err['analysis_'+isample+'_'+year+'_'+ptbin+"_ss_etabin"+str(i)+"_etabin"+str(j)+"_mll"])
+                h_os.SetBinContent(i+1,j+1,count['analysis_'+isample+'_'+year+'_'+ptbin+"_os_etabin"+str(i)+"_etabin"+str(j)+"_mll"])
+                h_os.SetBinError(i+1,j+1,count_err['analysis_'+isample+'_'+year+'_'+ptbin+"_os_etabin"+str(i)+"_etabin"+str(j)+"_mll"])
         if isample=='DATA':
             h_ss_sub=h_ss.Clone()
             h_ss_sub.SetName('h_'+ptbin+'_ss_DATASUB')
@@ -159,6 +159,7 @@ def ratio(filename,data,ptbin,output):
     h_os=fin.Get('h_%s_os_%s' %(ptbin,data))
     h_ratio=h_ss.Clone()
     h_ratio.Divide(h_os)
+    # gotten ride of low stats figure, unreliable
     for i in range(0,h_ratio.GetNbinsX()):
         for j in range(0,h_ratio.GetNbinsY()):
             if h_ss.GetBinContent(i+1,j+1)<10:
@@ -176,7 +177,8 @@ def ratio(filename,data,ptbin,output):
 
     c=ROOT.TCanvas()
     ROOT.gStyle.SetOptStat(0)
-    ROOT.gStyle.SetPaintTextFormat("1.4f")
+    #ROOT.gStyle.SetPaintTextFormat("1.6f")
+    #ROOT.gStyle.SetPaintTextFormat("4.1f") # HERE
     h_ss.Draw("colz texte")
 
     c.SaveAs( '%s/h_ss_%s_%s_%s_mll.png' %(output,data,year,ptbin))
@@ -198,8 +200,9 @@ if __name__ == '__main__':
 
         #for iptbin in ptbin:
         #fit zmass
-        iptbin="lowpt2"
-        fit( ifile , iptbin , 'plots/%s/Zmassfit' %name )
-        #compute ratio
-        for idata in ['DATASUB','DY']:
-            ratio( "plots/%s/Zmassfit/%s_mll/count_%s_hist_%s.root" %(name,iptbin,iptbin,name) , idata , iptbin , 'plots/%s/Chflipfit' %name )
+        for iptbin in ptbin:
+            #iptbin="lowpt2"
+            fit( ifile , iptbin , 'plots/%s/Zmassfit' %name )
+            #compute ratio
+            for idata in ['DATASUB','DY']:
+                ratio( "plots/%s/Zmassfit/%s_mll/count_%s_hist_%s.root" %(name,iptbin,iptbin,name) , idata , iptbin , 'plots/%s/Chflipfit' %name )
