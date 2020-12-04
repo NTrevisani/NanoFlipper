@@ -1,6 +1,10 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+
+typedef std::map<std::string, std::map<std::string, std::map<std::string, std::map<std::string, std::list<std::string>>>>> nested_dict;
+typedef std::map<std::string,std::string> WP_dict;
+
 /*
  * configuration for ntuple
  */
@@ -9,15 +13,33 @@ struct config_t {
   bool isMC=false;
   std::string year;
   std::string lumi;
+  std::string base;
+  nested_dict SF_files_map;
+  const unsigned int nlep_SF=2;
 
-  std::vector<TH2D> h_SF_ele {} ;
-  std::vector<TH2D> h_SF_ele_err {} ;
-  std::vector<TH2D> h_SF_ele_sys {} ;
+  WP_dict HWW_WP= {
+    { "2016" , "LepCut2l__ele_mva_90p_Iso2016__mu_cut_Tight80x" } ,
+    { "2017" , "LepCut2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW" } ,
+    { "2018" , "LepCut2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW" }
+  };
 
-  std::vector<TH2D> h_SF_ele_ttHMVA {} ;
-  std::vector<TH2D> h_SF_ele_ttHMVA_err {} ;
-  std::vector<TH2D> h_SF_ele_ttHMVA_sys {} ;
-
+  std::vector<TH2D> h_SF_ele {};
+  std::vector<TH2D> h_SF_ele_err {};
+  std::vector<TH2D> h_SF_ele_sys {};
+  std::vector<TH2D> h_SF_ele_ttHMVA {};
+  std::vector<TH2D> h_SF_ele_ttHMVA_err {};
+  std::vector<TH2D> h_SF_ele_ttHMVA_sys {};
+  
+  std::vector<TH2D> h_SF_mu_Id {};
+  std::vector<TH2D> h_SF_mu_Id_err {};
+  std::vector<TH2D> h_SF_mu_Id_sys {};
+  std::vector<TH2D> h_SF_mu_Iso {};
+  std::vector<TH2D> h_SF_mu_Iso_err {};
+  std::vector<TH2D> h_SF_mu_Iso_sys {};
+  std::vector<TH2D> h_SF_mu_ttHMVA {};
+  std::vector<TH2D> h_SF_mu_ttHMVA_err {};
+  std::vector<TH2D> h_SF_mu_ttHMVA_sys {};
+  
   size_t listSize;
 
   std::map< const std::string , const std::vector<std::string> > outBranch ={
@@ -43,8 +65,14 @@ struct config_t {
         "gen_promptmatch",
         "ptllDYW" ,
 	"nLepton" ,
-	"LepCut2l_ttHMVA" ,
-	"LepSF2l_ttHMVA"
+	//"LepCut2l_ttHMVA" ,
+	//"LepSF2l_ttHMVA"
+	"LepWPCut" ,
+	"ttHMVA_SF_2l",
+	"ttHMVA_2l_ele_SF_Up",
+	"ttHMVA_2l_ele_SF_Down",
+	"ttHMVA_2l_mu_SF_Up",
+	"ttHMVA_2l_mu_SF_Down"
       }
     },
 
@@ -70,9 +98,15 @@ struct config_t {
 	"gen_promptmatch",
 	"ptllDYW" ,
 	"nLepton" ,
-	"LepCut2l_ttHMVA" ,
-	"LepSF2l_ttHMVA"
-       }
+	//"LepCut2l_ttHMVA" ,
+	//"LepSF2l_ttHMVA"
+	"LepWPCut" ,
+	"ttHMVA_SF_2l" ,
+	"ttHMVA_2l_ele_SF_Up",
+        "ttHMVA_2l_ele_SF_Down",
+        "ttHMVA_2l_mu_SF_Up",
+        "ttHMVA_2l_mu_SF_Down"              
+      }
     },
 
     {
@@ -96,8 +130,14 @@ struct config_t {
 	"gen_promptmatch",
 	"ptllDYW" ,
 	"nLepton" ,
-	"LepCut2l_ttHMVA" ,
-	"LepSF2l_ttHMVA"
+	//"LepCut2l_ttHMVA" ,
+	//"LepSF2l_ttHMVA"
+	"LepWPCut" ,
+	"ttHMVA_SF_2l" ,
+	"ttHMVA_2l_ele_SF_Up" ,
+        "ttHMVA_2l_ele_SF_Down" ,
+        "ttHMVA_2l_mu_SF_Up" ,
+        "ttHMVA_2l_mu_SF_Down"              
       }
     },
     
@@ -122,7 +162,8 @@ struct config_t {
 	"mll",
 	"trigger" ,
 	"nLepton" ,
-	"LepCut2l_ttHMVA"
+	//"LepCut2l_ttHMVA"
+	"LepWPCut"
       }
     },
     
@@ -147,7 +188,8 @@ struct config_t {
 	"mll",
 	"trigger" ,
 	"nLepton" ,
-	"LepCut2l_ttHMVA"
+	//"LepCut2l_ttHMVA"
+	"LepWPCut"
       }
     },
     
@@ -172,7 +214,8 @@ struct config_t {
 	"mll",
 	"trigger" ,
 	"nLepton" ,
-	"LepCut2l_ttHMVA"
+	//"LepCut2l_ttHMVA"
+	"LepWPCut"
       }
     },
     
@@ -268,15 +311,13 @@ struct config_t {
   
   //trigger configuration
   std::map< const std::string , const std::string > trigger = {
-    //{"MuonEG","Trigger_ElMu"},
-    //{"DoubleMuon","!Trigger_ElMu && Trigger_dblMu"},
-    //{"SingleMuon","!Trigger_ElMu && !Trigger_dblMu && Trigger_sngMu"},
+    {"MuonEG","Trigger_ElMu"},
+    {"DoubleMuon","!Trigger_ElMu && Trigger_dblMu"},
+    {"SingleMuon","!Trigger_ElMu && !Trigger_dblMu && Trigger_sngMu"},
     {"DoubleEG","!Trigger_ElMu && !Trigger_dblMu && !Trigger_sngMu && Trigger_dblEl"}, // none existent for 2018
     {"SingleElectron","!Trigger_ElMu && !Trigger_dblMu && !Trigger_sngMu && !Trigger_dblEl && Trigger_sngEl"},
     {"EGamma","!Trigger_ElMu && !Trigger_dblMu && !Trigger_sngMu && (Trigger_sngEl || Trigger_dblEl)"} // only 2018
-  };
-
-  //tthMVA scale factor
+  };  
   
 };
 

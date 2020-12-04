@@ -29,7 +29,8 @@ if datasets == 'nanov5_2016':
         samplelists.append( dirs + itxt )
 elif datasets == 'nanov5_2017':
     lumi="41.53"
-    for	itxt in	[ "DYJetsToLL_M-10to50-LO_ext1.txt" , "DYJetsToLL_M-50-LO_ext1.txt" , "SingleElectron.txt" , "DoubleEG.txt" , "Fake_SingleElectron.txt" , "Fake_DoubleEG.txt" ]:
+    for	itxt in [ "DYJetsToLL_M-10to50-LO_ext1.txt" , "DYJetsToLL_M-50-LO_ext1.txt" , "SingleElectron.txt" , "MuonEG.txt" ] :
+        #[ "DYJetsToLL_M-10to50-LO_ext1.txt" , "DYJetsToLL_M-50-LO_ext1.txt" , "SingleElectron.txt" , "DoubleEG.txt" , "Fake_SingleElectron.txt" , "Fake_DoubleEG.txt" ]:
         samplelists.append( dirs + itxt )
 elif datasets == 'nanov5_2018':
     lumi = "59.74"
@@ -56,5 +57,6 @@ for iproc in samplelists:
     tproc = time.time()
     print(cmd)
     os.system(cmd)
+    #os.system('gdb --args %s' %cmd)
     print("--- running on %s took : %.3f seconds (%.3f minutes) ---" % ( sample , (time.time() - tproc) , (time.time() - tproc)/60. ) )
 print("--- Total run time : %.3f seconds (%.3f minutes) ---" % ( (time.time() - trun) , (time.time() - trun)/60. ) )

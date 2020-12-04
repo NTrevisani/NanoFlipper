@@ -1,0 +1,11 @@
+digraph {
+	5 [label="DY region : ( abs(mll-91.2)<15 )", style="filled", fillcolor="#c4cfd4", shape="diamond"];
+	4 [label="E-Mu channel : ( abs(Lepton_pdgId[0]*Lepton_pdgId[1])==11*13 )", style="filled", fillcolor="#c4cfd4", shape="diamond"];
+	3 [label="Lepton pt cut : (Lepton_pt[0]>23 && Lepton_pt[1]>12)", style="filled", fillcolor="#c4cfd4", shape="diamond"];
+	2 [label="Nlepton cut : ( nLepton==2 || ( nLepton>=3 && Lepton_pt[2]<10 ) )", style="filled", fillcolor="#c4cfd4", shape="diamond"];
+	0 [label="Events", style="filled", fillcolor="#e8f8fc", shape="oval"];
+	4 -> 5;
+	3 -> 4;
+	2 -> 3;
+	0 -> 2;
+}
