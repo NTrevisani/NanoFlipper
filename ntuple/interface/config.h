@@ -65,9 +65,7 @@ struct config_t {
         "gen_promptmatch",
         "ptllDYW" ,
 	"nLepton" ,
-	//"LepCut2l_ttHMVA" ,
-	//"LepSF2l_ttHMVA"
-	"LepWPCut" ,
+	"LepCut2l__ele_mu_tthMVA" ,
 	"ttHMVA_SF_2l",
 	"ttHMVA_2l_ele_SF_Up",
 	"ttHMVA_2l_ele_SF_Down",
@@ -98,9 +96,7 @@ struct config_t {
 	"gen_promptmatch",
 	"ptllDYW" ,
 	"nLepton" ,
-	//"LepCut2l_ttHMVA" ,
-	//"LepSF2l_ttHMVA"
-	"LepWPCut" ,
+	"LepCut2l__ele_mu_tthMVA" ,
 	"ttHMVA_SF_2l" ,
 	"ttHMVA_2l_ele_SF_Up",
         "ttHMVA_2l_ele_SF_Down",
@@ -130,9 +126,7 @@ struct config_t {
 	"gen_promptmatch",
 	"ptllDYW" ,
 	"nLepton" ,
-	//"LepCut2l_ttHMVA" ,
-	//"LepSF2l_ttHMVA"
-	"LepWPCut" ,
+	"LepCut2l__ele_mu_tthMVA" ,
 	"ttHMVA_SF_2l" ,
 	"ttHMVA_2l_ele_SF_Up" ,
         "ttHMVA_2l_ele_SF_Down" ,
@@ -162,8 +156,7 @@ struct config_t {
 	"mll",
 	"trigger" ,
 	"nLepton" ,
-	//"LepCut2l_ttHMVA"
-	"LepWPCut"
+	"LepCut2l__ele_mu_tthMVA"
       }
     },
     
@@ -188,8 +181,7 @@ struct config_t {
 	"mll",
 	"trigger" ,
 	"nLepton" ,
-	//"LepCut2l_ttHMVA"
-	"LepWPCut"
+	"LepCut2l__ele_mu_tthMVA"
       }
     },
     
@@ -214,8 +206,7 @@ struct config_t {
 	"mll",
 	"trigger" ,
 	"nLepton" ,
-	//"LepCut2l_ttHMVA"
-	"LepWPCut"
+	"LepCut2l__ele_mu_tthMVA"
       }
     },
     

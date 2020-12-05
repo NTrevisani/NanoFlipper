@@ -29,8 +29,7 @@ if datasets == 'nanov5_2016':
         samplelists.append( dirs + itxt )
 elif datasets == 'nanov5_2017':
     lumi="41.53"
-    for	itxt in [ "DYJetsToLL_M-10to50-LO_ext1.txt" , "DYJetsToLL_M-50-LO_ext1.txt" , "SingleElectron.txt" , "MuonEG.txt" ] :
-        #[ "DYJetsToLL_M-10to50-LO_ext1.txt" , "DYJetsToLL_M-50-LO_ext1.txt" , "SingleElectron.txt" , "DoubleEG.txt" , "Fake_SingleElectron.txt" , "Fake_DoubleEG.txt" ]:
+    for	itxt in [ "DYJetsToLL_M-10to50-LO_ext1.txt" , "DYJetsToLL_M-50-LO_ext1.txt" , "SingleElectron.txt" , "DoubleEG.txt" , "Fake_SingleElectron.txt" , "Fake_DoubleEG.txt" ]:
         samplelists.append( dirs + itxt )
 elif datasets == 'nanov5_2018':
     lumi = "59.74"

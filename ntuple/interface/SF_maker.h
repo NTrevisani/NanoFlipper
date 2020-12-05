@@ -304,8 +304,9 @@ template < typename T >
 	  else{                                                                                                               
 	    res = GetSF(11, lepton_eta[i], lepton_pt[i], SF_path.size()==1 ? 0 : run_period__ - 1, cfg , "Id");               
 	    res_ttHMVA = GetSF(11, lepton_eta[i], lepton_pt[i], SF_path_ttHMVA.size()==1 ? 0 : run_period__ - 1, cfg , "ttHMVA");
-	  }                                                                                                                      
-	  SF_vect.push_back(std::get<0>(res)*std::get<0>(res_ttHMVA));                                                           
+	  }
+	  // scale factor = HWW x ttHMVA
+	  SF_vect.push_back(std::get<0>(res)*std::get<0>(res_ttHMVA));
 	  SF_err_vect.push_back(TMath::Sqrt(TMath::Power(std::get<1>(res), 2) + TMath::Power(std::get<2>(res), 2)                
 					    + TMath::Power(std::get<1>(res_ttHMVA), 2) + TMath::Power(std::get<2>(res_ttHMVA), 2) ));
 	}
@@ -318,6 +319,7 @@ template < typename T >
 	  double SF_id = std::get<0>(res_id);                                                      
 	  double SF_iso = std::get<0>(res_iso);                                                                                                                
 	  double SF_ttHMVA = std::get<0>(res_ttHMVA);
+	  // scale factor = HWW x ttHMVA
 	  SF_vect.push_back( SF_id * SF_iso * SF_ttHMVA );
 	  // SF_err_vect.push_back((SF_id * SF_iso) * TMath::Sqrt( TMath::Power(std::get<1>(res_id)/SF_id, 2) + TMath::Power(std::get<1>(res_iso)/SF_iso, 2) )); // Old formula for debugging                   
 	  SF_err_vect.push_back(                                                                                                                               
@@ -356,7 +358,7 @@ template < typename T >
   
   df = df
     .Define( "HWW_WP_cut" , cfg.HWW_WP[cfg.year] )
-    .Define( "LepWPCut" , "HWW_WP_cut*( (abs(Lepton_pdgId[0])==11 || Muon_mvaTTH[Lepton_muonIdx[0]]>0.8) && (abs(Lepton_pdgId[1])==11 || Muon_mvaTTH[Lepton_muonIdx[1]]>0.8) && (abs(Lepton_pdgId[0])==13 || Electron_mvaTTH[Lepton_electronIdx[0]]>0.70) && (abs(Lepton_pdgId[1])==13 || Electron_mvaTTH[Lepton_electronIdx[1]]>0.70))");
+    .Define( "LepCut2l__ele_mu_tthMVA" , "HWW_WP_cut*( (abs(Lepton_pdgId[0])==11 || Muon_mvaTTH[Lepton_muonIdx[0]]>0.8) && (abs(Lepton_pdgId[1])==11 || Muon_mvaTTH[Lepton_muonIdx[1]]>0.8) && (abs(Lepton_pdgId[0])==13 || Electron_mvaTTH[Lepton_electronIdx[0]]>0.70) && (abs(Lepton_pdgId[1])==13 || Electron_mvaTTH[Lepton_electronIdx[1]]>0.70))");
 
   // mc only
   if (cfg.isMC){

@@ -61,8 +61,8 @@ int main(int argc, char **argv) {
   auto pre_outdf = df
     .Filter("nLepton==2 || ( nLepton>=3 && Lepton_pt[2]<10 )","Nlepton cut : ( nLepton==2 || ( nLepton>=3 && Lepton_pt[2]<10 ) )")
     .Filter("Lepton_pt[0]>23 && Lepton_pt[1]>12","Lepton pt cut : (Lepton_pt[0]>23 && Lepton_pt[1]>12)")
-    .Filter("abs(Lepton_pdgId[0]*Lepton_pdgId[1])==11*13","E-Mu channel : ( abs(Lepton_pdgId[0]*Lepton_pdgId[1])==11*13 )")
-    //.Filter("abs(mll-91.2)>15" , "DY region : ( abs(mll-91.2)>15 )")
+    .Filter("abs(Lepton_pdgId[0]*Lepton_pdgId[1])==11*11","e-e channel : ( abs(Lepton_pdgId[0]*Lepton_pdgId[1])==11*11 )")
+    .Filter("abs(mll-91.2)<15" , "DY region : ( abs(mll-91.2)<15 )")
     .Define("lep1_pt"    , "Lepton_pt[0]")
     .Define("lep1_eta"   , "Lepton_eta[0]")
     .Define("lep1_pdgId" , "Lepton_pdgId[0]")
@@ -75,7 +75,8 @@ int main(int argc, char **argv) {
 
   if (mycfg.isMC){
     // gen-matching to prompt only (GenLepMatch2l matches to *any* gen lepton)
-    outdf = outdf.Define("gen_promptmatch" , "Lepton_promptgenmatched[0]*Lepton_promptgenmatched[1]")
+    outdf = outdf
+      .Define("gen_promptmatch" , "Lepton_promptgenmatched[0]*Lepton_promptgenmatched[1]")
       .Define("ptllDYW"    , mycfg.ptllDYW_LO[year]);
   }
   else{
@@ -84,7 +85,6 @@ int main(int argc, char **argv) {
     std::string::size_type iss = tname.find(s);
     if (iss != std::string::npos)
       tname.erase(iss, s.length());
-    //
     outdf = outdf.Define( "trigger" , mycfg.trigger[tname] );
   }
 
