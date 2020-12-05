@@ -4,7 +4,7 @@
 #include "helper.h"
 #include "config.h"
 
-void makeSF_ele( std::list<std::string> SF_files_map_in , std::vector<TH2D> &sf_nom , std::vector<TH2D> &sf_stat , std::vector<TH2D> &sf_syst ) {
+void makeSF_ele( std::list<std::string> SF_files_map_in , std::vector<TH2D> &sf_nom  ) { //, std::vector<TH2D> &sf_stat , std::vector<TH2D> &sf_syst ) {
 
   int ele_nbins_eta = 10;
   int ele_nbins_pt = 7;
@@ -16,8 +16,8 @@ void makeSF_ele( std::list<std::string> SF_files_map_in , std::vector<TH2D> &sf_
   for( auto f : SF_files_map_in ){
 
     TH2D h_SF = TH2D("", "", ele_nbins_eta, ele_eta_bins, ele_nbins_pt, ele_pt_bins);
-    TH2D h_SF_err = TH2D("", "", ele_nbins_eta, ele_eta_bins, ele_nbins_pt, ele_pt_bins);
-    TH2D h_SF_sys = TH2D("", "", ele_nbins_eta, ele_eta_bins, ele_nbins_pt, ele_pt_bins);
+    //TH2D h_SF_err = TH2D("", "", ele_nbins_eta, ele_eta_bins, ele_nbins_pt, ele_pt_bins);
+    //TH2D h_SF_sys = TH2D("", "", ele_nbins_eta, ele_eta_bins, ele_nbins_pt, ele_pt_bins);
 
     for(int iBinX = 1; iBinX<=h_SF.GetNbinsX(); iBinX++){
       for(int iBinY = 1; iBinY<=h_SF.GetNbinsY(); iBinY++){
@@ -53,12 +53,12 @@ void makeSF_ele( std::list<std::string> SF_files_map_in , std::vector<TH2D> &sf_
 	      double data = lines[i][4];
 	      double mc = lines[i][6];
 
-	      double sigma_d = lines[i][5];
-	      double sigma_m = lines[i][7];
+	      //double sigma_d = lines[i][5];
+	      //double sigma_m = lines[i][7];
 
 	      h_SF.SetBinContent(iBinX, iBinY, data/mc);
-	      h_SF_err.SetBinContent(iBinX, iBinY, TMath::Sqrt( TMath::Power(sigma_d/mc, 2) + TMath::Power(data/mc/mc*sigma_m, 2) ));
-	      h_SF_sys.SetBinContent(iBinX, iBinY, TMath::Sqrt( TMath::Power(lines[i][8], 2) + TMath::Power(lines[i][9], 2) + TMath::Power(lines[i][10], 2) + TMath::Power(lines[i][11], 2) ) / mc);
+	      //h_SF_err.SetBinContent(iBinX, iBinY, TMath::Sqrt( TMath::Power(sigma_d/mc, 2) + TMath::Power(data/mc/mc*sigma_m, 2) ));
+	      //h_SF_sys.SetBinContent(iBinX, iBinY, TMath::Sqrt( TMath::Power(lines[i][8], 2) + TMath::Power(lines[i][9], 2) + TMath::Power(lines[i][10], 2) + TMath::Power(lines[i][11], 2) ) / mc);
 	      break;
 	    }
 	  }
@@ -71,18 +71,19 @@ void makeSF_ele( std::list<std::string> SF_files_map_in , std::vector<TH2D> &sf_
     }
 
     sf_nom.push_back(h_SF);
-    sf_stat.push_back(h_SF_err);
-    sf_syst.push_back(h_SF_sys);
+    //sf_stat.push_back(h_SF_err);
+    //sf_syst.push_back(h_SF_sys);
   }
 }
 
 ///
-std::tuple<double, double, double> GetSF(int flavor, float eta, float pt, int run_period, config_t mycfg , std::string type){
+//std::tuple<double, double, double> GetSF(int flavor, float eta, float pt, int run_period, config_t mycfg , std::string type){
+double GetSF(int flavor, float eta, float pt, int run_period, config_t mycfg , std::string type){
 
   double eta_temp = eta;
   double pt_temp = pt;
 
-  double SF, SF_err, SF_sys;
+  double SF = 1. ; //, SF_err, SF_sys;
 
   if((flavor==11) && (type == "ttHMVA")){
 
@@ -97,8 +98,8 @@ std::tuple<double, double, double> GetSF(int flavor, float eta, float pt, int ru
     if(pt_temp > pt_max){pt_temp = pt_max;}
 
     SF = mycfg.h_SF_ele_ttHMVA[run_period].GetBinContent(mycfg.h_SF_ele_ttHMVA[run_period].FindBin(eta_temp, pt_temp));
-    SF_err = mycfg.h_SF_ele_ttHMVA_err[run_period].GetBinContent(mycfg.h_SF_ele_ttHMVA_err[run_period].FindBin(eta_temp, pt_temp));
-    SF_sys = mycfg.h_SF_ele_ttHMVA_sys[run_period].GetBinContent(mycfg.h_SF_ele_ttHMVA_sys[run_period].FindBin(eta_temp, pt_temp));
+    //SF_err = mycfg.h_SF_ele_ttHMVA_err[run_period].GetBinContent(mycfg.h_SF_ele_ttHMVA_err[run_period].FindBin(eta_temp, pt_temp));
+    //SF_sys = mycfg.h_SF_ele_ttHMVA_sys[run_period].GetBinContent(mycfg.h_SF_ele_ttHMVA_sys[run_period].FindBin(eta_temp, pt_temp));
 
   }
   else if((flavor==11) && (type == "Id")){
@@ -114,15 +115,16 @@ std::tuple<double, double, double> GetSF(int flavor, float eta, float pt, int ru
     if(pt_temp > pt_max){pt_temp = pt_max;}
 
     SF = mycfg.h_SF_ele[run_period].GetBinContent(mycfg.h_SF_ele[run_period].FindBin(eta_temp, pt_temp));
-    SF_err = mycfg.h_SF_ele_err[run_period].GetBinContent(mycfg.h_SF_ele_err[run_period].FindBin(eta_temp, pt_temp));
-    SF_sys = mycfg.h_SF_ele_sys[run_period].GetBinContent(mycfg.h_SF_ele_sys[run_period].FindBin(eta_temp, pt_temp));
+    //SF_err = mycfg.h_SF_ele_err[run_period].GetBinContent(mycfg.h_SF_ele_err[run_period].FindBin(eta_temp, pt_temp));
+    //SF_sys = mycfg.h_SF_ele_sys[run_period].GetBinContent(mycfg.h_SF_ele_sys[run_period].FindBin(eta_temp, pt_temp));
 
   }
   else {std::cout << "Invalid call to compute_SF::GetSF" << std::endl;}
 
   //std::tuple<double, double, double> result = {SF, SF_err, SF_sys};
 
-  return std::tuple<double,double,double>{ SF, SF_err, SF_sys };
+  //return std::tuple<double,double,double>{ SF, SF_err, SF_sys };
+  return SF;
 
 }
 
@@ -139,9 +141,9 @@ template < typename T >
 				    )
     {
       std::vector<double> SF_vect {};
-      std::vector<double> SF_err_vect {};
-      std::vector<double> SF_up {};
-      std::vector<double> SF_do {};
+      //std::vector<double> SF_err_vect {};
+      //std::vector<double> SF_up {};
+      //std::vector<double> SF_do {};
       
       const unsigned int nlep = cfg.nlep_SF; 
       int run_period__ = run_period;
@@ -150,8 +152,10 @@ template < typename T >
 	if(TMath::Abs(pdgId[i]) == 11){
 	  std::list<std::string> SF_path = cfg.SF_files_map["electron"]["TightObjWP"][cfg.year]["wpSF"];
 	  std::list<std::string> SF_path_ttHMVA = cfg.SF_files_map["electron"]["ttHMVA0p7"][cfg.year]["ttHMVA"];
-	  std::tuple<double, double, double> res;
-	  std::tuple<double, double, double> res_ttHMVA;
+	  //std::tuple<double, double, double> res;
+	  //std::tuple<double, double, double> res_ttHMVA;
+	  double res;
+	  double res_ttHMVA;
 	  if( cfg.year.find("2017") != std::string::npos ){
 	    int runp = run_period;                         
 	    if (runp <= 2){                                
@@ -168,9 +172,10 @@ template < typename T >
 	    res_ttHMVA = GetSF(11, lepton_eta[i], lepton_pt[i], SF_path_ttHMVA.size()==1 ? 0 : run_period__ - 1, cfg , "ttHMVA");
 	  }
 	  // scale factor = HWW x ttHMVA
-	  SF_vect.push_back(std::get<0>(res)*std::get<0>(res_ttHMVA));
-	  SF_err_vect.push_back(TMath::Sqrt(TMath::Power(std::get<1>(res), 2) + TMath::Power(std::get<2>(res), 2)                
-					    + TMath::Power(std::get<1>(res_ttHMVA), 2) + TMath::Power(std::get<2>(res_ttHMVA), 2) ));
+	  SF_vect.push_back( res * res_ttHMVA );
+	  //SF_vect.push_back(std::get<0>(res)*std::get<0>(res_ttHMVA));
+	  //SF_err_vect.push_back(TMath::Sqrt(TMath::Power(std::get<1>(res), 2) + TMath::Power(std::get<2>(res), 2)                
+	  //+ TMath::Power(std::get<1>(res_ttHMVA), 2) + TMath::Power(std::get<2>(res_ttHMVA), 2) ));
 	}
 	else if(TMath::Abs(pdgId[i]) == 13){
 	  std::cout<<"Impossible, we only look at e-e phase space"<<std::endl;

@@ -24,11 +24,11 @@ struct config_t {
   };
 
   std::vector<TH2D> h_SF_ele {};
-  std::vector<TH2D> h_SF_ele_err {};
-  std::vector<TH2D> h_SF_ele_sys {};
+  //std::vector<TH2D> h_SF_ele_err {};
+  //std::vector<TH2D> h_SF_ele_sys {};
   std::vector<TH2D> h_SF_ele_ttHMVA {};
-  std::vector<TH2D> h_SF_ele_ttHMVA_err {};
-  std::vector<TH2D> h_SF_ele_ttHMVA_sys {};
+  //std::vector<TH2D> h_SF_ele_ttHMVA_err {};
+  //std::vector<TH2D> h_SF_ele_ttHMVA_sys {};
     
   size_t listSize;
 
