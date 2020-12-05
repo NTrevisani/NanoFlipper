@@ -76,90 +76,6 @@ void makeSF_ele( std::list<std::string> SF_files_map_in , std::vector<TH2D> &sf_
   }
 }
 
-void makeSF_muon( std::list<std::string> SF_files_map_in , std::vector<TH2D> &sf_nom , std::vector<TH2D> &sf_stat , std::vector<TH2D> &sf_syst , std::string histname ) {
-  
-  for( auto f : SF_files_map_in ){
-    TFile rootfile(f.c_str());
-    TH2D* htemp = (TH2D*)rootfile.Get(histname.c_str());
-
-    int mu_nbins_eta = htemp->GetNbinsX(), mu_nbins_pt = htemp->GetNbinsY();
-    
-    // C language allows the creation of arrays on the stack of variable length, but C ++ does not. In C ++ the size of the arrays allocated in the stack must be known at compile time.
-    std::vector<double> mu_eta_bins(mu_nbins_eta+1), mu_pt_bins(mu_nbins_pt+1);
-
-    for(int k=0;k<=mu_nbins_eta;k++) { mu_eta_bins[k] = htemp->GetXaxis()->GetXbins()->At(k); }
-    for(int k=0;k<=mu_nbins_pt;k++) { mu_pt_bins[k] = htemp->GetYaxis()->GetXbins()->At(k); }
-    
-    TH2D h_SF = TH2D("", "", mu_nbins_eta, mu_eta_bins.data(), mu_nbins_pt, mu_pt_bins.data());
-    TH2D h_SF_err = TH2D("", "", mu_nbins_eta, mu_eta_bins.data(), mu_nbins_pt, mu_pt_bins.data());
-    TH2D h_SF_sys = TH2D("", "", mu_nbins_eta, mu_eta_bins.data(), mu_nbins_pt, mu_pt_bins.data());
-    
-    for(int i=1; i<=mu_nbins_eta;i++){
-            for(int j=1; j<=mu_nbins_pt;j++){
-              h_SF.SetBinContent(i, j, htemp->GetBinContent(i, j));
-              h_SF_err.SetBinContent(i, j, htemp->GetBinError(i, j));
-	      h_SF_sys.SetBinContent(i, j, 1.); // FIXME this is here as a placeholder: old SF files only have total error, in the new ones it is split
-            }
-        }
-    sf_nom.push_back(h_SF);
-    sf_stat.push_back(h_SF_err);
-    sf_syst.push_back(h_SF_sys);
-  }
-}
-
-void makeSF_muon_tthMVA( std::pair< std::list<std::string> , std::list<std::string> > SF_files_map_in , std::vector<TH2D> &sf_nom , std::vector<TH2D> &sf_stat , std::vector<TH2D> &sf_syst , std::string histname ) {
-
-  // NOM
-  for( auto f : SF_files_map_in.first ){
-
-    TFile rootfile(f.c_str());
-    TH2D* htemp = (TH2D*)rootfile.Get(histname.c_str());
-
-    int mu_nbins_eta = htemp->GetNbinsX(), mu_nbins_pt = htemp->GetNbinsY();
-    std::vector<double> mu_eta_bins(mu_nbins_eta+1), mu_pt_bins(mu_nbins_pt+1);
-    
-    for(int k=0;k<=mu_nbins_eta;k++) { mu_eta_bins[k] = htemp->GetXaxis()->GetXbins()->At(k); }
-    for(int k=0;k<=mu_nbins_pt;k++) { mu_pt_bins[k] = htemp->GetYaxis()->GetXbins()->At(k); }
-
-    TH2D h_SF = TH2D("", "", mu_nbins_eta, mu_eta_bins.data(), mu_nbins_pt, mu_pt_bins.data());
-    TH2D h_SF_err = TH2D("", "", mu_nbins_eta, mu_eta_bins.data(), mu_nbins_pt, mu_pt_bins.data());
-    TH2D h_SF_sys = TH2D("", "", mu_nbins_eta, mu_eta_bins.data(), mu_nbins_pt, mu_pt_bins.data());
-
-    for(int i=1; i<=mu_nbins_eta;i++){
-      for(int j=1; j<=mu_nbins_pt;j++){
-	h_SF.SetBinContent(i, j, htemp->GetBinContent(i, j));
-	h_SF_err.SetBinContent(i, j, htemp->GetBinError(i, j));
-      }
-    }
-
-    sf_nom.push_back(h_SF);
-    sf_stat.push_back(h_SF_err);
-  }
-
-  // SYS
-  for( auto f : SF_files_map_in.second ){
-    TFile rootfile(f.c_str());
-    TH2D* htemp = (TH2D*)rootfile.Get(histname.c_str());
-
-    int mu_nbins_eta = htemp->GetNbinsX(), mu_nbins_pt = htemp->GetNbinsY();
-    std::vector<double> mu_eta_bins(mu_nbins_eta+1), mu_pt_bins(mu_nbins_pt+1);
-    
-    for(int k=0;k<=mu_nbins_eta;k++) { mu_eta_bins[k] = htemp->GetXaxis()->GetXbins()->At(k); }
-    for(int k=0;k<=mu_nbins_pt;k++) { mu_pt_bins[k] = htemp->GetYaxis()->GetXbins()->At(k); }
-
-    TH2D h_SF = TH2D("", "", mu_nbins_eta, mu_eta_bins.data(), mu_nbins_pt, mu_pt_bins.data());
-    TH2D h_SF_err = TH2D("", "", mu_nbins_eta, mu_eta_bins.data(), mu_nbins_pt, mu_pt_bins.data());
-    TH2D h_SF_sys = TH2D("", "", mu_nbins_eta, mu_eta_bins.data(), mu_nbins_pt, mu_pt_bins.data());
-
-    for(int i=1; i<=mu_nbins_eta;i++){
-      for(int j=1; j<=mu_nbins_pt;j++){
-	h_SF_sys.SetBinContent(i, j, htemp->GetBinError(i, j));
-      }
-    }
-    sf_syst.push_back(h_SF_sys);
-  }
-}
-
 ///
 std::tuple<double, double, double> GetSF(int flavor, float eta, float pt, int run_period, config_t mycfg , std::string type){
 
@@ -202,57 +118,6 @@ std::tuple<double, double, double> GetSF(int flavor, float eta, float pt, int ru
     SF_sys = mycfg.h_SF_ele_sys[run_period].GetBinContent(mycfg.h_SF_ele_sys[run_period].FindBin(eta_temp, pt_temp));
 
   }
-  else if((flavor == 13) && (type == "Id")){
-
-    double eta_max = 2.39;
-    double eta_min = -2.4;
-    double pt_max = 199.;
-    double pt_min = 10.;
-
-    if(eta_temp < eta_min){eta_temp = eta_min;}
-    if(eta_temp > eta_max){eta_temp = eta_max;}
-    if(pt_temp < pt_min){pt_temp = pt_min;}
-    if(pt_temp > pt_max){pt_temp = pt_max;}
-
-    SF = mycfg.h_SF_mu_Id[run_period].GetBinContent(mycfg.h_SF_mu_Id[run_period].FindBin(eta_temp, pt_temp));
-    SF_err = mycfg.h_SF_mu_Id_err[run_period].GetBinContent(mycfg.h_SF_mu_Id_err[run_period].FindBin(eta_temp, pt_temp));
-    SF_sys = mycfg.h_SF_mu_Id_sys[run_period].GetBinContent(mycfg.h_SF_mu_Id_sys[run_period].FindBin(eta_temp, pt_temp));
-
-  }
-  else if((flavor == 13) && (type == "Iso")){
-
-    double eta_max = 2.39;
-    double eta_min = -2.4;
-    double pt_max = 199.;
-    double pt_min = 10.;
-
-    if(eta_temp < eta_min){eta_temp = eta_min;}
-    if(eta_temp > eta_max){eta_temp = eta_max;}
-    if(pt_temp < pt_min){pt_temp = pt_min;}
-    if(pt_temp > pt_max){pt_temp = pt_max;}
-
-    SF = mycfg.h_SF_mu_Iso[run_period].GetBinContent(mycfg.h_SF_mu_Iso[run_period].FindBin(eta_temp, pt_temp));
-    SF_err = mycfg.h_SF_mu_Iso_err[run_period].GetBinContent(mycfg.h_SF_mu_Iso_err[run_period].FindBin(eta_temp, pt_temp));
-    SF_sys = mycfg.h_SF_mu_Iso_sys[run_period].GetBinContent(mycfg.h_SF_mu_Iso_sys[run_period].FindBin(eta_temp, pt_temp));
-
-  }
-  else if((flavor == 13) && (type == "ttHMVA")){
-
-    double eta_max = 2.39;
-    double eta_min = -2.4;
-    double pt_max = 199.;
-    double pt_min = 10.;
-
-    if(eta_temp < eta_min){eta_temp = eta_min;}
-    if(eta_temp > eta_max){eta_temp = eta_max;}
-    if(pt_temp < pt_min){pt_temp = pt_min;}
-    if(pt_temp > pt_max){pt_temp = pt_max;}
-
-    SF = mycfg.h_SF_mu_ttHMVA[run_period].GetBinContent(mycfg.h_SF_mu_ttHMVA[run_period].FindBin(eta_temp, pt_temp));
-    SF_err = mycfg.h_SF_mu_ttHMVA_err[run_period].GetBinContent(mycfg.h_SF_mu_ttHMVA_err[run_period].FindBin(eta_temp, pt_temp));
-    SF_sys = mycfg.h_SF_mu_ttHMVA_sys[run_period].GetBinContent(mycfg.h_SF_mu_ttHMVA_sys[run_period].FindBin(eta_temp, pt_temp));
-
-  }
   else {std::cout << "Invalid call to compute_SF::GetSF" << std::endl;}
 
   //std::tuple<double, double, double> result = {SF, SF_err, SF_sys};
@@ -270,10 +135,7 @@ template < typename T >
 				    const int& run_period ,
 				    const RVec<int>& pdgId ,
 				    const RVec<float>& lepton_pt ,
-				    const RVec<float>& lepton_eta ,
-				    const RVec<float>& lepton_recoSF ,
-				    const RVec<float>& lepton_recoSF_Up ,
-				    const RVec<float>& lepton_recoSF_Down
+				    const RVec<float>& lepton_eta
 				    )
     {
       std::vector<double> SF_vect {};
@@ -311,23 +173,8 @@ template < typename T >
 					    + TMath::Power(std::get<1>(res_ttHMVA), 2) + TMath::Power(std::get<2>(res_ttHMVA), 2) ));
 	}
 	else if(TMath::Abs(pdgId[i]) == 13){
-	  std::list<std::string> SF_path_id = cfg.SF_files_map["muon"]["TightObjWP"][cfg.year]["idSF"];             
-	  std::list<std::string> SF_path_iso = cfg.SF_files_map["muon"]["TightObjWP"][cfg.year]["isoSF"];
-	  std::tuple<double, double, double> res_id = GetSF(13, lepton_eta[i], lepton_pt[i], SF_path_id.size()==1 ? 0 : run_period__ - 1, cfg , "Id");
-	  std::tuple<double, double, double> res_iso = GetSF(13, lepton_eta[i], lepton_pt[i], SF_path_iso.size()==1 ? 0 : run_period__ - 1, cfg , "Iso");
-	  std::tuple<double, double, double> res_ttHMVA = GetSF(13, lepton_eta[i], lepton_pt[i], SF_path_iso.size()==1 ? 0 : run_period__ - 1, cfg , "ttHMVA");
-	  double SF_id = std::get<0>(res_id);                                                      
-	  double SF_iso = std::get<0>(res_iso);                                                                                                                
-	  double SF_ttHMVA = std::get<0>(res_ttHMVA);
-	  // scale factor = HWW x ttHMVA
-	  SF_vect.push_back( SF_id * SF_iso * SF_ttHMVA );
-	  // SF_err_vect.push_back((SF_id * SF_iso) * TMath::Sqrt( TMath::Power(std::get<1>(res_id)/SF_id, 2) + TMath::Power(std::get<1>(res_iso)/SF_iso, 2) )); // Old formula for debugging                   
-	  SF_err_vect.push_back(                                                                                                                               
-				(SF_id * SF_iso * SF_ttHMVA) * TMath::Sqrt(                                                                                    
-									   TMath::Power(std::get<1>(res_id)/SF_id, 2)                                          
-									   + TMath::Power(std::get<1>(res_iso)/SF_iso, 2)                                      
-									   + (TMath::Power(std::get<1>(res_ttHMVA), 2) + TMath::Power(std::get<2>(res_ttHMVA), 2))/SF_ttHMVA/SF_ttHMVA )
-																			       );
+	  std::cout<<"Impossible, we only look at e-e phase space"<<std::endl;
+	  exit(0);
 	}
       } // end of loops
       
@@ -335,51 +182,19 @@ template < typename T >
       
       // Calculate product of IsIso_SFs for all leptons in the event
       for(auto x : SF_vect) SF *= x;
-
-      // Now for the variations, these also have to account for the recoSF
-      for( unsigned int i=0 ; i< nlep ; i++ ){
-	
-	SF_up.push_back( ((SF_vect[i] * lepton_recoSF[i]) + TMath::Sqrt(TMath::Power(SF_err_vect[i], 2) + TMath::Power(lepton_recoSF_Up[i] - lepton_recoSF[i], 2) ))/(SF_vect[i] * lepton_recoSF[i]) );
-	SF_do.push_back( ((SF_vect[i] * lepton_recoSF[i]) - TMath::Sqrt(TMath::Power(SF_err_vect[i], 2) + TMath::Power(lepton_recoSF_Down[i] - lepton_recoSF[i], 2) ))/(SF_vect[i] * lepton_recoSF[i]) );
-      }
-      // output {total_SF ; single_SF_up_0 ; single_SF_up_1 ; single_SF_down_0 ; single_SF_down_1 }
-      return RVec<double> (
-	{
-	  SF,
-	    SF_vect.size() > 0 ? SF_up[0] : 1. ,
-	    SF_vect.size() > 1 ? SF_up[1] : 1. ,
-	    SF_vect.size() > 0 ? SF_do[0] : 1. ,
-	    SF_vect.size() > 1 ? SF_do[1] : 1.
-	    }
-	);
+      
+      return SF;
     };
   
   std::cout<<" --> default HWW WP : "<< cfg.HWW_WP[cfg.year] <<std::endl;
   
   df = df
     .Define( "HWW_WP_cut" , cfg.HWW_WP[cfg.year] )
-    .Define( "LepCut2l__ele_mu_tthMVA" , "HWW_WP_cut*( (abs(Lepton_pdgId[0])==11 || Muon_mvaTTH[Lepton_muonIdx[0]]>0.8) && (abs(Lepton_pdgId[1])==11 || Muon_mvaTTH[Lepton_muonIdx[1]]>0.8) && (abs(Lepton_pdgId[0])==13 || Electron_mvaTTH[Lepton_electronIdx[0]]>0.70) && (abs(Lepton_pdgId[1])==13 || Electron_mvaTTH[Lepton_electronIdx[1]]>0.70))");
-
+    .Define( "LepCut2l__ele_mu_HWW_tthMVA" , "HWW_WP_cut*( (abs(Lepton_pdgId[0])==11 || Muon_mvaTTH[Lepton_muonIdx[0]]>0.8) && (abs(Lepton_pdgId[1])==11 || Muon_mvaTTH[Lepton_muonIdx[1]]>0.8) && (abs(Lepton_pdgId[0])==13 || Electron_mvaTTH[Lepton_electronIdx[0]]>0.70) && (abs(Lepton_pdgId[1])==13 || Electron_mvaTTH[Lepton_electronIdx[1]]>0.70))");
+  
   // mc only
-  if (cfg.isMC){
-    df = df
-      .Define( "ttHMVA" , hww_tthmva_sf_maker , { "run_period" , "Lepton_pdgId" , "Lepton_pt" , "Lepton_eta" , "Lepton_RecoSF" , "Lepton_RecoSF_Up" , "Lepton_RecoSF_Down" } )
-      .Define( "ttHMVA_SF_2l" , "ttHMVA[0]" )
-      .Define( "ttHMVA_SF_Up_0" , "ttHMVA[1]" )
-      .Define( "ttHMVA_SF_Up_1" , "ttHMVA[2]" )
-      .Define( "ttHMVA_SF_Down_0" , "ttHMVA[3]" )
-      .Define( "ttHMVA_SF_Down_1" , "ttHMVA[4]" );
-
-    // Up/Down variations for electrons, i.e. LepSF2l__ele_'+eleWP+'__Up/Down
-    df = df
-      .Define( "ttHMVA_2l_ele_SF_Up" , "(ttHMVA_SF_Up_0*(TMath::Abs(Lepton_pdgId[0]) == 11) + (TMath::Abs(Lepton_pdgId[0]) == 13)) * (ttHMVA_SF_Up_1*(TMath::Abs(Lepton_pdgId[1]) == 11) + (TMath::Abs(Lepton_pdgId[1]) == 13))" )
-      .Define( "ttHMVA_2l_ele_SF_Down" , "(ttHMVA_SF_Down_0*(TMath::Abs(Lepton_pdgId[0]) == 11) + (TMath::Abs(Lepton_pdgId[0]) == 13)) * (ttHMVA_SF_Down_1*(TMath::Abs(Lepton_pdgId[1]) == 11) + (TMath::Abs(Lepton_pdgId[1]) == 13))" );
-    
-    // Up/Down variations for muons, i.e. LepSF2l__mu_'+muWP+'__Up/Down
-    df = df
-      .Define( "ttHMVA_2l_mu_SF_Up" , "(ttHMVA_SF_Up_0*(TMath::Abs(Lepton_pdgId[0]) == 13) + (TMath::Abs(Lepton_pdgId[0]) == 11)) * (ttHMVA_SF_Up_1*(TMath::Abs(Lepton_pdgId[1]) == 13) + (TMath::Abs(Lepton_pdgId[1]) == 11))" )
-      .Define( "ttHMVA_2l_mu_SF_Down" , "(ttHMVA_SF_Down_0*(TMath::Abs(Lepton_pdgId[0]) == 13) + (TMath::Abs(Lepton_pdgId[0]) == 11)) * (ttHMVA_SF_Down_1*(TMath::Abs(Lepton_pdgId[1]) == 13) + (TMath::Abs(Lepton_pdgId[1]) == 11))" );
-      }
+  if (cfg.isMC) df = df.Define( "HWW_ttHMVA_SF_2l" , hww_tthmva_sf_maker , { "run_period" , "Lepton_pdgId" , "Lepton_pt" , "Lepton_eta" } );
+  
   return df;
 }
 

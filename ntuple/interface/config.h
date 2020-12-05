@@ -29,17 +29,7 @@ struct config_t {
   std::vector<TH2D> h_SF_ele_ttHMVA {};
   std::vector<TH2D> h_SF_ele_ttHMVA_err {};
   std::vector<TH2D> h_SF_ele_ttHMVA_sys {};
-  
-  std::vector<TH2D> h_SF_mu_Id {};
-  std::vector<TH2D> h_SF_mu_Id_err {};
-  std::vector<TH2D> h_SF_mu_Id_sys {};
-  std::vector<TH2D> h_SF_mu_Iso {};
-  std::vector<TH2D> h_SF_mu_Iso_err {};
-  std::vector<TH2D> h_SF_mu_Iso_sys {};
-  std::vector<TH2D> h_SF_mu_ttHMVA {};
-  std::vector<TH2D> h_SF_mu_ttHMVA_err {};
-  std::vector<TH2D> h_SF_mu_ttHMVA_sys {};
-  
+    
   size_t listSize;
 
   std::map< const std::string , const std::vector<std::string> > outBranch ={
@@ -65,12 +55,8 @@ struct config_t {
         "gen_promptmatch",
         "ptllDYW" ,
 	"nLepton" ,
-	"LepCut2l__ele_mu_tthMVA" ,
-	"ttHMVA_SF_2l",
-	"ttHMVA_2l_ele_SF_Up",
-	"ttHMVA_2l_ele_SF_Down",
-	"ttHMVA_2l_mu_SF_Up",
-	"ttHMVA_2l_mu_SF_Down"
+	"LepCut2l__ele_mu_HWW_tthMVA" ,
+	"HWW_ttHMVA_SF_2l"
       }
     },
 
@@ -96,12 +82,8 @@ struct config_t {
 	"gen_promptmatch",
 	"ptllDYW" ,
 	"nLepton" ,
-	"LepCut2l__ele_mu_tthMVA" ,
-	"ttHMVA_SF_2l" ,
-	"ttHMVA_2l_ele_SF_Up",
-        "ttHMVA_2l_ele_SF_Down",
-        "ttHMVA_2l_mu_SF_Up",
-        "ttHMVA_2l_mu_SF_Down"              
+	"LepCut2l__ele_mu_HWW_tthMVA" ,
+        "HWW_ttHMVA_SF_2l"
       }
     },
 
@@ -126,12 +108,8 @@ struct config_t {
 	"gen_promptmatch",
 	"ptllDYW" ,
 	"nLepton" ,
-	"LepCut2l__ele_mu_tthMVA" ,
-	"ttHMVA_SF_2l" ,
-	"ttHMVA_2l_ele_SF_Up" ,
-        "ttHMVA_2l_ele_SF_Down" ,
-        "ttHMVA_2l_mu_SF_Up" ,
-        "ttHMVA_2l_mu_SF_Down"              
+	"LepCut2l__ele_mu_HWW_tthMVA" ,
+        "HWW_ttHMVA_SF_2l"
       }
     },
     
@@ -156,7 +134,7 @@ struct config_t {
 	"mll",
 	"trigger" ,
 	"nLepton" ,
-	"LepCut2l__ele_mu_tthMVA"
+	"LepCut2l__ele_mu_HWW_tthMVA"
       }
     },
     
@@ -181,7 +159,7 @@ struct config_t {
 	"mll",
 	"trigger" ,
 	"nLepton" ,
-	"LepCut2l__ele_mu_tthMVA"
+	"LepCut2l__ele_mu_HWW_tthMVA"
       }
     },
     
@@ -206,7 +184,7 @@ struct config_t {
 	"mll",
 	"trigger" ,
 	"nLepton" ,
-	"LepCut2l__ele_mu_tthMVA"
+	"LepCut2l__ele_mu_HWW_tthMVA"
       }
     },
     
@@ -302,9 +280,9 @@ struct config_t {
   
   //trigger configuration
   std::map< const std::string , const std::string > trigger = {
-    {"MuonEG","Trigger_ElMu"},
-    {"DoubleMuon","!Trigger_ElMu && Trigger_dblMu"},
-    {"SingleMuon","!Trigger_ElMu && !Trigger_dblMu && Trigger_sngMu"},
+    //{"MuonEG","Trigger_ElMu"},
+    //{"DoubleMuon","!Trigger_ElMu && Trigger_dblMu"},
+    //{"SingleMuon","!Trigger_ElMu && !Trigger_dblMu && Trigger_sngMu"},
     {"DoubleEG","!Trigger_ElMu && !Trigger_dblMu && !Trigger_sngMu && Trigger_dblEl"}, // none existent for 2018
     {"SingleElectron","!Trigger_ElMu && !Trigger_dblMu && !Trigger_sngMu && !Trigger_dblEl && Trigger_sngEl"},
     {"EGamma","!Trigger_ElMu && !Trigger_dblMu && !Trigger_sngMu && (Trigger_sngEl || Trigger_dblEl)"} // only 2018

@@ -46,14 +46,6 @@ int main(int argc, char **argv) {
     // electron
     makeSF_ele( mycfg.SF_files_map["electron"]["TightObjWP"][year]["wpSF"]  , mycfg.h_SF_ele , mycfg.h_SF_ele_err , mycfg.h_SF_ele_sys );
     makeSF_ele( mycfg.SF_files_map["electron"]["ttHMVA0p7"][year]["ttHMVA"] , mycfg.h_SF_ele_ttHMVA , mycfg.h_SF_ele_ttHMVA_err , mycfg.h_SF_ele_ttHMVA_sys );
-    // muon
-    makeSF_muon( mycfg.SF_files_map["muon"]["TightObjWP"][year]["idSF"]  , mycfg.h_SF_mu_Id , mycfg.h_SF_mu_Id_err , mycfg.h_SF_mu_Id_sys , "Muon_idSF2D" ); //  IdSF
-    makeSF_muon( mycfg.SF_files_map["muon"]["TightObjWP"][year]["isoSF"]  , mycfg.h_SF_mu_Iso , mycfg.h_SF_mu_Iso_err , mycfg.h_SF_mu_Iso_sys , "Muon_isoSF2D" ); // IsoSF 
-    std::pair< std::list<std::string> , std::list<std::string> > listPair = std::make_pair(
-											   mycfg.SF_files_map["muon"]["ttHMVA0p8"][year]["ttHMVA"] ,
-											   mycfg.SF_files_map["muon"]["ttHMVA0p8"][year]["ttHMVA_SYS"]
-											   );
-    makeSF_muon_tthMVA( listPair  , mycfg.h_SF_mu_ttHMVA , mycfg.h_SF_mu_ttHMVA_err , mycfg.h_SF_mu_ttHMVA_sys , "ttHMVA0p8_TightHWWCut" );
   }
   //mycfg.listSize = SF_files_map["electron"]["TightObjWP"][year]["ttHMVA"].size();
 
