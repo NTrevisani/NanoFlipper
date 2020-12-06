@@ -41,7 +41,7 @@ struct config_t {
     { "2016" , "32" }, // 27+5
     { "2017" , "40" }, // 35+5
     { "2018" , "37" }  // 32+5
-  };                    
+  };
 
   std::vector<TH2D> h_SF_ele {};
   //std::vector<TH2D> h_SF_ele_err {};
@@ -49,7 +49,7 @@ struct config_t {
   std::vector<TH2D> h_SF_ele_ttHMVA {};
   //std::vector<TH2D> h_SF_ele_ttHMVA_err {};
   //std::vector<TH2D> h_SF_ele_ttHMVA_sys {};
-    
+
   size_t listSize;
 
   std::map< const std::string , const std::vector<std::string> > outBranch ={
@@ -132,7 +132,7 @@ struct config_t {
         "HWW_ttHMVA_SF_2l"
       }
     },
-    
+
     {
       "data_2016",{
 	"run",
@@ -152,12 +152,12 @@ struct config_t {
 	"lep2_eta",
 	"lep2_pdgId",
 	"mll",
-	"full_trigger" ,
+	"triggers" ,
 	"nLepton" ,
 	"LepCut2l__ele_mu_HWW_tthMVA"
       }
     },
-    
+
     {
       "data_2017",{
 	"run",
@@ -177,12 +177,12 @@ struct config_t {
 	"lep2_eta",
 	"lep2_pdgId",
 	"mll",
-	"full_trigger" ,
+	"triggers" ,
 	"nLepton" ,
 	"LepCut2l__ele_mu_HWW_tthMVA"
       }
     },
-    
+
     {
       "data_2018",{
 	"run",
@@ -202,12 +202,12 @@ struct config_t {
 	"lep2_eta",
 	"lep2_pdgId",
 	"mll",
-	"full_trigger" ,
+	"triggers" ,
 	"nLepton" ,
 	"LepCut2l__ele_mu_HWW_tthMVA"
       }
     },
-    
+
     {
       "fake_2016",{
         "run",
@@ -228,11 +228,11 @@ struct config_t {
         "lep2_eta",
         "lep2_pdgId",
         "mll",
-        "full_trigger" ,
+        "triggers" ,
 	"nLepton"
       }
     },
-    
+
     {
       "fake_2017",{
         "run",
@@ -253,7 +253,7 @@ struct config_t {
         "lep2_eta",
         "lep2_pdgId",
         "mll",
-        "full_trigger" ,
+        "triggers" ,
 	"nLepton"
       }
     },
@@ -278,13 +278,13 @@ struct config_t {
         "lep2_eta",
         "lep2_pdgId",
         "mll",
-        "full_trigger" ,
+        "triggers" ,
 	"nLepton"
       }
     }
-    
+
   };
-  
+
   //DY correction
   //std::map< const std::string , const std::string> ptllDYW_NLO = {
   //  {"2016","(0.876979+gen_ptll*(4.11598e-03)-(2.35520e-05)*gen_ptll*gen_ptll)*(1.10211 * (0.958512 - 0.131835*TMath::Erf((gen_ptll-14.1972)/10.1525)))*(gen_ptll<140)+0.891188*(gen_ptll>=140)"},
@@ -297,7 +297,7 @@ struct config_t {
     {"2017","((0.632927+0.0456956*gen_ptll-0.00154485*gen_ptll*gen_ptll+2.64397e-05*gen_ptll*gen_ptll*gen_ptll-2.19374e-07*gen_ptll*gen_ptll*gen_ptll*gen_ptll+6.99751e-10*gen_ptll*gen_ptll*gen_ptll*gen_ptll*gen_ptll)*(gen_ptll>0)*(gen_ptll<100)+(1.41713-0.00165342*gen_ptll)*(gen_ptll>=100)*(gen_ptll<300)+1*(gen_ptll>=300))"},
     {"2018","((0.632927+0.0456956*gen_ptll-0.00154485*gen_ptll*gen_ptll+2.64397e-05*gen_ptll*gen_ptll*gen_ptll-2.19374e-07*gen_ptll*gen_ptll*gen_ptll*gen_ptll+6.99751e-10*gen_ptll*gen_ptll*gen_ptll*gen_ptll*gen_ptll)*(gen_ptll>0)*(gen_ptll<100)+(1.41713-0.00165342*gen_ptll)*(gen_ptll>=100)*(gen_ptll<300)+1*(gen_ptll>=300))"}
   };
-  
+
   //trigger configuration
   std::map< const std::string , const std::string > triggers = {
     {"MuonEG","Trigger_ElMu"},
@@ -306,8 +306,8 @@ struct config_t {
     {"DoubleEG","!Trigger_ElMu && !Trigger_dblMu && !Trigger_sngMu && Trigger_dblEl"}, // none existent for 2018
     {"SingleElectron","!Trigger_ElMu && !Trigger_dblMu && !Trigger_sngMu && !Trigger_dblEl && Trigger_sngEl"},
     {"EGamma","!Trigger_ElMu && !Trigger_dblMu && !Trigger_sngMu && (Trigger_sngEl || Trigger_dblEl)"} // only 2018
-  };  
-  
+  };
+
 };
 
 #endif

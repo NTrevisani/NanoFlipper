@@ -8,7 +8,7 @@ parser = OptionParser(usage)
 parser.add_option("-d","--dataset", action="store", type="string", dest="dataset", default="nanov5_2016")
 parser.add_option("-l","--location", action="store", type="string", dest="location", default="eos")
 parser.add_option("-o","--output", action="store", type="string", dest="output", default="%s/results/" %(cwd))
-
+                  
 (options, args) = parser.parse_args()
 
 datasets = options.dataset
@@ -26,14 +26,17 @@ print("--- compilation took : %.3f seconds (%.3f minutes) ---" % ( (time.time() 
 if datasets == 'nanov5_2016':
     lumi = "35.867"
     for itxt in [ "DYJetsToLL_M-10to50-LO.txt" , "DYJetsToLL_M-50-LO_ext2.txt" , "SingleElectron.txt" , "Fake_SingleElectron.txt" , "DoubleEG.txt" , "Fake_DoubleEG.txt" ]:
+        if 'DY' in itxt : continue;
         samplelists.append( dirs + itxt )
 elif datasets == 'nanov5_2017':
     lumi="41.53"
     for	itxt in [ "DYJetsToLL_M-10to50-LO_ext1.txt" , "DYJetsToLL_M-50-LO_ext1.txt" , "SingleElectron.txt" , "Fake_SingleElectron.txt" , "DoubleEG.txt" , "Fake_DoubleEG.txt" ]:
+        if 'DY' in itxt : continue;
         samplelists.append( dirs + itxt )
 elif datasets == 'nanov5_2018':
     lumi = "59.74"
-    for itxt in [ "DYJetsToLL_M-10to50-LO_ext1.txt" , "DYJetsToLL_M-50-LO.txt" , "EGamma.txt" , "Fake_EGamma.txt" , "DoubleEG.txt" , "Fake_DoubleEG.txt" ]:
+    for itxt in [ "DYJetsToLL_M-10to50-LO_ext1.txt" , "DYJetsToLL_M-50-LO.txt" , "EGamma.txt" , "Fake_EGamma.txt" ]:
+        if 'DY' in itxt : continue;
         samplelists.append( dirs + itxt )
 else:
     print(' >>> ERROR: Dude... really? Pick one datasets here <<<')
