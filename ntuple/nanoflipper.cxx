@@ -77,7 +77,7 @@ int main(int argc, char **argv) {
     std::string::size_type iss = tname.find(s);
     if (iss != std::string::npos)
       tname.erase(iss, s.length());
-    outdf = outdf.Define( "trigger" , mycfg.trigger[tname] );
+    outdf = outdf.Define( "triggers" , mycfg.triggers[tname] );
   }
 
   if (name.find("Fake_") != std::string::npos){
@@ -87,7 +87,8 @@ int main(int argc, char **argv) {
   else{
     outdf.Snapshot( "flipper", output, mycfg.outBranch[ (mycfg.isMC) ? "mc_"+year : "data_"+year ] );
   }
-  ROOT::RDF::SaveGraph( outdf ,"graph_flip.dot");                                                                                                                                                         
+  ROOT::RDF::SaveGraph( outdf ,"graph_flip.dot");
+  
   auto report = outdf.Report();
   report->Print();
   

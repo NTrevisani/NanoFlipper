@@ -3,7 +3,7 @@
 
 
 typedef std::map<std::string, std::map<std::string, std::map<std::string, std::map<std::string, std::list<std::string>>>>> nested_dict;
-typedef std::map<std::string,std::string> WP_dict;
+typedef std::map<std::string,std::string> Lep_dict;
 
 /*
  * configuration for ntuple
@@ -17,11 +17,31 @@ struct config_t {
   nested_dict SF_files_map;
   const unsigned int nlep_SF=2;
 
-  WP_dict HWW_WP= {
+  Lep_dict HWW_WP = {
     { "2016" , "LepCut2l__ele_mva_90p_Iso2016__mu_cut_Tight80x" } ,
     { "2017" , "LepCut2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW" } ,
     { "2018" , "LepCut2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW" }
   };
+
+  // SingleElectron
+  // 2016 : HLT Ele27 WPTight Gsf v* || HLT Ele25 eta2p1 WPTight Gsf v*
+  // 2017 : HLT Ele35 WPTight Gsf v*
+  // 2018 : EGamma : HLT Ele32 WPTight Gsf v* || HLT Ele35 WPTight Gsf v* || HLT Ele23 Ele12 CaloIdL TrackIdL IsoVL v*
+  Lep_dict SingleElectron_leptrigPt = {
+    { "2016" , "32" }, // 27+5
+    { "2017" , "40" }, // 35+5
+    { "2018" , "37" }  // 32+5
+  };
+
+  // DoubleEG
+  // 2016 : HLT Ele23 Ele12 CaloIdL TrackIdL IsoVL DZ v*
+  // 2017 : HLT Ele23 Ele12 CaloIdL TrackIdL IsoVL v*
+  // 2018 : EGamma : HLT Ele32 WPTight Gsf v* || HLT Ele35 WPTight Gsf v* || HLT Ele23 Ele12 CaloIdL TrackIdL IsoVL v*
+  Lep_dict DoubleEG_leptrigPt = {
+    { "2016" , "32" }, // 27+5
+    { "2017" , "40" }, // 35+5
+    { "2018" , "37" }  // 32+5
+  };                    
 
   std::vector<TH2D> h_SF_ele {};
   //std::vector<TH2D> h_SF_ele_err {};
@@ -132,7 +152,7 @@ struct config_t {
 	"lep2_eta",
 	"lep2_pdgId",
 	"mll",
-	"trigger" ,
+	"full_trigger" ,
 	"nLepton" ,
 	"LepCut2l__ele_mu_HWW_tthMVA"
       }
@@ -157,7 +177,7 @@ struct config_t {
 	"lep2_eta",
 	"lep2_pdgId",
 	"mll",
-	"trigger" ,
+	"full_trigger" ,
 	"nLepton" ,
 	"LepCut2l__ele_mu_HWW_tthMVA"
       }
@@ -182,7 +202,7 @@ struct config_t {
 	"lep2_eta",
 	"lep2_pdgId",
 	"mll",
-	"trigger" ,
+	"full_trigger" ,
 	"nLepton" ,
 	"LepCut2l__ele_mu_HWW_tthMVA"
       }
@@ -208,7 +228,7 @@ struct config_t {
         "lep2_eta",
         "lep2_pdgId",
         "mll",
-        "trigger" ,
+        "full_trigger" ,
 	"nLepton"
       }
     },
@@ -233,7 +253,7 @@ struct config_t {
         "lep2_eta",
         "lep2_pdgId",
         "mll",
-        "trigger" ,
+        "full_trigger" ,
 	"nLepton"
       }
     },
@@ -258,7 +278,7 @@ struct config_t {
         "lep2_eta",
         "lep2_pdgId",
         "mll",
-        "trigger" ,
+        "full_trigger" ,
 	"nLepton"
       }
     }
@@ -279,10 +299,10 @@ struct config_t {
   };
   
   //trigger configuration
-  std::map< const std::string , const std::string > trigger = {
-    //{"MuonEG","Trigger_ElMu"},
-    //{"DoubleMuon","!Trigger_ElMu && Trigger_dblMu"},
-    //{"SingleMuon","!Trigger_ElMu && !Trigger_dblMu && Trigger_sngMu"},
+  std::map< const std::string , const std::string > triggers = {
+    {"MuonEG","Trigger_ElMu"},
+    {"DoubleMuon","!Trigger_ElMu && Trigger_dblMu"},
+    {"SingleMuon","!Trigger_ElMu && !Trigger_dblMu && Trigger_sngMu"},
     {"DoubleEG","!Trigger_ElMu && !Trigger_dblMu && !Trigger_sngMu && Trigger_dblEl"}, // none existent for 2018
     {"SingleElectron","!Trigger_ElMu && !Trigger_dblMu && !Trigger_sngMu && !Trigger_dblEl && Trigger_sngEl"},
     {"EGamma","!Trigger_ElMu && !Trigger_dblMu && !Trigger_sngMu && (Trigger_sngEl || Trigger_dblEl)"} // only 2018
