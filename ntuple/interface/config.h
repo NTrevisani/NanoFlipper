@@ -300,12 +300,14 @@ struct config_t {
 
   //trigger configuration
   std::map< const std::string , const std::string > triggers = {
-    {"MuonEG","Trigger_ElMu"},
-    {"DoubleMuon","!Trigger_ElMu && Trigger_dblMu"},
-    {"SingleMuon","!Trigger_ElMu && !Trigger_dblMu && Trigger_sngMu"},
-    {"DoubleEG","!Trigger_ElMu && !Trigger_dblMu && !Trigger_sngMu && Trigger_dblEl"}, // none existent for 2018
-    {"SingleElectron","!Trigger_ElMu && !Trigger_dblMu && !Trigger_sngMu && !Trigger_dblEl && Trigger_sngEl"},
-    {"EGamma","!Trigger_ElMu && !Trigger_dblMu && !Trigger_sngMu && (Trigger_sngEl || Trigger_dblEl)"} // only 2018
+    //{"MuonEG","Trigger_ElMu"},
+    //{"DoubleMuon","!Trigger_ElMu && Trigger_dblMu"},
+    //{"SingleMuon","!Trigger_ElMu && !Trigger_dblMu && Trigger_sngMu"},
+    //{"DoubleEG","!Trigger_ElMu && !Trigger_sngMu && !Trigger_sngEl && !Trigger_dblMu && Trigger_dblEl"}, // none existent for 2018
+    //{"SingleElectron","!Trigger_ElMu && !Trigger_dblMu && !Trigger_sngMu && !Trigger_dblEl && Trigger_sngEl"},
+    //{"EGamma","!Trigger_ElMu && !Trigger_dblMu && !Trigger_sngMu && (Trigger_sngEl || Trigger_dblEl)"} // only 2018
+    {"DoubleEG","!Trigger_sngEl && Trigger_dblEl"}, // none existent for 2018 
+    {"SingleElectron","!Trigger_dblEl && Trigger_sngEl"},
   };
 
 };
