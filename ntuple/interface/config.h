@@ -300,8 +300,8 @@ struct config_t {
 
   //trigger configuration
   std::map< const std::string , const std::string > triggers = {
-    {"EGamma","(Trigger_sngEl || Trigger_dblEl)"}
-    {"DoubleEG","!Trigger_sngEl && Trigger_dblEl"},
+    {"EGamma","(Trigger_sngEl || Trigger_dblEl)"} ,
+    {"DoubleEG","!Trigger_sngEl && Trigger_dblEl"} ,
     {"SingleElectron","!Trigger_dblEl && Trigger_sngEl"}
   };
 
