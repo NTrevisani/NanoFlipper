@@ -44,10 +44,9 @@ int main(int argc, char **argv) {
     // set path
     Helper::leptonID(mycfg);
     // electron
-    makeSF_ele( mycfg.SF_files_map["electron"]["TightObjWP"][year]["wpSF"]  , mycfg.h_SF_ele ); //, mycfg.h_SF_ele_err , mycfg.h_SF_ele_sys );
+    //makeSF_ele( mycfg.SF_files_map["electron"]["TightObjWP"][year]["wpSF"]  , mycfg.h_SF_ele ); //, mycfg.h_SF_ele_err , mycfg.h_SF_ele_sys );
     makeSF_ele( mycfg.SF_files_map["electron"]["ttHMVA0p7"][year]["ttHMVA"] , mycfg.h_SF_ele_ttHMVA ); //, mycfg.h_SF_ele_ttHMVA_err , mycfg.h_SF_ele_ttHMVA_sys );
   }
-  //mycfg.listSize = SF_files_map["electron"]["TightObjWP"][year]["ttHMVA"].size();
 
   ROOT::RDataFrame df("Events", infiles);
   auto pre_outdf = df
@@ -77,7 +76,7 @@ int main(int argc, char **argv) {
     std::string::size_type iss = tname.find(s);
     if (iss != std::string::npos)
       tname.erase(iss, s.length());
-    outdf = outdf.Define( "triggers" , mycfg.triggers[tname] );
+    outdf = outdf.Define( "trig_sngEl_dblEl" , mycfg.triggers[tname] );
   }
 
   if (name.find("Fake_") != std::string::npos){

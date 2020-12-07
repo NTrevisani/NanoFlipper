@@ -38,8 +38,8 @@ struct config_t {
   // 2017 : HLT Ele23 Ele12 CaloIdL TrackIdL IsoVL v*
   // 2018 : EGamma : HLT Ele32 WPTight Gsf v* || HLT Ele35 WPTight Gsf v* || HLT Ele23 Ele12 CaloIdL TrackIdL IsoVL v*
   Lep_dict DoubleEG_leptrigPt = {
-    { "2016" , "32" }, // 27+5
-    { "2017" , "40" }, // 35+5
+    { "2016" , "28" }, // 23+5
+    { "2017" , "28" }, // 23+5
     { "2018" , "37" }  // 32+5
   };
 

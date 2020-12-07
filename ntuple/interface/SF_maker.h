@@ -146,33 +146,34 @@ template < typename T >
       //std::vector<double> SF_do {};
       
       const unsigned int nlep = cfg.nlep_SF; 
-      int run_period__ = run_period;
+      //int run_period__ = run_period;
       
       for ( unsigned int i=0 ; i < nlep ; i++ ){
 	if(TMath::Abs(pdgId[i]) == 11){
-	  std::list<std::string> SF_path = cfg.SF_files_map["electron"]["TightObjWP"][cfg.year]["wpSF"];
+	  //std::list<std::string> SF_path = cfg.SF_files_map["electron"]["TightObjWP"][cfg.year]["wpSF"];
 	  std::list<std::string> SF_path_ttHMVA = cfg.SF_files_map["electron"]["ttHMVA0p7"][cfg.year]["ttHMVA"];
 	  //std::tuple<double, double, double> res;
 	  //std::tuple<double, double, double> res_ttHMVA;
-	  double res;
+	  //double res;
 	  double res_ttHMVA;
 	  if( cfg.year.find("2017") != std::string::npos ){
-	    int runp = run_period;                         
-	    if (runp <= 2){                                
-	      run_period__ = runp-1;
+	    int run_period__;
+	    if ( run_period <= 2){                                
+	      run_period__ = run_period - 1;
 	    }                                              
 	    else{                                          
-	      run_period__ = runp-2;                       
+	      run_period__ = run_period - 2;               
 	    }                                              
-	    res = GetSF( 11 , lepton_eta[i] , lepton_pt[i], SF_path.size()==1 ? 0 : run_period__ , cfg , "Id"); 
+	    //res = GetSF( 11 , lepton_eta[i] , lepton_pt[i], SF_path.size()==1 ? 0 : run_period__ , cfg , "Id"); 
 	    res_ttHMVA = GetSF(11, lepton_eta[i], lepton_pt[i], SF_path_ttHMVA.size()==1 ? 0 : run_period__ , cfg , "ttHMVA");
 	  }                                                                                                                   
 	  else{                                                                                                               
-	    res = GetSF(11, lepton_eta[i], lepton_pt[i], SF_path.size()==1 ? 0 : run_period__ - 1, cfg , "Id");               
-	    res_ttHMVA = GetSF(11, lepton_eta[i], lepton_pt[i], SF_path_ttHMVA.size()==1 ? 0 : run_period__ - 1, cfg , "ttHMVA");
+	    //res = GetSF(11, lepton_eta[i], lepton_pt[i], SF_path.size()==1 ? 0 : run_period__ - 1, cfg , "Id");               
+	    res_ttHMVA = GetSF(11, lepton_eta[i], lepton_pt[i], SF_path_ttHMVA.size()==1 ? 0 : run_period - 1, cfg , "ttHMVA");
 	  }
 	  // scale factor = HWW x ttHMVA
-	  SF_vect.push_back( res * res_ttHMVA );
+	  SF_vect.push_back( res_ttHMVA );
+	  //SF_vect.push_back( res * res_ttHMVA );
 	  //SF_vect.push_back(std::get<0>(res)*std::get<0>(res_ttHMVA));
 	  //SF_err_vect.push_back(TMath::Sqrt(TMath::Power(std::get<1>(res), 2) + TMath::Power(std::get<2>(res), 2)                
 	  //+ TMath::Power(std::get<1>(res_ttHMVA), 2) + TMath::Power(std::get<2>(res_ttHMVA), 2) ));
@@ -195,7 +196,8 @@ template < typename T >
   
   df = df
     .Define( "HWW_WP_cut" , cfg.HWW_WP[cfg.year] )
-    .Define( "LepCut2l__ele_mu_HWW_tthMVA" , "HWW_WP_cut*( (abs(Lepton_pdgId[0])==11 || Muon_mvaTTH[Lepton_muonIdx[0]]>0.8) && (abs(Lepton_pdgId[1])==11 || Muon_mvaTTH[Lepton_muonIdx[1]]>0.8) && (abs(Lepton_pdgId[0])==13 || Electron_mvaTTH[Lepton_electronIdx[0]]>0.70) && (abs(Lepton_pdgId[1])==13 || Electron_mvaTTH[Lepton_electronIdx[1]]>0.70))");
+    .Define( "LepCut2l__ele_mu_HWW_tthMVA" , "(Electron_mvaTTH[Lepton_electronIdx[0]]>0.70 && Electron_mvaTTH[Lepton_electronIdx[1]]>0.70)");
+    //.Define( "LepCut2l__ele_mu_HWW_tthMVA" , "HWW_WP_cut*( (abs(Lepton_pdgId[0])==11 || Muon_mvaTTH[Lepton_muonIdx[0]]>0.8) && (abs(Lepton_pdgId[1])==11 || Muon_mvaTTH[Lepton_muonIdx[1]]>0.8) && (abs(Lepton_pdgId[0])==13 || Electron_mvaTTH[Lepton_electronIdx[0]]>0.70) && (abs(Lepton_pdgId[1])==13 || Electron_mvaTTH[Lepton_electronIdx[1]]>0.70))");
   
   // mc only
   if (cfg.isMC) df = df.Define( "HWW_ttHMVA_SF_2l" , hww_tthmva_sf_maker , { "run_period" , "Lepton_pdgId" , "Lepton_pt" , "Lepton_eta" } );
