@@ -101,6 +101,18 @@ def model_3x3( i , par ):
      return value
 pass
 
+def model_2x2( i , par ):
+
+     if   i == 0:  value = ( par[0] * (1-par[ 0]) + (1-par[ 0]) * par[ 0] ) / ( 1 - ( par[0] * (1-par[ 0]) + (1-par[ 0]) * par[ 0] ) )
+     elif i == 1:  value = ( par[0] * (1-par[ 1]) + (1-par[ 0]) * par[ 1] ) / ( 1 - ( par[0] * (1-par[ 1]) + (1-par[ 0]) * par[ 1] ) )
+
+     elif i == 2:  value = ( par[1] * (1-par[ 0]) + (1-par[ 1]) * par[ 0] ) / ( 1 - ( par[1] * (1-par[ 0]) + (1-par[ 1]) * par[ 0] ) )
+     elif i == 3:  value = ( par[1] * (1-par[ 1]) + (1-par[ 1]) * par[ 1] ) / ( 1 - ( par[1] * (1-par[ 1]) + (1-par[ 1]) * par[ 1] ) )
+
+     return value
+pass
+
+
 """ meaning of parametrs:
 npar:  number of parameters
 deriv: aray of derivatives df/dp_i (x), optional
@@ -112,8 +124,9 @@ iflag: internal flag: 1 at first call, 3 at the last, 4 during minimisation
 def fcn( npar , deriv , f , par , iflag):
 
     #model = model_5x5;
-    model = model_4x4;
-    #model = model_3x3
+    #model = model_4x4;
+    #model = model_3x3;
+    model = model_2x2;
 
     chisq=0.0
     for i in range(0, nBins):
@@ -132,8 +145,9 @@ def fit( p , perr ):
      nBins=len(val)
 
      #name=['q0','q1','q2','q3','q4']
-     name=['q0','q1','q2','q3']
+     #name=['q0','q1','q2','q3']
      #name=['q0','q1','q2']
+     name = [ 'q0' , 'q1' ]
 
      npar=len(name)
      # the initial values
@@ -362,7 +376,7 @@ def mkValidation(ifile_,flipPro,h_val,ptbin_):
           dim = len(h_val[year][ids][0]) # infers dimension
           flipper = map(lambda x: x[0], flipPro[year][ids]) # extract the fitted value (mischarge probability)
 
-          bins_postfit = map( lambda x: model_4x4(x,flipper) , list(range(0,dim)) ) # reproduce the ratio
+          bins_postfit = map( lambda x: model_2x2(x,flipper) , list(range(0,dim)) ) # reproduce the ratio
           bins_prefit = h_val[year][ids][0]
           bins_diff = map(lambda x : (abs(bins_prefit[x] - bins_postfit[x])/bins_prefit[x])*100. , list(range(0,dim)) )
 
@@ -386,8 +400,8 @@ def mkToy(dim):
 
     c.cd(1) ; h_A_prefit_toy = mk2DHisto( zA , 'h_ratio_prefit_toy_A' , errorzA , 'toy A N_{ss}/N_{os}' ) ; h_A_prefit_toy.Draw("Colz TEXTE")
     c.cd(2) ; h_B_prefit_toy = mk2DHisto( zB , 'h_ratio_prefit_toy_B' , errorzB , 'toy B N_{ss}/N_{os}' ) ; h_B_prefit_toy.Draw("Colz TEXTE")
-    fit_A_param = map( lambda x : x[0] , fit( zA , errorzA ) ) ; fit_A_toy = map( lambda x: model_4x4(x,fit_A_param) , list(range(0,dim)) )
-    fit_B_param = map( lambda x : x[0] , fit( zB , errorzB ) ) ; fit_B_toy = map( lambda x: model_4x4(x,fit_B_param) , list(range(0,dim)) )
+    fit_A_param = map( lambda x : x[0] , fit( zA , errorzA ) ) ; fit_A_toy = map( lambda x: model_2x2(x,fit_A_param) , list(range(0,dim)) )
+    fit_B_param = map( lambda x : x[0] , fit( zB , errorzB ) ) ; fit_B_toy = map( lambda x: model_2x2(x,fit_B_param) , list(range(0,dim)) )
     c.cd(3) ; h_A_postfit_toy = mk2DHisto( fit_A_toy , 'h_ratio_postfit_toy_A' , None , 'toy A N_{ss}/N_{os}' ) ; h_A_postfit_toy.Draw("Colz TEXTE")
     c.cd(4) ; h_B_postfit_toy = mk2DHisto( fit_B_toy , 'h_ratio_postfit_toy_B' , None , 'toy A N_{ss}/N_{os}' ) ; h_B_postfit_toy.Draw("Colz TEXTE")
     c.Update()
