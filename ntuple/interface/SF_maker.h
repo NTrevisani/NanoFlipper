@@ -196,11 +196,9 @@ template < typename T >
   
   df = df
     .Define( "HWW_WP_cut" , cfg.HWW_WP[cfg.year] )
-    .Define( "LepCut2l__ele_mu_HWW_tthMVA" , "(Electron_mvaTTH[Lepton_electronIdx[0]]>0.70 && Electron_mvaTTH[Lepton_electronIdx[1]]>0.70)");
-    //.Define( "LepCut2l__ele_mu_HWW_tthMVA" , "HWW_WP_cut*( (abs(Lepton_pdgId[0])==11 || Muon_mvaTTH[Lepton_muonIdx[0]]>0.8) && (abs(Lepton_pdgId[1])==11 || Muon_mvaTTH[Lepton_muonIdx[1]]>0.8) && (abs(Lepton_pdgId[0])==13 || Electron_mvaTTH[Lepton_electronIdx[0]]>0.70) && (abs(Lepton_pdgId[1])==13 || Electron_mvaTTH[Lepton_electronIdx[1]]>0.70))");
-  
+    .Define( "LepCut2l__ele_mu_HWW_tthMVA" , "HWW_WP_cut*( ( abs(Lepton_pdgId[0])==11 || Muon_mvaTTH[Lepton_muonIdx[0]]>0.8 ) && ( abs(Lepton_pdgId[1])==11 || Muon_mvaTTH[Lepton_muonIdx[1]]>0.8 ) && ( abs(Lepton_pdgId[0])==13 || Electron_mvaTTH[Lepton_electronIdx[0]]>0.70) && ( abs(Lepton_pdgId[1])==13 || Electron_mvaTTH[Lepton_electronIdx[1]]>0.70) )");
   // mc only
-  if (cfg.isMC) df = df.Define( "HWW_ttHMVA_SF_2l" , hww_tthmva_sf_maker , { "run_period" , "Lepton_pdgId" , "Lepton_pt" , "Lepton_eta" } );
+  if (cfg.isMC) df = df.Define( "LepSF2l__ele_mu_HWW_ttHMVA" , hww_tthmva_sf_maker , { "run_period" , "Lepton_pdgId" , "Lepton_pt" , "Lepton_eta" } );
   
   return df;
 }

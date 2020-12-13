@@ -23,6 +23,12 @@ struct config_t {
     { "2018" , "LepCut2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW" }
   };
 
+  Lep_dict HWW_WP_SF = {
+    { "2016" , "LepSF2l__ele_mva_90p_Iso2016__mu_cut_Tight80x" } ,
+    { "2017" , "LepSF2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW" } ,
+    { "2018" , "LepSF2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW" }
+  };
+
   // SingleElectron
   // 2016 : HLT Ele27 WPTight Gsf v* || HLT Ele25 eta2p1 WPTight Gsf v*
   // 2017 : HLT Ele35 WPTight Gsf v*
@@ -52,7 +58,7 @@ struct config_t {
 
   size_t listSize;
 
-  std::map< const std::string , const std::vector<std::string> > outBranch ={
+  std::map< const std::string , std::vector<std::string> > outBranch ={
     {
       "mc_2016",{
         "run",
@@ -60,10 +66,8 @@ struct config_t {
         "event",
         "PrefireWeight",
         "SFweight2l",
-        "LepSF2l__ele_mva_90p_Iso2016__mu_cut_Tight80x",
         "METFilter_MC",
         "XSWeight",
-        "LepCut2l__ele_mva_90p_Iso2016__mu_cut_Tight80x",
         "GenLepMatch2l",
         "lep1_pt",
         "lep1_eta",
@@ -76,7 +80,7 @@ struct config_t {
         "ptllDYW" ,
 	"nLepton" ,
 	"LepCut2l__ele_mu_HWW_tthMVA" ,
-	"HWW_ttHMVA_SF_2l"
+	"LepSF2l__ele_mu_HWW_ttHMVA"
       }
     },
 
@@ -87,8 +91,6 @@ struct config_t {
 	"event",
 	"PrefireWeight",
 	"SFweight2l",
-	"LepSF2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW",
-	"LepCut2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW",
 	"METFilter_MC",
 	"XSWeight",
 	"GenLepMatch2l",
@@ -103,7 +105,7 @@ struct config_t {
 	"ptllDYW" ,
 	"nLepton" ,
 	"LepCut2l__ele_mu_HWW_tthMVA" ,
-        "HWW_ttHMVA_SF_2l"
+        "LepSF2l__ele_mu_HWW_ttHMVA"
       }
     },
 
@@ -113,8 +115,6 @@ struct config_t {
 	"luminosityBlock",
 	"event",
 	"SFweight2l",
-	"LepSF2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW",
-	"LepCut2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW",
 	"METFilter_MC",
 	"XSWeight",
 	"GenLepMatch2l",
@@ -129,21 +129,18 @@ struct config_t {
 	"ptllDYW" ,
 	"nLepton" ,
 	"LepCut2l__ele_mu_HWW_tthMVA" ,
-        "HWW_ttHMVA_SF_2l"
+        "LepSF2l__ele_mu_HWW_ttHMVA"
       }
     },
 
     {
       "data_2016",{
-	"run",
-	"luminosityBlock",
 	"event",
 	"Trigger_sngEl",
 	"Trigger_sngMu",
 	"Trigger_dblEl",
 	"Trigger_dblMu",
 	"Trigger_ElMu",
-	"LepCut2l__ele_mva_90p_Iso2016__mu_cut_Tight80x",
 	"METFilter_DATA",
 	"lep1_pt",
 	"lep1_eta",
@@ -160,8 +157,6 @@ struct config_t {
 
     {
       "data_2017",{
-	"run",
-	"luminosityBlock",
 	"event",
 	"Trigger_sngEl",
 	"Trigger_sngMu",
@@ -169,7 +164,6 @@ struct config_t {
 	"Trigger_dblMu",
 	"Trigger_ElMu",
 	"METFilter_DATA",
-	"LepCut2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW",
 	"lep1_pt",
 	"lep1_eta",
 	"lep1_pdgId",
@@ -185,8 +179,6 @@ struct config_t {
 
     {
       "data_2018",{
-	"run",
-	"luminosityBlock",
 	"event",
 	"Trigger_sngEl",
 	"Trigger_sngMu",
@@ -194,7 +186,6 @@ struct config_t {
 	"Trigger_dblMu",
 	"Trigger_ElMu",
 	"METFilter_DATA",
-	"LepCut2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW",
 	"lep1_pt",
 	"lep1_eta",
 	"lep1_pdgId",
@@ -286,25 +277,26 @@ struct config_t {
   };
 
   //DY correction
-  //std::map< const std::string , const std::string> ptllDYW_NLO = {
-  //  {"2016","(0.876979+gen_ptll*(4.11598e-03)-(2.35520e-05)*gen_ptll*gen_ptll)*(1.10211 * (0.958512 - 0.131835*TMath::Erf((gen_ptll-14.1972)/10.1525)))*(gen_ptll<140)+0.891188*(gen_ptll>=140)"},
-  //  {"2017","(((0.623108 + 0.0722934*gen_ptll - 0.00364918*gen_ptll*gen_ptll + 6.97227e-05*gen_ptll*gen_ptll*gen_ptll - 4.52903e-07*gen_ptll*gen_ptll*gen_ptll*gen_ptll)*(gen_ptll<45)*(gen_ptll>0) + 1*(gen_ptll>=45))*(abs(gen_mll-90)<3) + (abs(gen_mll-90)>3))"},
-  //  {"2018","(0.87*(gen_ptll<10)+(0.379119+0.099744*gen_ptll-0.00487351*gen_ptll*gen_ptll+9.19509e-05*(gen_ptll*gen_ptll*gen_ptll)-6.0212e-07*(gen_ptll*gen_ptll*gen_ptll*gen_ptll))*(gen_ptll>=10 && gen_ptll<45)+(9.12137e-01+1.11957e-04*gen_ptll-3.15325e-06*gen_ptll*gen_ptll-4.29708e-09*gen_ptll*gen_ptll*gen_ptll+3.35791e-11*gen_ptll*gen_ptll*gen_ptll*gen_ptll)*(gen_ptll>=45 && gen_ptll<200) + 1*(gen_ptll>200))"}
-  //};
-
+  std::map< const std::string , const std::string> ptllDYW_NLO = {
+    {"2016","(0.876979+gen_ptll*(4.11598e-03)-(2.35520e-05)*gen_ptll*gen_ptll)*(1.10211 * (0.958512 - 0.131835*TMath::Erf((gen_ptll-14.1972)/10.1525)))*(gen_ptll<140)+0.891188*(gen_ptll>=140)"},
+    {"2017","(((0.623108 + 0.0722934*gen_ptll - 0.00364918*gen_ptll*gen_ptll + 6.97227e-05*gen_ptll*gen_ptll*gen_ptll - 4.52903e-07*gen_ptll*gen_ptll*gen_ptll*gen_ptll)*(gen_ptll<45)*(gen_ptll>0) + 1*(gen_ptll>=45))*(abs(gen_mll-90)<3) + (abs(gen_mll-90)>3))"},
+    {"2018","(0.87*(gen_ptll<10)+(0.379119+0.099744*gen_ptll-0.00487351*gen_ptll*gen_ptll+9.19509e-05*(gen_ptll*gen_ptll*gen_ptll)-6.0212e-07*(gen_ptll*gen_ptll*gen_ptll*gen_ptll))*(gen_ptll>=10 && gen_ptll<45)+(9.12137e-01+1.11957e-04*gen_ptll-3.15325e-06*gen_ptll*gen_ptll-4.29708e-09*gen_ptll*gen_ptll*gen_ptll+3.35791e-11*gen_ptll*gen_ptll*gen_ptll*gen_ptll)*(gen_ptll>=45 && gen_ptll<200) + 1*(gen_ptll>200))"}
+  };
+  
   std::map< const std::string , const std::string> ptllDYW_LO = {
     {"2016","(gen_ptll>=0.0)*((8.61313e-01+gen_ptll*4.46807e-03-1.52324e-05*gen_ptll*gen_ptll)*(1.08683 * (0.95 - 0.0657370*TMath::Erf((gen_ptll-11.)/5.51582)))*(gen_ptll<140)+1.141996*(gen_ptll>=140))"},
     {"2017","((0.632927+0.0456956*gen_ptll-0.00154485*gen_ptll*gen_ptll+2.64397e-05*gen_ptll*gen_ptll*gen_ptll-2.19374e-07*gen_ptll*gen_ptll*gen_ptll*gen_ptll+6.99751e-10*gen_ptll*gen_ptll*gen_ptll*gen_ptll*gen_ptll)*(gen_ptll>0)*(gen_ptll<100)+(1.41713-0.00165342*gen_ptll)*(gen_ptll>=100)*(gen_ptll<300)+1*(gen_ptll>=300))"},
     {"2018","((0.632927+0.0456956*gen_ptll-0.00154485*gen_ptll*gen_ptll+2.64397e-05*gen_ptll*gen_ptll*gen_ptll-2.19374e-07*gen_ptll*gen_ptll*gen_ptll*gen_ptll+6.99751e-10*gen_ptll*gen_ptll*gen_ptll*gen_ptll*gen_ptll)*(gen_ptll>0)*(gen_ptll<100)+(1.41713-0.00165342*gen_ptll)*(gen_ptll>=100)*(gen_ptll<300)+1*(gen_ptll>=300))"}
   };
-
+  
   //trigger configuration
   std::map< const std::string , const std::string > triggers = {
+    {"SingleMuon", "!Trigger_ElMu && Trigger_sngMu"} ,
     {"EGamma","(Trigger_sngEl || Trigger_dblEl)"} ,
     {"DoubleEG","!Trigger_sngEl && Trigger_dblEl"} ,
     {"SingleElectron","!Trigger_dblEl && Trigger_sngEl"}
   };
-
+  
 };
 
 #endif
