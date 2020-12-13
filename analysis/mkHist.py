@@ -60,7 +60,7 @@ ptbin= OrderedDict({
 
 print(ptbin)
 
-eta_bin = [ 0. , 1.444 , 2.5 ]
+eta_bin = [ 0. , 1.4 , 2.5 ]
 
 from utils.helper import *
 from utils.mkroot import *
@@ -76,7 +76,6 @@ if __name__ == '__main__':
         'DATA_%s' %(dataset.split('_')[-1]) : ROOT.ROOT.RDataFrame("flipper", [ ntupleDIR+'/DoubleEG.root' ] if dataset != "nanov5_2018" else [ ntupleDIR+'/EGamma.root' ] ),
         'FAKE_%s' %(dataset.split('_')[-1]) : ROOT.ROOT.RDataFrame("flipper", [ ntupleDIR+'/Fake_DoubleEG.root' ] if dataset != "nanov5_2018" else [ ntupleDIR+'/Fake_EGamma.root' ] )
     })
-
     
     presel="nLepton==2"
     # HLT Ele23 Ele12 CaloIdL TrackIdL IsoVL DZ v*

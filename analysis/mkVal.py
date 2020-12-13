@@ -46,10 +46,26 @@ void loadSF2D( const char *filename )
     f.Close();
 }
 
-double getFlip( const double pt1_in , const double eta1_in , const double pt2_in , const double eta2_in , bool useData_ )
+double getFlip( double pt1_in , double eta1_in , double pt2_in , double eta2_in , bool useData_ )
 {
-    //std::cout<<"Eval::Accessing : "<< SFmap["sf"]->GetNbinsX() <<std::endl;
 
+    double eta_max = 2.39;
+    double eta_min = -2.4;
+    double pt_max = 199.;
+    double pt_min = 15.;
+
+    // pt , eta 1
+    if(eta1_in < eta_min){ eta1_in = eta_min; }
+    if(eta1_in > eta_max){ eta1_in = eta_max; }
+    if(pt1_in < pt_min  ){ pt1_in = pt_min; }
+    if(pt1_in > pt_max  ){ pt1_in = pt_max; }
+
+    // pt, eta 2
+    if(eta2_in < eta_min){ eta2_in = eta_min; }
+    if(eta2_in > eta_max){ eta2_in = eta_max; }
+    if(pt2_in < pt_min  ){ pt2_in = pt_min; }
+    if(pt2_in > pt_max  ){ pt2_in = pt_max; }
+  
     double flip1 =0.; double flip1_sys=0.; double flip2=0.; double flip2_sys=0.; double commonW=1.;
     const std::string SFmapKey = (useData_) ? "data" : "mc";
 
@@ -64,13 +80,30 @@ double getFlip( const double pt1_in , const double eta1_in , const double pt2_in
     return commonW;
 }
 
-double getSF( const double pt1_in , const double eta1_in , const double pt2_in , const double eta2_in , const int pdgId1 , const int pdgId2 )
+double getSF( double pt1_in , double eta1_in , double pt2_in , double eta2_in , const int pdgId1 , const int pdgId2 )
 {
     double sf1=1.; double sf2=1.; double SF=1.;
-    //if ( pdgId1*pdgId2 == 11*11 || pdgId1*pdgId2 == 11*13 ){
+
+    double eta_max = 2.39;
+    double eta_min = -2.4;
+    double pt_max = 199.;
+    double pt_min = 15.;
+
+    // pt , eta 1
+    if( eta1_in < eta_min ){ eta1_in = eta_min; }
+    if( eta1_in > eta_max ){ eta1_in = eta_max; }
+    if( pt1_in < pt_min   ){ pt1_in = pt_min; }
+    if( pt1_in > pt_max   ){ pt1_in = pt_max; }
+
+    // pt, eta 2
+    if( eta2_in < eta_min ){ eta2_in = eta_min; }
+    if( eta2_in > eta_max ){ eta2_in = eta_max; }
+    if( pt2_in < pt_min   ){ pt2_in = pt_min; }
+    if( pt2_in > pt_max   ){ pt2_in = pt_max; }
+
     sf1 = SFmap["sf"]->GetBinContent( SFmap["sf"]->FindBin( abs(eta1_in) , pt1_in ) );
     sf2 = SFmap["sf"]->GetBinContent( SFmap["sf"]->FindBin( abs(eta2_in) , pt2_in ) );
-    //}
+    
     SF = sf1*sf2;
 
     return SF;
@@ -306,7 +339,7 @@ if __name__ == '__main__' :
         #histlist = { key.GetName() : fhist.Get(key.GetName()) for key in ROOT.gDirectory.GetListOfKeys() if not 'analysis' in key.GetName() }
         DF_Dict = PrepareDF( DF , presel(idataset) , "mvaBased_tthmva" )
 
-        mkVal1( DF_Dict , idataset , output )
+        #mkVal1( DF_Dict , idataset , output )
         mkVal2( DF_Dict , idataset , output )
         mkVal3( DF_Dict , idataset , output )
-        mkVal4( DF_Dict , idataset )
+        #mkVal4( DF_Dict , idataset )

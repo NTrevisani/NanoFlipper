@@ -16,21 +16,16 @@ from mkHist import *
 ######
 
 def initGrid( eta_bin ):
-    etagrid=np.zeros((len(eta_bin)-1,len(eta_bin)-1),dtype=np.object)                                                                                                                        
-    for i in range(len(etagrid)):                                                                                                                                                            
-        for j in range(len(etagrid[i])):                                                                                                                                                     
-            etagrid[i][j]='abs(lep1_eta)>='+str(eta_bin[i])+' && abs(lep1_eta)<'+str(eta_bin[i+1])+' && abs(lep2_eta)>='+str(eta_bin[j])+' && abs(lep2_eta)<'+str(eta_bin[j+1])              
-                                                                                                                                                                                         
+    etagrid=np.zeros((len(eta_bin)-1,len(eta_bin)-1),dtype=np.object)
+    for i in range(len(etagrid)):
+        for j in range(len(etagrid[i])):
+            etagrid[i][j]='abs(lep1_eta)>='+str(eta_bin[i])+' && abs(lep1_eta)<'+str(eta_bin[i+1])+' && abs(lep2_eta)>='+str(eta_bin[j])+' && abs(lep2_eta)<'+str(eta_bin[j+1])
     bins=np.array(eta_bin)
     return [ bins , etagrid ];
 pass
 
 def makeEtaGrid(etagrid,indf,iterdf,prefix):    
-    for i in range(len(etagrid)):                                                                                                                                                        
-        for j in range(len(etagrid[i])):                                                                                                                                                 
-            prefix_tmp=prefix+"_etabin"+str(i)+"_etabin"+str(j)+"_mll"                                                                                                                   
-            dftmp=iterdf.Filter(etagrid[i][j])                                                                                                                                           
-            indf[prefix_tmp]=dftmp.Histo1D( ( prefix_tmp , "%s ; mll [GeV] ; Events" %prefix_tmp , 30, 76.2, 106.2 ), "mll","weights")
+    for i in range(len(etagrid)):                                                                                                                                                               for j in range(len(etagrid[i])):                                                                                                                                                            prefix_tmp=prefix+"_etabin"+str(i)+"_etabin"+str(j)+"_mll"                                                                                                                              dftmp=iterdf.Filter(etagrid[i][j])                                                                                                                                                      indf[prefix_tmp]=dftmp.Histo1D( ( prefix_tmp , "%s ; mll [GeV] ; Events" %prefix_tmp , 30, 76.2, 106.2 ), "mll","weights")
 pass
 
 def addWeights( df_in , name , wp ):   
