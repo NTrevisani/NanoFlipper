@@ -129,7 +129,7 @@ double GetSF(int flavor, float eta, float pt, int run_period, config_t mycfg , s
 }
 
 template < typename T >
-  auto hww_tthmva_sf( T &df, config_t &cfg){
+  auto hww_tthmva_sf( T &df, config_t &cfg ){
   using namespace ROOT::VecOps;
   
   // lambda function
@@ -145,8 +145,7 @@ template < typename T >
       //std::vector<double> SF_up {};
       //std::vector<double> SF_do {};
       
-      const unsigned int nlep = cfg.nlep_SF; 
-      //int run_period__ = run_period;
+      const unsigned int nlep = cfg.nlep_SF;
       
       for ( unsigned int i=0 ; i < nlep ; i++ ){
 	if(TMath::Abs(pdgId[i]) == 11){
@@ -179,27 +178,41 @@ template < typename T >
 	  //+ TMath::Power(std::get<1>(res_ttHMVA), 2) + TMath::Power(std::get<2>(res_ttHMVA), 2) ));
 	}
 	else if(TMath::Abs(pdgId[i]) == 13){
-	  std::cout<<"Impossible, we only look at e-e phase space"<<std::endl;
-	  exit(0);
+	  SF_vect.push_back(1.);
+	  //std::cout<<"Impossible, we only look at e-e phase space"<<std::endl;
+	  //exit(0);
 	}
       } // end of loops
       
-      double SF = 1.;
+      //double SF = 1.;
       
       // Calculate product of IsIso_SFs for all leptons in the event
-      for(auto x : SF_vect) SF *= x;
+      //for(auto x : SF_vect) SF *= x;
       
-      return SF;
+      return SF_vect;
     };
   
   std::cout<<" --> default HWW WP : "<< cfg.HWW_WP[cfg.year] <<std::endl;
   
   df = df
-    .Define( "HWW_WP_cut" , cfg.HWW_WP[cfg.year] )
-    .Define( "LepCut2l__ele_mu_HWW_tthMVA" , "HWW_WP_cut*( ( abs(Lepton_pdgId[0])==11 || Muon_mvaTTH[Lepton_muonIdx[0]]>0.8 ) && ( abs(Lepton_pdgId[1])==11 || Muon_mvaTTH[Lepton_muonIdx[1]]>0.8 ) && ( abs(Lepton_pdgId[0])==13 || Electron_mvaTTH[Lepton_electronIdx[0]]>0.70) && ( abs(Lepton_pdgId[1])==13 || Electron_mvaTTH[Lepton_electronIdx[1]]>0.70) )");
+    .Define( "lep1_ele_cut_ttHMVA" , "abs(Lepton_pdgId[0])==11 && Electron_mvaTTH[Lepton_electronIdx[0]]>0.7" )
+    .Define( "lep2_ele_cut_ttHMVA" , "abs(Lepton_pdgId[1])==11 && Electron_mvaTTH[Lepton_electronIdx[1]]>0.7" )
+    .Define( "lep3_ele_cut_ttHMVA" , "abs(Lepton_pdgId[2])==11 && Electron_mvaTTH[Lepton_electronIdx[2]]>0.7" )
+    .Define( "lep1_mu_cut_ttHMVA"  , "abs(Lepton_pdgId[0])==13 && Muon_mvaTTH[Lepton_muonIdx[0]]>0.8" )
+    .Define( "lep2_mu_cut_ttHMVA"  , "abs(Lepton_pdgId[1])==13 && Muon_mvaTTH[Lepton_muonIdx[1]]>0.8" )
+    .Define( "lep3_mu_cut_ttHMVA"  , "abs(Lepton_pdgId[2])==13 && Muon_mvaTTH[Lepton_muonIdx[2]]>0.8" )
+    ;
+  //.Define( "HWW_WP_cut" , cfg.HWW_WP[cfg.year] )                                                                                                                                                        
+  //.Define( "LepCut2l__ele_mu_HWW_tthMVA" , "HWW_WP_cut*( ( abs(Lepton_pdgId[0])==11 || Muon_mvaTTH[Lepton_muonIdx[0]]>0.8 ) && ( abs(Lepton_pdgId[1])==11 || Muon_mvaTTH[Lepton_muonIdx[1]]>0.8 ) && ( abs(Lepton_pdgId[0])==13 || Electron_mvaTTH[Lepton_electronIdx[0]]>0.70) && ( abs(Lepton_pdgId[1])==13 || Electron_mvaTTH[Lepton_electronIdx[1]]>0.70) )");                        
   // mc only
-  if (cfg.isMC) df = df.Define( "LepSF2l__ele_mu_HWW_ttHMVA" , hww_tthmva_sf_maker , { "run_period" , "Lepton_pdgId" , "Lepton_pt" , "Lepton_eta" } );
-  
+  if (cfg.isMC) {
+    df = df
+      .Define( "LepSF2l__ele_mu_HWW_ttHMVA" , hww_tthmva_sf_maker , { "run_period" , "Lepton_pdgId" , "Lepton_pt" , "Lepton_eta" } )
+      .Define( "lep1_SF_ttHMVA" , "LepSF2l__ele_mu_HWW_ttHMVA[1]" )
+      .Define( "lep2_SF_ttHMVA" , "LepSF2l__ele_mu_HWW_ttHMVA[2]" )
+      .Define( "lep3_SF_ttHMVA" , "LepSF2l__ele_mu_HWW_ttHMVA[3]" )
+      ;
+  }
   return df;
 }
 

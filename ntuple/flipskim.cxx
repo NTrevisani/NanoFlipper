@@ -54,7 +54,11 @@ int main(int argc, char **argv) {
     .Define("lep1_pdgId" , "Lepton_pdgId[0]")
     .Define("lep2_pt"    , "Lepton_pt[1]")
     .Define("lep2_eta"   , "Lepton_eta[1]")
-    .Define("lep2_pdgId" , "Lepton_pdgId[1]");
+    .Define("lep2_pdgId" , "Lepton_pdgId[1]")
+    .Define("lep3_pt"    , "Lepton_pt[2]")
+    .Define("lep3_eta"   , "Lepton_eta[2]")
+    .Define("lep3_pdgId" , "Lepton_pdgId[2]")
+    ;
   
   // make lepton SF
   auto outdf = hww_tthmva_sf( df2 , mycfg );

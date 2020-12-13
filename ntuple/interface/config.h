@@ -15,7 +15,7 @@ struct config_t {
   std::string lumi;
   std::string base;
   nested_dict SF_files_map;
-  const unsigned int nlep_SF=2;
+  const unsigned int nlep_SF=3;
 
   Lep_dict HWW_WP = {
     { "2016" , "LepCut2l__ele_mva_90p_Iso2016__mu_cut_Tight80x" } ,
@@ -61,9 +61,6 @@ struct config_t {
   std::map< const std::string , std::vector<std::string> > outBranch ={
     {
       "mc_2016",{
-        "run",
-        "luminosityBlock",
-        "event",
         "PrefireWeight",
         "SFweight2l",
         "METFilter_MC",
@@ -75,20 +72,28 @@ struct config_t {
         "lep2_pt",
         "lep2_eta",
         "lep2_pdgId",
+	"lep3_pt",
+        "lep3_eta",
+        "lep3_pdgId",
+	"Mll",
         "mll",
         "gen_promptmatch",
         "ptllDYW" ,
 	"nLepton" ,
-	"LepCut2l__ele_mu_HWW_tthMVA" ,
-	"LepSF2l__ele_mu_HWW_ttHMVA"
+	"lep1_ele_cut_ttHMVA" ,
+	"lep2_ele_cut_ttHMVA" ,
+	"lep3_ele_cut_ttHMVA" ,
+	"lep1_mu_cut_ttHMVA" ,
+	"lep2_mu_cut_ttHMVA" ,
+	"lep3_mu_cut_ttHMVA" ,
+	"lep1_SF_ttHMVA" ,
+	"lep2_SF_ttHMVA" ,
+	"lep3_SF_ttHMVA"
       }
     },
 
     {
       "mc_2017",{
-	"run",
-	"luminosityBlock",
-	"event",
 	"PrefireWeight",
 	"SFweight2l",
 	"METFilter_MC",
@@ -100,20 +105,28 @@ struct config_t {
 	"lep2_pt",
 	"lep2_eta",
 	"lep2_pdgId",
+	"lep3_pt",
+        "lep3_eta",
+        "lep3_pdgId",
+	"Mll",
 	"mll",
 	"gen_promptmatch",
 	"ptllDYW" ,
 	"nLepton" ,
-	"LepCut2l__ele_mu_HWW_tthMVA" ,
-        "LepSF2l__ele_mu_HWW_ttHMVA"
+	"lep1_ele_cut_ttHMVA" ,
+        "lep2_ele_cut_ttHMVA" ,
+        "lep3_ele_cut_ttHMVA" ,
+        "lep1_mu_cut_ttHMVA" ,
+        "lep2_mu_cut_ttHMVA" ,
+        "lep3_mu_cut_ttHMVA" ,
+        "lep1_SF_ttHMVA" ,
+        "lep2_SF_ttHMVA" ,
+        "lep3_SF_ttHMVA"
       }
     },
 
     {
       "mc_2018",{
-	"run",
-	"luminosityBlock",
-	"event",
 	"SFweight2l",
 	"METFilter_MC",
 	"XSWeight",
@@ -124,12 +137,23 @@ struct config_t {
 	"lep2_pt",
 	"lep2_eta",
 	"lep2_pdgId",
+	"lep3_pt",
+        "lep3_eta",
+        "lep3_pdgId",
+	"Mll",
 	"mll",
 	"gen_promptmatch",
 	"ptllDYW" ,
 	"nLepton" ,
-	"LepCut2l__ele_mu_HWW_tthMVA" ,
-        "LepSF2l__ele_mu_HWW_ttHMVA"
+	"lep1_ele_cut_ttHMVA" ,
+        "lep2_ele_cut_ttHMVA" ,
+        "lep3_ele_cut_ttHMVA" ,
+        "lep1_mu_cut_ttHMVA" ,
+        "lep2_mu_cut_ttHMVA" ,
+        "lep3_mu_cut_ttHMVA" ,
+        "lep1_SF_ttHMVA" ,
+        "lep2_SF_ttHMVA" ,
+        "lep3_SF_ttHMVA"
       }
     },
 
@@ -148,10 +172,19 @@ struct config_t {
 	"lep2_pt",
 	"lep2_eta",
 	"lep2_pdgId",
+	"lep3_pt",
+        "lep3_eta",
+        "lep3_pdgId",
+	"Mll",
 	"mll",
 	"trig_sngEl_dblEl" ,
 	"nLepton" ,
-	"LepCut2l__ele_mu_HWW_tthMVA"
+	"lep1_ele_cut_ttHMVA" ,
+        "lep2_ele_cut_ttHMVA" ,
+        "lep3_ele_cut_ttHMVA" ,
+        "lep1_mu_cut_ttHMVA" ,
+        "lep2_mu_cut_ttHMVA" ,
+        "lep3_mu_cut_ttHMVA"
       }
     },
 
@@ -170,13 +203,22 @@ struct config_t {
 	"lep2_pt",
 	"lep2_eta",
 	"lep2_pdgId",
+	"lep3_pt",
+        "lep3_eta",
+        "lep3_pdgId",
+	"Mll",
 	"mll",
 	"trig_sngEl_dblEl" ,
 	"nLepton" ,
-	"LepCut2l__ele_mu_HWW_tthMVA"
+	"lep1_ele_cut_ttHMVA" ,
+        "lep2_ele_cut_ttHMVA" ,
+	"lep3_ele_cut_ttHMVA" ,
+        "lep1_mu_cut_ttHMVA" ,
+        "lep2_mu_cut_ttHMVA" ,
+        "lep3_mu_cut_ttHMVA"
       }
     },
-
+    
     {
       "data_2018",{
 	"event",
@@ -192,10 +234,19 @@ struct config_t {
 	"lep2_pt",
 	"lep2_eta",
 	"lep2_pdgId",
+	"lep3_pt",
+        "lep3_eta",
+        "lep3_pdgId",
+	"Mll",
 	"mll",
 	"trig_sngEl_dblEl" ,
 	"nLepton" ,
-	"LepCut2l__ele_mu_HWW_tthMVA"
+	"lep1_ele_cut_ttHMVA" ,
+        "lep2_ele_cut_ttHMVA" ,
+	"lep3_ele_cut_ttHMVA" ,
+        "lep1_mu_cut_ttHMVA" ,
+        "lep2_mu_cut_ttHMVA" ,
+        "lep3_mu_cut_ttHMVA"
       }
     },
 
@@ -218,6 +269,10 @@ struct config_t {
         "lep2_pt",
         "lep2_eta",
         "lep2_pdgId",
+	"lep3_pt",
+        "lep3_eta",
+        "lep3_pdgId",
+	"Mll",
         "mll",
         "trig_sngEl_dblEl" ,
 	"nLepton"
@@ -243,6 +298,10 @@ struct config_t {
         "lep2_pt",
         "lep2_eta",
         "lep2_pdgId",
+	"lep3_pt",
+        "lep3_eta",
+        "lep3_pdgId",
+	"Mll",
         "mll",
         "trig_sngEl_dblEl" ,
 	"nLepton"
@@ -268,6 +327,10 @@ struct config_t {
         "lep2_pt",
         "lep2_eta",
         "lep2_pdgId",
+	"lep3_pt",
+        "lep3_eta",
+        "lep3_pdgId",
+	"Mll",
         "mll",
         "trig_sngEl_dblEl" ,
 	"nLepton"
