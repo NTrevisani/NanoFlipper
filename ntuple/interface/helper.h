@@ -47,5 +47,16 @@ namespace Helper {
     };                                                                                                                                   
     mycfg.SF_files_map["electron"]["ttHMVA0p7"]["2018"]["ttHMVA"] = { mycfg.base + "/data/ttHMVA_SF/egammaEffi_TightHWW_ttHMVA_0p7_SFs_2018.txt" };   
   }
+  
+  auto add_p4 = [](float pt, float eta, float phi)
+    {
+      return ROOT::Math::PtEtaPhiMVector(pt, eta, phi, 0.);
+    };
+  
+  auto pair = [](ROOT::Math::PtEtaPhiMVector& p4_1, ROOT::Math::PtEtaPhiMVector& p4_2)
+    {
+      return std::vector<float>( { float((p4_1+p4_2).Pt()) , float((p4_1+p4_2).Eta()) , float((p4_1+p4_2).Phi()) , float((p4_1+p4_2).M()) } );
+    };
+  
 }
 #endif

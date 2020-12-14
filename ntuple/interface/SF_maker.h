@@ -140,7 +140,7 @@ template < typename T >
 				    const RVec<float>& lepton_eta
 				    )
     {
-      std::vector<double> SF_vect {};
+      std::vector<double> SF_vect( 3 , 1. );
       //std::vector<double> SF_err_vect {};
       //std::vector<double> SF_up {};
       //std::vector<double> SF_do {};
@@ -171,14 +171,14 @@ template < typename T >
 	    res_ttHMVA = GetSF(11, lepton_eta[i], lepton_pt[i], SF_path_ttHMVA.size()==1 ? 0 : run_period - 1, cfg , "ttHMVA");
 	  }
 	  // scale factor = HWW x ttHMVA
-	  SF_vect.push_back( res_ttHMVA );
+	  SF_vect[i] = res_ttHMVA;
 	  //SF_vect.push_back( res * res_ttHMVA );
 	  //SF_vect.push_back(std::get<0>(res)*std::get<0>(res_ttHMVA));
 	  //SF_err_vect.push_back(TMath::Sqrt(TMath::Power(std::get<1>(res), 2) + TMath::Power(std::get<2>(res), 2)                
 	  //+ TMath::Power(std::get<1>(res_ttHMVA), 2) + TMath::Power(std::get<2>(res_ttHMVA), 2) ));
 	}
 	else if(TMath::Abs(pdgId[i]) == 13){
-	  SF_vect.push_back(1.);
+	  SF_vect[i] = 1.;
 	  //std::cout<<"Impossible, we only look at e-e phase space"<<std::endl;
 	  //exit(0);
 	}
@@ -197,10 +197,10 @@ template < typename T >
   df = df
     .Define( "lep1_ele_cut_ttHMVA" , "abs(Lepton_pdgId[0])==11 && Electron_mvaTTH[Lepton_electronIdx[0]]>0.7" )
     .Define( "lep2_ele_cut_ttHMVA" , "abs(Lepton_pdgId[1])==11 && Electron_mvaTTH[Lepton_electronIdx[1]]>0.7" )
-    .Define( "lep3_ele_cut_ttHMVA" , "abs(Lepton_pdgId[2])==11 && Electron_mvaTTH[Lepton_electronIdx[2]]>0.7" )
+    .Define( "lep3_ele_cut_ttHMVA" , "nLepton==3 && abs(Lepton_pdgId[2])==11 && Electron_mvaTTH[Lepton_electronIdx[2]]>0.7" )
     .Define( "lep1_mu_cut_ttHMVA"  , "abs(Lepton_pdgId[0])==13 && Muon_mvaTTH[Lepton_muonIdx[0]]>0.8" )
     .Define( "lep2_mu_cut_ttHMVA"  , "abs(Lepton_pdgId[1])==13 && Muon_mvaTTH[Lepton_muonIdx[1]]>0.8" )
-    .Define( "lep3_mu_cut_ttHMVA"  , "abs(Lepton_pdgId[2])==13 && Muon_mvaTTH[Lepton_muonIdx[2]]>0.8" )
+    .Define( "lep3_mu_cut_ttHMVA"  , "nLepton == 3 && abs(Lepton_pdgId[2])==13 && Muon_mvaTTH[Lepton_muonIdx[2]]>0.8" )
     ;
   //.Define( "HWW_WP_cut" , cfg.HWW_WP[cfg.year] )                                                                                                                                                        
   //.Define( "LepCut2l__ele_mu_HWW_tthMVA" , "HWW_WP_cut*( ( abs(Lepton_pdgId[0])==11 || Muon_mvaTTH[Lepton_muonIdx[0]]>0.8 ) && ( abs(Lepton_pdgId[1])==11 || Muon_mvaTTH[Lepton_muonIdx[1]]>0.8 ) && ( abs(Lepton_pdgId[0])==13 || Electron_mvaTTH[Lepton_electronIdx[0]]>0.70) && ( abs(Lepton_pdgId[1])==13 || Electron_mvaTTH[Lepton_electronIdx[1]]>0.70) )");                        

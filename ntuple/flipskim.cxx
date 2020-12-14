@@ -20,7 +20,7 @@ int main(int argc, char **argv) {
   // init cfg
   config_t mycfg;
   mycfg.year = year;
-  mycfg.isMC = (input.find("DYJetsToLL") != std::string::npos) ? true : false;
+  mycfg.isMC = ( ( input.find("DYJetsToLL") != std::string::npos ) || ( input.find("WZ") != std::string::npos ) ) ? true : false;
   mycfg.base = std::getenv("PWD");
 
   std::cout << ">>> Process is mc: " << mycfg.isMC << std::endl;
@@ -46,19 +46,8 @@ int main(int argc, char **argv) {
   }
 
   ROOT::RDataFrame df( "Events", infiles);
-  auto df1 = selection( df , input );
-  auto df2 = df1
-    .Filter("abs(Mll-91.2)<15" , "DY region : ( abs(mll-91.2)<15 )")
-    .Define("lep1_pt"    , "Lepton_pt[0]")
-    .Define("lep1_eta"   , "Lepton_eta[0]")
-    .Define("lep1_pdgId" , "Lepton_pdgId[0]")
-    .Define("lep2_pt"    , "Lepton_pt[1]")
-    .Define("lep2_eta"   , "Lepton_eta[1]")
-    .Define("lep2_pdgId" , "Lepton_pdgId[1]")
-    .Define("lep3_pt"    , "Lepton_pt[2]")
-    .Define("lep3_eta"   , "Lepton_eta[2]")
-    .Define("lep3_pdgId" , "Lepton_pdgId[2]")
-    ;
+  auto df1 = threeLep_selection( df , workflow );  
+  auto df2 = df1.Filter("abs(Mll-91.2)<15" , "DY region : ( abs(mll-91.2)<15 )");
   
   // make lepton SF
   auto outdf = hww_tthmva_sf( df2 , mycfg );
@@ -93,7 +82,7 @@ int main(int argc, char **argv) {
   
   outdf.Snapshot( "flipper", output, outbranch );
   
-  ROOT::RDF::SaveGraph( outdf ,"graph_flip_"+name+".dot");
+  ROOT::RDF::SaveGraph( outdf ,"graph_flip.dot");
   
   auto report = outdf.Report();
   report->Print();
