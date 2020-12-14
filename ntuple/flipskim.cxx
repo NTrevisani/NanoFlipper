@@ -46,7 +46,7 @@ int main(int argc, char **argv) {
   }
 
   ROOT::RDataFrame df( "Events", infiles);
-  auto df1 = threeLep_selection( df , workflow );  
+  auto df1 = threeLep_selection( df );  
   auto df2 = df1.Filter("abs(Mll-91.2)<15" , "DY region : ( abs(mll-91.2)<15 )");
   
   // make lepton SF
