@@ -64,9 +64,10 @@ def prepare( dataset_ , source_ , fake=False ):
         path=""
         if isample in [ 'SingleElectron' , 'SingleMuon' , 'MuonEG' , 'DoubleEG' , 'DoubleMuon' , 'EGamma' ]:
             path=datasets[dataset_]['DATA_path']
+            os.system( "ls %s/%s/*%s* > %s/%s.txt" %( source_ , path , isample , location , isample ) )
         else:
             path=datasets[dataset_]['MC_path']
-        os.system( "ls %s/%s/*%s__* > %s/%s.txt" %( source_ , path , isample , location , isample ) )
+            os.system( "ls %s/%s/*%s__* > %s/%s.txt" %( source_ , path , isample , location , isample ) )
         out.append( "%s/%s.txt" %( location , isample ) )
     print("")
     print(" --> preparing samplelist : ", out)
