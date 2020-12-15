@@ -7,7 +7,7 @@ cwd = os.getcwd()
 usage = "usage: %prog [options]"
 parser = OptionParser(usage)
 parser.add_option("-d","--dataset", action="store", type="string", dest="dataset", default="nanov5_2016")
-parser.add_option("-l","--location", action="store", type="string", dest="location", default="eos")
+parser.add_option("-l","--location", action="store", type="string", dest="location", default="%s/data/filelists" %(cwd) )
 parser.add_option("-s", "--Samples", action="append", type="string", dest="Samples" , default=[])
 parser.add_option("-b","--batch", action="store_true", dest="batch", default=False)
 parser.add_option("-t","--test", action="store_true", dest="test", default=False)
@@ -17,9 +17,8 @@ parser.add_option("-o","--output", action="store", type="string", dest="output",
 (options, args) = parser.parse_args()
 
 dataset = options.dataset
-locations = options.location
 Samples = options.Samples
-dirs = "%s/data/filelists/%s/" % (cwd,dataset)
+location = options.location + "/" + dataset
 batch = options.batch
 test = options.test
 nfile = options.nfile
@@ -28,32 +27,47 @@ if batch:
 else:
     output = options.output + "%s" %(dataset)
 
+source=""
+
 datasets={
     'nanov5_2016' : {
-        'lumi' : '35.867',
-        'files' : [ i for i in os.listdir('%s/data/filelists/nanov5_2016/' %cwd) if 'fake_' not in i ]
+        'lumi'      : '35.867',
+        'DATA_path' : 'Run2016_102X_nAODv5_Full2016v6/DATAl1loose2016v6__l2loose__l2tightOR2016v6',
+        'MC_path'   : 'Summer16_102X_nAODv5_Full2016v6/MCl1loose2016v6__MCCorr2016v6__l2loose__l2tightOR2016v6'
     },
     'nanov5_2017' : {
         'lumi' : "41.53",
-        'files' : [ i for i in os.listdir('%s/data/filelists/nanov5_2017/' %cwd) if 'fake_' not in i ]
+        'DATA_path' : 'Run2017_102X_nAODv5_Full2017v6/DATAl1loose2017v6__l2loose__l2tightOR2017v6',
+        'MC_path'   : 'Fall2017_102X_nAODv5_Full2017v6/MCl1loose2017v6__MCCorr2017v6__l2loose__l2tightOR2017v6'
     },
     'nanov5_2018' : {
         'lumi' : "59.74",
-        'files' : [ i for i in os.listdir('%s/data/filelists/nanov5_2018/' %cwd) if 'fake_' not in i ]
+        'DATA_path' : 'Run2018_102X_nAODv6_Full2018v6/DATAl1loose2018v6__l2loose__l2tightOR2018v6',
+        'MC_path'   : 'Autumn18_102X_nAODv6_Full2018v6/MCl1loose2018v6__MCCorr2018v6__l2loose__l2tightOR2018v6'
     }
 }
+
+# detect database ; make list
+if '/home/shoh'	in os.getcwd() :
+    # my stash
+    source="/media/shoh/02A1ACF427292FC0/nanov5"
+elif '/lustre' in os.getcwd() or '/homeui' in os.getcwd() :
+    # padova
+    source = "/"
+elif '/afs/cern.ch/user' in os.getcwd() :
+    source = "/eos/cms/store/group/phys_higgs/cmshww/amassiro/HWWNano"
 ###################################################
 
-def prepare( dataset_ , fake=False ):
+def prepare( dataset_ , source_ , fake=False ):
     out=[]
-    for itxt in ( datasets[dataset_]['files'] ) :
-        
-        if not any( i in itxt for i in Samples ): continue
-        out.append( dirs + itxt )
-        
-        #if fake and 'DY' not in i:
-        #    itxt = 'Fake_'+itxt
-        #    out.append( dirs + itxt )
+    for isample in Samples:
+        path=""
+        if isample in [ 'SingleElectron' , 'SingleMuon' , 'MuonEG' , 'DoubleEG' , 'DoubleMuon' , 'EGamma' ]:
+            path=datasets[dataset_]['DATA_path']
+        else:
+            path=datasets[dataset_]['MC_path']
+        os.system( "ls %s/%s/*%s* > %s/%s.txt" %( source_ , path , isample , location , isample ) )
+        out.append( "%s/%s.txt" %( location , isample ) )
     print("")
     print(" --> preparing samplelist : ", out)
     print("")
@@ -108,9 +122,21 @@ def execute( sample_ , iproc_ , output_ , year_ , batch_ ):
     
 if __name__ == "__main__" :
 
-    if not os.path.exists(output): os.system( "mkdir -p %s" %( output ) )
+    # detect database ; make list
+    if '/home/shoh' in os.getcwd() :
+    # my stash
+        source="/media/shoh/02A1ACF427292FC0/nanov5"
+    elif '/lustre' in os.getcwd() or '/homeui' in os.getcwd() :
+        # padova
+        source = "/"
+    elif '/afs/cern.ch/user' in os.getcwd() :
+        source = "/eos/cms/store/group/phys_higgs/cmshww/amassiro/HWWNano"
+
+    if not os.path.exists(output)   : os.system( "mkdir -p %s" %output   )
+    if not os.path.exists(location) : os.system( "mkdir -p %s" %location ) 
     
-    samplelists = prepare( dataset )
+    # output filelist
+    samplelists = prepare( dataset , source )
     trun = time.time();
 
     # samplelist refer to txt
