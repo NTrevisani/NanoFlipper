@@ -22,6 +22,8 @@ int main(int argc, char **argv) {
   mycfg.year = year;
   mycfg.isMC = ( ( input.find("DYJetsToLL") != std::string::npos ) || ( input.find("WZ") != std::string::npos ) ) ? true : false;
   mycfg.base = std::getenv("PWD");
+  std::string cmssw_base = std::getenv("CMSSW_BASE");
+  if ( cmssw_base != NULL ) mycfg.base = cmssw_base+"/../NanoFlipper/ntuple/";
 
   std::cout << ">>> Process is mc: " << mycfg.isMC << std::endl;
   std::cout << ">>> Process input: " << input << std::endl;
