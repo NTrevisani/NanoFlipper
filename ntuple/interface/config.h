@@ -18,15 +18,15 @@ struct config_t {
   const unsigned int nlep_SF=3;
 
   Lep_dict HWW_WP = {
-    { "2016" , "LepCut2l__ele_mva_90p_Iso2016__mu_cut_Tight80x" } ,
-    { "2017" , "LepCut2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW" } ,
-    { "2018" , "LepCut2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW" }
+    { "2016" , "LepCut3l__ele_mva_90p_Iso2016__mu_cut_Tight80x" } ,
+    { "2017" , "LepCut3l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW" } ,
+    { "2018" , "LepCut3l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW" }
   };
 
   Lep_dict HWW_WP_SF = {
-    { "2016" , "LepSF2l__ele_mva_90p_Iso2016__mu_cut_Tight80x" } ,
-    { "2017" , "LepSF2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW" } ,
-    { "2018" , "LepSF2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW" }
+    { "2016" , "LepSF3l__ele_mva_90p_Iso2016__mu_cut_Tight80x" } ,
+    { "2017" , "LepSF3l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW" } ,
+    { "2018" , "LepSF3l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW" }
   };
 
   // SingleElectron
@@ -50,11 +50,11 @@ struct config_t {
   };
 
   std::vector<TH2D> h_SF_ele {};
-  //std::vector<TH2D> h_SF_ele_err {};
-  //std::vector<TH2D> h_SF_ele_sys {};
   std::vector<TH2D> h_SF_ele_ttHMVA {};
-  //std::vector<TH2D> h_SF_ele_ttHMVA_err {};
-  //std::vector<TH2D> h_SF_ele_ttHMVA_sys {};
+  
+  std::vector<TH2D> h_SF_mu_Id {};
+  std::vector<TH2D> h_SF_mu_Iso {};
+  std::vector<TH2D> h_SF_mu_ttHMVA {};
 
   size_t listSize;
 
@@ -78,17 +78,9 @@ struct config_t {
 	"Mll",
         "mll",
         "gen_promptmatch",
-        "ptllDYW" ,
 	"nLepton" ,
-	"lep1_ele_cut_ttHMVA" ,
-	"lep2_ele_cut_ttHMVA" ,
-	"lep3_ele_cut_ttHMVA" ,
-	"lep1_mu_cut_ttHMVA" ,
-	"lep2_mu_cut_ttHMVA" ,
-	"lep3_mu_cut_ttHMVA" ,
-	"lep1_SF_ttHMVA" ,
-	"lep2_SF_ttHMVA" ,
-	"lep3_SF_ttHMVA"
+	"LepCut3l__ele_mu_HWW_ttHMVA" , 
+	"LepSF3l__ele_mu_HWW_ttHMVA"
       }
     },
 
@@ -111,17 +103,9 @@ struct config_t {
 	"Mll",
 	"mll",
 	"gen_promptmatch",
-	"ptllDYW" ,
 	"nLepton" ,
-	"lep1_ele_cut_ttHMVA" ,
-        "lep2_ele_cut_ttHMVA" ,
-        "lep3_ele_cut_ttHMVA" ,
-        "lep1_mu_cut_ttHMVA" ,
-        "lep2_mu_cut_ttHMVA" ,
-        "lep3_mu_cut_ttHMVA" ,
-        "lep1_SF_ttHMVA" ,
-        "lep2_SF_ttHMVA" ,
-        "lep3_SF_ttHMVA"
+	"LepCut3l__ele_mu_HWW_ttHMVA" ,
+        "LepSF3l__ele_mu_HWW_ttHMVA"
       }
     },
 
@@ -143,17 +127,9 @@ struct config_t {
 	"Mll",
 	"mll",
 	"gen_promptmatch",
-	"ptllDYW" ,
 	"nLepton" ,
-	"lep1_ele_cut_ttHMVA" ,
-        "lep2_ele_cut_ttHMVA" ,
-        "lep3_ele_cut_ttHMVA" ,
-        "lep1_mu_cut_ttHMVA" ,
-        "lep2_mu_cut_ttHMVA" ,
-        "lep3_mu_cut_ttHMVA" ,
-        "lep1_SF_ttHMVA" ,
-        "lep2_SF_ttHMVA" ,
-        "lep3_SF_ttHMVA"
+	"LepCut3l__ele_mu_HWW_ttHMVA" ,
+        "LepSF3l__ele_mu_HWW_ttHMVA"
       }
     },
 
@@ -177,14 +153,9 @@ struct config_t {
         "lep3_pdgId",
 	"Mll",
 	"mll",
-	"trig_sngEl_dblEl" ,
+	"triggers" ,
 	"nLepton" ,
-	"lep1_ele_cut_ttHMVA" ,
-        "lep2_ele_cut_ttHMVA" ,
-        "lep3_ele_cut_ttHMVA" ,
-        "lep1_mu_cut_ttHMVA" ,
-        "lep2_mu_cut_ttHMVA" ,
-        "lep3_mu_cut_ttHMVA"
+	"LepCut3l__ele_mu_HWW_ttHMVA"
       }
     },
 
@@ -208,14 +179,9 @@ struct config_t {
         "lep3_pdgId",
 	"Mll",
 	"mll",
-	"trig_sngEl_dblEl" ,
+	"triggers" ,
 	"nLepton" ,
-	"lep1_ele_cut_ttHMVA" ,
-        "lep2_ele_cut_ttHMVA" ,
-	"lep3_ele_cut_ttHMVA" ,
-        "lep1_mu_cut_ttHMVA" ,
-        "lep2_mu_cut_ttHMVA" ,
-        "lep3_mu_cut_ttHMVA"
+	"LepCut3l__ele_mu_HWW_ttHMVA"
       }
     },
     
@@ -239,14 +205,9 @@ struct config_t {
         "lep3_pdgId",
 	"Mll",
 	"mll",
-	"trig_sngEl_dblEl" ,
+	"triggers" ,
 	"nLepton" ,
-	"lep1_ele_cut_ttHMVA" ,
-        "lep2_ele_cut_ttHMVA" ,
-	"lep3_ele_cut_ttHMVA" ,
-        "lep1_mu_cut_ttHMVA" ,
-        "lep2_mu_cut_ttHMVA" ,
-        "lep3_mu_cut_ttHMVA"
+	"LepCut3l__ele_mu_HWW_ttHMVA"
       }
     },
 
@@ -354,10 +315,12 @@ struct config_t {
   
   //trigger configuration
   std::map< const std::string , const std::string > triggers = {
-    {"SingleMuon", "!Trigger_ElMu && Trigger_sngMu"} ,
-    {"EGamma","(Trigger_sngEl || Trigger_dblEl)"} ,
-    {"DoubleEG","!Trigger_sngEl && Trigger_dblEl"} ,
-    {"SingleElectron","!Trigger_dblEl && Trigger_sngEl"}
+    { "MuonEG"         , "Trigger_ElMu" },
+    { "SingleMuon"     , "!Trigger_ElMu && Trigger_sngMu" },
+    { "SingleElectron" , "!Trigger_ElMu && !Trigger_sngMu && Trigger_sngEl" },
+    { "DoubleMuon"     , "!Trigger_ElMu && !Trigger_sngMu && !Trigger_sngEl && Trigger_dblMu" },
+    { "DoubleEG"       , "!Trigger_ElMu && !Trigger_sngMu && !Trigger_sngEl && !Trigger_dblMu && Trigger_dblEl" },
+    { "EGamma"         , "!Trigger_ElMu && !Trigger_dblMu && !Trigger_sngMu && (Trigger_sngEl || Trigger_dblEl)" }  
   };
   
 };

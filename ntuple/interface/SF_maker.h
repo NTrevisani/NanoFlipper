@@ -4,6 +4,40 @@
 #include "helper.h"
 #include "config.h"
 
+// make muon 
+void makeSF_muon( std::list<std::string> SF_files_map_in , std::vector<TH2D> &sf_nom , std::string histname ) { //, std::vector<TH2D> &sf_stat , std::vector<TH2D> &sf_syst , std::string histname ) {
+  
+  for( auto f : SF_files_map_in ){
+    TFile rootfile(f.c_str());
+    TH2D* htemp = (TH2D*)rootfile.Get(histname.c_str());
+
+    int mu_nbins_eta = htemp->GetNbinsX(), mu_nbins_pt = htemp->GetNbinsY();
+    
+    // C language allows the creation of arrays on the stack of variable length, but C ++ does not. 
+    //In C ++ the size of the arrays allocated in the stack must be known at compile time.
+    std::vector<double> mu_eta_bins(mu_nbins_eta+1), mu_pt_bins(mu_nbins_pt+1);
+
+    for(int k=0;k<=mu_nbins_eta;k++) { mu_eta_bins[k] = htemp->GetXaxis()->GetXbins()->At(k); }
+    for(int k=0;k<=mu_nbins_pt;k++) { mu_pt_bins[k] = htemp->GetYaxis()->GetXbins()->At(k); }
+    
+    TH2D h_SF = TH2D("", "", mu_nbins_eta, mu_eta_bins.data(), mu_nbins_pt, mu_pt_bins.data());
+    //TH2D h_SF_err = TH2D("", "", mu_nbins_eta, mu_eta_bins.data(), mu_nbins_pt, mu_pt_bins.data());
+    //TH2D h_SF_sys = TH2D("", "", mu_nbins_eta, mu_eta_bins.data(), mu_nbins_pt, mu_pt_bins.data());
+    
+    for(int i=1; i<=mu_nbins_eta;i++){
+            for(int j=1; j<=mu_nbins_pt;j++){
+              h_SF.SetBinContent(i, j, htemp->GetBinContent(i, j));
+              //h_SF_err.SetBinContent(i, j, htemp->GetBinError(i, j));
+	      //h_SF_sys.SetBinContent(i, j, 1.); // FIXME this is here as a placeholder: old SF files only have total error, in the new ones it is split
+            }
+        }
+    sf_nom.push_back(h_SF);
+    //sf_stat.push_back(h_SF_err);
+    //sf_syst.push_back(h_SF_sys);
+  }
+}
+
+// make electrion
 void makeSF_ele( std::list<std::string> SF_files_map_in , std::vector<TH2D> &sf_nom  ) { //, std::vector<TH2D> &sf_stat , std::vector<TH2D> &sf_syst ) {
 
   int ele_nbins_eta = 10;
@@ -119,6 +153,57 @@ double GetSF(int flavor, float eta, float pt, int run_period, config_t mycfg , s
     //SF_sys = mycfg.h_SF_ele_sys[run_period].GetBinContent(mycfg.h_SF_ele_sys[run_period].FindBin(eta_temp, pt_temp));
 
   }
+  else if((flavor == 13) && (type == "Id")){
+
+    double eta_max = 2.39;
+    double eta_min = -2.4;
+    double pt_max = 199.;
+    double pt_min = 10.;
+
+    if(eta_temp < eta_min){eta_temp = eta_min;}
+    if(eta_temp > eta_max){eta_temp = eta_max;}
+    if(pt_temp < pt_min){pt_temp = pt_min;}
+    if(pt_temp > pt_max){pt_temp = pt_max;}
+
+    SF = mycfg.h_SF_mu_Id[run_period].GetBinContent(mycfg.h_SF_mu_Id[run_period].FindBin(eta_temp, pt_temp));
+    //SF_err = mycfg.h_SF_mu_Id_err[run_period].GetBinContent(mycfg.h_SF_mu_Id_err[run_period].FindBin(eta_temp, pt_temp));
+    //SF_sys = mycfg.h_SF_mu_Id_sys[run_period].GetBinContent(mycfg.h_SF_mu_Id_sys[run_period].FindBin(eta_temp, pt_temp));
+
+  }
+  else if((flavor == 13) && (type == "Iso")){
+
+    double eta_max = 2.39;
+    double eta_min = -2.4;
+    double pt_max = 199.;
+    double pt_min = 10.;
+
+    if(eta_temp < eta_min){eta_temp = eta_min;}
+    if(eta_temp > eta_max){eta_temp = eta_max;}
+    if(pt_temp < pt_min){pt_temp = pt_min;}
+    if(pt_temp > pt_max){pt_temp = pt_max;}
+
+    SF = mycfg.h_SF_mu_Iso[run_period].GetBinContent(mycfg.h_SF_mu_Iso[run_period].FindBin(eta_temp, pt_temp));
+    //SF_err = mycfg.h_SF_mu_Iso_err[run_period].GetBinContent(mycfg.h_SF_mu_Iso_err[run_period].FindBin(eta_temp, pt_temp));
+    //SF_sys = mycfg.h_SF_mu_Iso_sys[run_period].GetBinContent(mycfg.h_SF_mu_Iso_sys[run_period].FindBin(eta_temp, pt_temp));
+
+  }
+  else if((flavor == 13) && (type == "ttHMVA")){
+
+    double eta_max = 2.39;
+    double eta_min = -2.4;
+    double pt_max = 199.;
+    double pt_min = 10.;
+
+    if(eta_temp < eta_min){eta_temp = eta_min;}
+    if(eta_temp > eta_max){eta_temp = eta_max;}
+    if(pt_temp < pt_min){pt_temp = pt_min;}
+    if(pt_temp > pt_max){pt_temp = pt_max;}
+
+    SF = mycfg.h_SF_mu_ttHMVA[run_period].GetBinContent(mycfg.h_SF_mu_ttHMVA[run_period].FindBin(eta_temp, pt_temp));
+    //SF_err = mycfg.h_SF_mu_ttHMVA_err[run_period].GetBinContent(mycfg.h_SF_mu_ttHMVA_err[run_period].FindBin(eta_temp, pt_temp));
+    //SF_sys = mycfg.h_SF_mu_ttHMVA_sys[run_period].GetBinContent(mycfg.h_SF_mu_ttHMVA_sys[run_period].FindBin(eta_temp, pt_temp));
+
+  }
   else {std::cout << "Invalid call to compute_SF::GetSF" << std::endl;}
 
   //std::tuple<double, double, double> result = {SF, SF_err, SF_sys};
@@ -131,88 +216,72 @@ double GetSF(int flavor, float eta, float pt, int run_period, config_t mycfg , s
 template < typename T >
   auto hww_tthmva_sf( T &df, config_t &cfg ){
   using namespace ROOT::VecOps;
-  
   // lambda function
   auto hww_tthmva_sf_maker = [&cfg](
 				    const int& run_period ,
 				    const RVec<int>& pdgId ,
 				    const RVec<float>& lepton_pt ,
-				    const RVec<float>& lepton_eta
+				    const RVec<float>& lepton_eta ,
+				    const RVec<int>& lepton_electronIdx ,
+				    const RVec<int>& lepton_muonIdx ,
+				    const RVec<float>& electron_mvaTTH ,
+				    const RVec<float>& muon_mvaTTH
 				    )
     {
-      std::vector<double> SF_vect( 3 , 1. );
-      //std::vector<double> SF_err_vect {};
-      //std::vector<double> SF_up {};
-      //std::vector<double> SF_do {};
-      
       const unsigned int nlep = cfg.nlep_SF;
-      
+      std::vector<double> SF_vect( nlep , 1. );
+      std::vector<bool> Cut_vect( nlep , 1 );
       for ( unsigned int i=0 ; i < nlep ; i++ ){
-	if(TMath::Abs(pdgId[i]) == 11){
-	  //std::list<std::string> SF_path = cfg.SF_files_map["electron"]["TightObjWP"][cfg.year]["wpSF"];
-	  std::list<std::string> SF_path_ttHMVA = cfg.SF_files_map["electron"]["ttHMVA0p7"][cfg.year]["ttHMVA"];
-	  //std::tuple<double, double, double> res;
-	  //std::tuple<double, double, double> res_ttHMVA;
-	  //double res;
-	  double res_ttHMVA;
-	  if( cfg.year.find("2017") != std::string::npos ){
-	    int run_period__;
-	    if ( run_period <= 2){                                
-	      run_period__ = run_period - 1;
-	    }                                              
-	    else{                                          
-	      run_period__ = run_period - 2;               
-	    }                                              
-	    //res = GetSF( 11 , lepton_eta[i] , lepton_pt[i], SF_path.size()==1 ? 0 : run_period__ , cfg , "Id"); 
-	    res_ttHMVA = GetSF(11, lepton_eta[i], lepton_pt[i], SF_path_ttHMVA.size()==1 ? 0 : run_period__ , cfg , "ttHMVA");
-	  }                                                                                                                   
-	  else{                                                                                                               
-	    //res = GetSF(11, lepton_eta[i], lepton_pt[i], SF_path.size()==1 ? 0 : run_period__ - 1, cfg , "Id");               
-	    res_ttHMVA = GetSF(11, lepton_eta[i], lepton_pt[i], SF_path_ttHMVA.size()==1 ? 0 : run_period - 1, cfg , "ttHMVA");
+	
+	if (TMath::Abs(pdgId[i]) == 11){
+	  if (cfg.isMC){
+	    std::list<std::string> SF_path = cfg.SF_files_map["electron"]["TightObjWP"][cfg.year]["idSF"];
+	    std::list<std::string> SF_path_ttHMVA = cfg.SF_files_map["electron"]["ttHMVA0p7"][cfg.year]["ttHMVA"];
+
+	    double res        = GetSF( 11, lepton_eta[i], lepton_pt[i], SF_path.size()==1 ? 0 : run_period - 1, cfg , "Id");
+	    double res_ttHMVA = GetSF( 11, lepton_eta[i], lepton_pt[i], SF_path_ttHMVA.size()==1 ? 0 : run_period - 1, cfg , "ttHMVA");
+
+	    // scale factor = HWW x ttHMVA
+	    SF_vect[i] = res * res_ttHMVA ;
 	  }
-	  // scale factor = HWW x ttHMVA
-	  SF_vect[i] = res_ttHMVA;
-	  //SF_vect.push_back( res * res_ttHMVA );
-	  //SF_vect.push_back(std::get<0>(res)*std::get<0>(res_ttHMVA));
-	  //SF_err_vect.push_back(TMath::Sqrt(TMath::Power(std::get<1>(res), 2) + TMath::Power(std::get<2>(res), 2)                
-	  //+ TMath::Power(std::get<1>(res_ttHMVA), 2) + TMath::Power(std::get<2>(res_ttHMVA), 2) ));
+	  // passing cut?
+	  Cut_vect[i] = ( electron_mvaTTH[lepton_electronIdx[i]] > 0.7 ) ? true : false;
 	}
 	else if(TMath::Abs(pdgId[i]) == 13){
-	  SF_vect[i] = 1.;
-	  //std::cout<<"Impossible, we only look at e-e phase space"<<std::endl;
-	  //exit(0);
-	}
+	  if (cfg.isMC){
+	    std::list<std::string> SF_path_id = cfg.SF_files_map["muon"]["TightObjWP"][cfg.year]["idSF"];
+	    std::list<std::string> SF_path_iso = cfg.SF_files_map["muon"]["TightObjWP"][cfg.year]["isoSF"];
+	    
+	    double res_id = GetSF(13, lepton_eta[i], lepton_pt[i], SF_path_id.size()==1 ? 0 : run_period - 1, cfg , "Id");
+	    double res_iso = GetSF(13, lepton_eta[i], lepton_pt[i], SF_path_iso.size()==1 ? 0 : run_period - 1, cfg , "Iso");
+	    double res_ttHMVA = GetSF(13, lepton_eta[i], lepton_pt[i], SF_path_iso.size()==1 ? 0 : run_period - 1, cfg , "ttHMVA");
+	    
+	    // scale factor = HWW_Id x HWW_Iso x ttHMVA
+	    SF_vect[i] = res_id * res_iso * res_ttHMVA ;
+	  }
+	  // passing cut ?
+	  Cut_vect[i] = ( muon_mvaTTH[lepton_muonIdx[i]] > 0.8 ) ? true : false;
+        }
       } // end of loops
       
-      //double SF = 1.;
-      
+      double SF = 1.;
+      bool Cut = true;
       // Calculate product of IsIso_SFs for all leptons in the event
-      //for(auto x : SF_vect) SF *= x;
+      for(auto x : SF_vect) SF *= x;
+      for(auto x : Cut_vect) Cut *= x;
       
-      return SF_vect;
+      return std::make_pair( Cut , SF );
     };
   
   std::cout<<" --> default HWW WP : "<< cfg.HWW_WP[cfg.year] <<std::endl;
   
   df = df
-    .Define( "lep1_ele_cut_ttHMVA" , "abs(Lepton_pdgId[0])==11 && Electron_mvaTTH[Lepton_electronIdx[0]]>0.7" )
-    .Define( "lep2_ele_cut_ttHMVA" , "abs(Lepton_pdgId[1])==11 && Electron_mvaTTH[Lepton_electronIdx[1]]>0.7" )
-    .Define( "lep3_ele_cut_ttHMVA" , "nLepton==3 && abs(Lepton_pdgId[2])==11 && Electron_mvaTTH[Lepton_electronIdx[2]]>0.7" )
-    .Define( "lep1_mu_cut_ttHMVA"  , "abs(Lepton_pdgId[0])==13 && Muon_mvaTTH[Lepton_muonIdx[0]]>0.8" )
-    .Define( "lep2_mu_cut_ttHMVA"  , "abs(Lepton_pdgId[1])==13 && Muon_mvaTTH[Lepton_muonIdx[1]]>0.8" )
-    .Define( "lep3_mu_cut_ttHMVA"  , "nLepton == 3 && abs(Lepton_pdgId[2])==13 && Muon_mvaTTH[Lepton_muonIdx[2]]>0.8" )
+    .Define( "hww_tthmva_sf_maker" , hww_tthmva_sf_maker , 
+	     { "run_period" , "Lepton_pdgId" , "Lepton_pt" , "Lepton_eta" , "Lepton_electronIdx" , "Lepton_muonIdx" , "Electron_mvaTTH" , "Muon_mvaTTH" } )
+    .Define( "HWW_WP_cut" , cfg.HWW_WP[cfg.year] )
+    .Define( "LepCut3l__ele_mu_HWW_ttHMVA" , "HWW_WP_cut*(hww_tthmva_sf_maker.first)" )
+    .Define( "LepSF3l__ele_mu_HWW_ttHMVA" , "hww_tthmva_sf_maker.second" )
     ;
-  //.Define( "HWW_WP_cut" , cfg.HWW_WP[cfg.year] )                                                                                                                                                        
-  //.Define( "LepCut2l__ele_mu_HWW_tthMVA" , "HWW_WP_cut*( ( abs(Lepton_pdgId[0])==11 || Muon_mvaTTH[Lepton_muonIdx[0]]>0.8 ) && ( abs(Lepton_pdgId[1])==11 || Muon_mvaTTH[Lepton_muonIdx[1]]>0.8 ) && ( abs(Lepton_pdgId[0])==13 || Electron_mvaTTH[Lepton_electronIdx[0]]>0.70) && ( abs(Lepton_pdgId[1])==13 || Electron_mvaTTH[Lepton_electronIdx[1]]>0.70) )");                        
-  // mc only
-  if (cfg.isMC) {
-    df = df
-      .Define( "LepSF2l__ele_mu_HWW_ttHMVA" , hww_tthmva_sf_maker , { "run_period" , "Lepton_pdgId" , "Lepton_pt" , "Lepton_eta" } )
-      .Define( "lep1_SF_ttHMVA" , "LepSF2l__ele_mu_HWW_ttHMVA[1]" )
-      .Define( "lep2_SF_ttHMVA" , "LepSF2l__ele_mu_HWW_ttHMVA[2]" )
-      .Define( "lep3_SF_ttHMVA" , "LepSF2l__ele_mu_HWW_ttHMVA[3]" )
-      ;
-  }
   return df;
 }
 
