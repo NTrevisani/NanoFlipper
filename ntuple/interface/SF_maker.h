@@ -280,8 +280,8 @@ template < typename T >
     .Define( "hww_tthmva_sf_maker" , hww_tthmva_sf_maker , 
 	     { "run_period" , "Lepton_pdgId" , "Lepton_pt" , "Lepton_eta" , "Lepton_electronIdx" , "Lepton_muonIdx" , "Electron_mvaTTH" , "Muon_mvaTTH" } )
     .Define( "HWW_WP_cut" , cfg.HWW_WP[cfg.year] )
-    .Define( "LepCut3l__ele_mu_HWW_ttHMVA" , "HWW_WP_cut*(hww_tthmva_sf_maker.first)" )
-    .Define( "LepSF3l__ele_mu_HWW_ttHMVA" , "hww_tthmva_sf_maker.second" )
+    .Define( "LepCut2l__ele_mu_HWW_ttHMVA" , "HWW_WP_cut*(hww_tthmva_sf_maker.first)" )
+    .Define( "LepSF2l__ele_mu_HWW_ttHMVA" , "hww_tthmva_sf_maker.second" )
     ;
   return df;
 }
