@@ -8,7 +8,7 @@ template < typename T>
 auto twoLep_selection( T &df ){
   
   auto df1 = df
-    .Filter("nLepton==2 || ( nLepton>3 && Lepton_pt[2]<10 )","Nlepton cut : ( nLepton==2 || ( nLepton>=3 && Lepton_pt[2]<10 ) )")
+    .Filter("nLepton==2 || ( nLepton>=3 && Lepton_pt[2]<10 )","Nlepton cut : ( nLepton==2 || ( nLepton>=3 && Lepton_pt[2]<10 ) )")
     .Filter("Lepton_pt[0]>15 && Lepton_pt[1]>15","Lepton pt cut : (Lepton_pt[0]>15 && Lepton_pt[1]>15)")
     .Filter("abs(Lepton_pdgId[0]*Lepton_pdgId[1])==11*11","e-e channel : ( abs(Lepton_pdgId[0]*Lepton_pdgId[1])==11*11 )")
     ;
@@ -37,10 +37,12 @@ template < typename T >
 auto threeLep_selection( T &df ){
   
   auto df1 = df
-    .Filter("nLepton==3 || ( nLepton>3 && Lepton_pt[3]<10 )","three leptons final state")
+    .Filter("nLepton==3 || ( nLepton>=4 && Lepton_pt[3]<10 )","three leptons final state")
     .Filter("Lepton_pt[0]>15 && Lepton_pt[1]>5","Lepton pt cut : (Lepton_pt[0]>15 && Lepton_pt[1]>5)")
-    .Filter("abs(Lepton_pdgId[0])==13","one leading pt muon")
-    .Filter("abs(Lepton_pdgId[1]*Lepton_pdgId[2])==11*11" , "two sub-leading pt electrons")
+    .Filter("abs(Lepton_pdgId[0])==13","abs(Lepton_pdgId[0])==13")
+    .Filter("abs(Lepton_pdgId[1])==11" , "abs(Lepton_pdgId[1])==11")
+    .Filter("abs(Lepton_pdgId[2])==11" , "abs(Lepton_pdgId[2])==11")
+    //.Filter("abs(Lepton_pdgId[1]*Lepton_pdgId[2])==11*11" , "two sub-leading pt electrons")
     ;
   
   auto df2 = df1

@@ -15,18 +15,18 @@ struct config_t {
   std::string lumi;
   std::string base;
   nested_dict SF_files_map;
-  const unsigned int nlep_SF=3;
+  const unsigned int nlep_SF=2;
 
   Lep_dict HWW_WP = {
-    { "2016" , "LepCut3l__ele_mva_90p_Iso2016__mu_cut_Tight80x" } ,
-    { "2017" , "LepCut3l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW" } ,
-    { "2018" , "LepCut3l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW" }
+    { "2016" , "LepCut2l__ele_mva_90p_Iso2016__mu_cut_Tight80x" } ,
+    { "2017" , "LepCut2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW" } ,
+    { "2018" , "LepCut2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW" }
   };
 
   Lep_dict HWW_WP_SF = {
-    { "2016" , "LepSF3l__ele_mva_90p_Iso2016__mu_cut_Tight80x" } ,
-    { "2017" , "LepSF3l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW" } ,
-    { "2018" , "LepSF3l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW" }
+    { "2016" , "LepSF2l__ele_mva_90p_Iso2016__mu_cut_Tight80x" } ,
+    { "2017" , "LepSF2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW" } ,
+    { "2018" , "LepSF2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW" }
   };
 
   // SingleElectron
@@ -79,8 +79,8 @@ struct config_t {
         "mll",
         "gen_promptmatch",
 	"nLepton" ,
-	"LepCut3l__ele_mu_HWW_ttHMVA" , 
-	"LepSF3l__ele_mu_HWW_ttHMVA"
+	"LepCut2l__ele_mu_HWW_ttHMVA" , 
+	"LepSF2l__ele_mu_HWW_ttHMVA"
       }
     },
 
@@ -104,8 +104,8 @@ struct config_t {
 	"mll",
 	"gen_promptmatch",
 	"nLepton" ,
-	"LepCut3l__ele_mu_HWW_ttHMVA" ,
-        "LepSF3l__ele_mu_HWW_ttHMVA"
+	"LepCut2l__ele_mu_HWW_ttHMVA" ,
+        "LepSF2l__ele_mu_HWW_ttHMVA"
       }
     },
 
@@ -128,8 +128,8 @@ struct config_t {
 	"mll",
 	"gen_promptmatch",
 	"nLepton" ,
-	"LepCut3l__ele_mu_HWW_ttHMVA" ,
-        "LepSF3l__ele_mu_HWW_ttHMVA"
+	"LepCut2l__ele_mu_HWW_ttHMVA" ,
+        "LepSF2l__ele_mu_HWW_ttHMVA"
       }
     },
 
@@ -155,7 +155,7 @@ struct config_t {
 	"mll",
 	"triggers" ,
 	"nLepton" ,
-	"LepCut3l__ele_mu_HWW_ttHMVA"
+	"LepCut2l__ele_mu_HWW_ttHMVA"
       }
     },
 
@@ -181,7 +181,7 @@ struct config_t {
 	"mll",
 	"triggers" ,
 	"nLepton" ,
-	"LepCut3l__ele_mu_HWW_ttHMVA"
+	"LepCut2l__ele_mu_HWW_ttHMVA"
       }
     },
     
@@ -207,7 +207,7 @@ struct config_t {
 	"mll",
 	"triggers" ,
 	"nLepton" ,
-	"LepCut3l__ele_mu_HWW_ttHMVA"
+	"LepCut2l__ele_mu_HWW_ttHMVA"
       }
     },
 
@@ -315,7 +315,7 @@ struct config_t {
   
   //trigger configuration
   std::map< const std::string , const std::string > triggers = {
-    { "MuonEG"         , "Trigger_ElMu" },
+    { "MuonEG"         , "Trigger_ElMu && (1==1)" },
     { "SingleMuon"     , "!Trigger_ElMu && Trigger_sngMu" },
     { "SingleElectron" , "!Trigger_ElMu && !Trigger_sngMu && Trigger_sngEl" },
     { "DoubleMuon"     , "!Trigger_ElMu && !Trigger_sngMu && !Trigger_sngEl && Trigger_dblMu" },

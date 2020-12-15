@@ -1,43 +1,43 @@
 digraph {
-	6 [label="DY region : ( abs(mll-91.2)<15 )", style="filled", fillcolor="#c4cfd4", shape="diamond"];
-	7 [label="Define
-Mll", style="filled", fillcolor="#60aef3", shape="oval"];
+	7 [label="DY region : ( abs(mll-91.2)<15 )", style="filled", fillcolor="#c4cfd4", shape="diamond"];
 	8 [label="Define
-addp4_1", style="filled", fillcolor="#60aef3", shape="oval"];
+Mll", style="filled", fillcolor="#60aef3", shape="oval"];
 	9 [label="Define
-addp4_2", style="filled", fillcolor="#60aef3", shape="oval"];
+addp4_1", style="filled", fillcolor="#60aef3", shape="oval"];
 	10 [label="Define
-lep1_eta", style="filled", fillcolor="#60aef3", shape="oval"];
+addp4_2", style="filled", fillcolor="#60aef3", shape="oval"];
 	11 [label="Define
-lep1_pdgId", style="filled", fillcolor="#60aef3", shape="oval"];
+lep1_eta", style="filled", fillcolor="#60aef3", shape="oval"];
 	12 [label="Define
-lep1_phi", style="filled", fillcolor="#60aef3", shape="oval"];
+lep1_pdgId", style="filled", fillcolor="#60aef3", shape="oval"];
 	13 [label="Define
-lep1_pt", style="filled", fillcolor="#60aef3", shape="oval"];
+lep1_phi", style="filled", fillcolor="#60aef3", shape="oval"];
 	14 [label="Define
-lep2_eta", style="filled", fillcolor="#60aef3", shape="oval"];
+lep1_pt", style="filled", fillcolor="#60aef3", shape="oval"];
 	15 [label="Define
-lep2_pdgId", style="filled", fillcolor="#60aef3", shape="oval"];
+lep2_eta", style="filled", fillcolor="#60aef3", shape="oval"];
 	16 [label="Define
-lep2_phi", style="filled", fillcolor="#60aef3", shape="oval"];
+lep2_pdgId", style="filled", fillcolor="#60aef3", shape="oval"];
 	17 [label="Define
-lep2_pt", style="filled", fillcolor="#60aef3", shape="oval"];
+lep2_phi", style="filled", fillcolor="#60aef3", shape="oval"];
 	18 [label="Define
-lep3_eta", style="filled", fillcolor="#60aef3", shape="oval"];
+lep2_pt", style="filled", fillcolor="#60aef3", shape="oval"];
 	19 [label="Define
-lep3_pdgId", style="filled", fillcolor="#60aef3", shape="oval"];
+lep3_eta", style="filled", fillcolor="#60aef3", shape="oval"];
 	20 [label="Define
-lep3_phi", style="filled", fillcolor="#60aef3", shape="oval"];
+lep3_pdgId", style="filled", fillcolor="#60aef3", shape="oval"];
 	21 [label="Define
-lep3_pt", style="filled", fillcolor="#60aef3", shape="oval"];
+lep3_phi", style="filled", fillcolor="#60aef3", shape="oval"];
 	22 [label="Define
+lep3_pt", style="filled", fillcolor="#60aef3", shape="oval"];
+	23 [label="Define
 pair", style="filled", fillcolor="#60aef3", shape="oval"];
-	5 [label="two sub-leading pt electrons", style="filled", fillcolor="#c4cfd4", shape="diamond"];
-	4 [label="one leading pt muon", style="filled", fillcolor="#c4cfd4", shape="diamond"];
+	6 [label="abs(Lepton_pdgId[2])==11", style="filled", fillcolor="#c4cfd4", shape="diamond"];
+	5 [label="abs(Lepton_pdgId[1])==11", style="filled", fillcolor="#c4cfd4", shape="diamond"];
+	4 [label="abs(Lepton_pdgId[0])==13", style="filled", fillcolor="#c4cfd4", shape="diamond"];
 	3 [label="Lepton pt cut : (Lepton_pt[0]>15 && Lepton_pt[1]>5)", style="filled", fillcolor="#c4cfd4", shape="diamond"];
 	2 [label="three leptons final state", style="filled", fillcolor="#c4cfd4", shape="diamond"];
 	0 [label="Events", style="filled", fillcolor="#e8f8fc", shape="oval"];
-	7 -> 6;
 	8 -> 7;
 	9 -> 8;
 	10 -> 9;
@@ -53,7 +53,9 @@ pair", style="filled", fillcolor="#60aef3", shape="oval"];
 	20 -> 19;
 	21 -> 20;
 	22 -> 21;
-	5 -> 22;
+	23 -> 22;
+	6 -> 23;
+	5 -> 6;
 	4 -> 5;
 	3 -> 4;
 	2 -> 3;

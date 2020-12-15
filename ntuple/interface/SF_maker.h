@@ -230,7 +230,7 @@ template < typename T >
     {
       const unsigned int nlep = cfg.nlep_SF;
       std::vector<double> SF_vect( nlep , 1. );
-      std::vector<bool> Cut_vect( nlep , 1 );
+      std::vector<int> Cut_vect( nlep , 1 );
       for ( unsigned int i=0 ; i < nlep ; i++ ){
 	
 	if (TMath::Abs(pdgId[i]) == 11){
@@ -245,7 +245,7 @@ template < typename T >
 	    SF_vect[i] = res * res_ttHMVA ;
 	  }
 	  // passing cut?
-	  Cut_vect[i] = ( electron_mvaTTH[lepton_electronIdx[i]] > 0.7 ) ? true : false;
+	  Cut_vect[i] = ( electron_mvaTTH[lepton_electronIdx[i]] > 0.7 ) ? 1 : 0;
 	}
 	else if(TMath::Abs(pdgId[i]) == 13){
 	  if (cfg.isMC){
@@ -260,15 +260,16 @@ template < typename T >
 	    SF_vect[i] = res_id * res_iso * res_ttHMVA ;
 	  }
 	  // passing cut ?
-	  Cut_vect[i] = ( muon_mvaTTH[lepton_muonIdx[i]] > 0.8 ) ? true : false;
+	  Cut_vect[i] = ( muon_mvaTTH[lepton_muonIdx[i]] > 0.8 ) ? 1 : 0;
         }
       } // end of loops
       
       double SF = 1.;
-      bool Cut = true;
+      int Cut = 1;
+      
+      for(auto x : Cut_vect) Cut *= x;
       // Calculate product of IsIso_SFs for all leptons in the event
       for(auto x : SF_vect) SF *= x;
-      for(auto x : Cut_vect) Cut *= x;
       
       return std::make_pair( Cut , SF );
     };
