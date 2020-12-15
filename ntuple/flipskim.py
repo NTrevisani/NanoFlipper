@@ -54,7 +54,7 @@ if '/home/shoh'	in os.getcwd() :
 elif '/lustre' in os.getcwd() or '/homeui' in os.getcwd() :
     # padova
     source = "/"
-elif '/afs/cern.ch/user' in os.getcwd() :
+elif '/afs/cern.ch' in os.getcwd() :
     source = "/eos/cms/store/group/phys_higgs/cmshww/amassiro/HWWNano"
 ###################################################
 
@@ -66,7 +66,7 @@ def prepare( dataset_ , source_ , fake=False ):
             path=datasets[dataset_]['DATA_path']
         else:
             path=datasets[dataset_]['MC_path']
-        os.system( "ls %s/%s/*%s* > %s/%s.txt" %( source_ , path , isample , location , isample ) )
+        os.system( "ls %s/%s/*%s__* > %s/%s.txt" %( source_ , path , isample , location , isample ) )
         out.append( "%s/%s.txt" %( location , isample ) )
     print("")
     print(" --> preparing samplelist : ", out)
