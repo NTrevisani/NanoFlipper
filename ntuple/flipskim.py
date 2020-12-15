@@ -11,7 +11,7 @@ parser.add_option("-l","--location", action="store", type="string", dest="locati
 parser.add_option("-s", "--Samples", action="append", type="string", dest="Samples" , default=[])
 parser.add_option("-b","--batch", action="store_true", dest="batch", default=False)
 parser.add_option("-t","--test", action="store_true", dest="test", default=False)
-parser.add_option("-n","--nfile", action="store", type="int", dest="nfile", default=10)
+parser.add_option("-n","--nfile", action="store", type="int", dest="nfile", default=5)
 parser.add_option("-o","--output", action="store", type="string", dest="output", default="%s/results/" %(cwd))
                   
 (options, args) = parser.parse_args()
@@ -26,9 +26,7 @@ if batch:
     output = options.output + "/batch/%s" %(dataset)
 else:
     output = options.output + "%s" %(dataset)
-
-source=""
-
+    
 datasets={
     'nanov5_2016' : {
         'lumi'      : '35.867',
@@ -46,17 +44,6 @@ datasets={
         'MC_path'   : 'Autumn18_102X_nAODv6_Full2018v6/MCl1loose2018v6__MCCorr2018v6__l2loose__l2tightOR2018v6'
     }
 }
-
-# detect database ; make list
-if '/home/shoh'	in os.getcwd() :
-    # my stash
-    source="/media/shoh/02A1ACF427292FC0/nanov5"
-elif '/lustre' in os.getcwd() or '/homeui' in os.getcwd() :
-    # padova
-    source = "/"
-elif '/afs/cern.ch' in os.getcwd() :
-    source = "/eos/cms/store/group/phys_higgs/cmshww/amassiro/HWWNano"
-###################################################
 
 def prepare( dataset_ , source_ , fake=False ):
     out=[]
@@ -78,19 +65,51 @@ pass
 def submit_script( sample_name__ , jobname_ , output_ , year_ ):
     outscript=jobname_.replace('.txt','.sh')
     outname=jobname_.split('/')[-1].split('.txt')[0]
-    with open( outscript , 'a') as script :
-        script.write('#!/bin/bash\n')
-        # source environment ?
-        # script.write('')
-        script.write('make\n')
-        script.write('./flipskim %s %s %s/%s.root %s\n' %( sample_name__ , jobname_ , output_ , outname , year_ ) )
-    os.system( 'chmod +x %s' %outscript )
+    # condor
+    if '/afs/cern.ch' in os.getcwd() :
+        # executable script
+        with open( outscript , 'a') as script :
+            script.write( '#!/bin/bash\n' )
+            script.write( 'export X509_USER_PROXY=/afs/cern.ch/user/'+os.environ["USER"][:1]+'/'+os.environ["USER"]+'/.proxy\n' )
+            script.write( 'voms-proxy-info\n' )
+            #script.write( 'export SCRAM_ARCH=$SCRAM_ARCH\n' )
+            script.write( 'export VO_CMS_SW_DIR=/cvmfs/cms.cern.ch\n' )
+            script.write( 'source $VO_CMS_SW_DIR/cmsset_default.sh\n' )
+            script.write( 'export HOME=%s\n' %os.environ['PWD'] )
+            script.write( 'export CMSSW_BASE=%s\n' %os.environ['CMSSW_BASE'] )
+            script.write( 'echo $HOME\n' )
+            script.write( 'echo $CMSSW_BASE\n' )
+            script.write( 'cd $CMSSW_BASE\n' )
+            script.write( 'eval `scramv1 ru -sh`\n' )
+            #script.write( 'ulimit -c 0\n' )
+            script.write( 'cd $HOME\n' )
+            script.write( 'make\n')
+            script.write( 'cd $TMPDIR\n' )
+            script.write( 'pwd\n' )
+            script.write( '$HOME/flipskim %s %s %s/%s.root %s\n' %( sample_name__ , jobname_ , output_ , outname , year_ ) )
+            script.close()
+        os.system( 'chmod +x %s' %outscript )
+
+        # submission script
+        outscriptSub = outscript.replace( '.sh' , '.sub' )
+        with open( outscriptSub , 'a' ) as script :
+            script.write( 'executable              = %s\n' %outscript )
+            script.write( '+JobFlavour             = \"longlunch\"\n')
+            script.write( 'request_cpus            = 3\n' )
+            script.write( 'output                  = %s.out\n' %outscript.replace('.sh' , '') )
+            script.write( 'error                   = %s.err\n' %outscript.replace('.sh' , '') )
+            script.write( 'log                     = %s.log\n' %outscript.replace('.sh','') )
+            script.write( 'transfer_output_remaps  = \"%s.root=%s.root\"\n' %( sample_name__ , outscript.split('/')[-1].replace('.sh','') ) )
+            script.write( 'queue\n' )
+            script.close()
+        if not test: os.system( 'condor_submit %s' %outscriptSub )
     pass
 
 def text_writer( split_line_ , output_ , sample_name_ , year_ ):
     for num , ichunck in enumerate(split_line_) :
         jobname = '%s/%s__job%s.txt' %( output_ , sample_name_ , num )
         f=open( jobname , 'w' )
+        if '/afs/cern.ch/' in os.getcwd() : ichunck = map( lambda x : 'root://eoscms.cern.ch/'+x , ichunck )
         f.write( '\n'.join(ichunck) )
         submit_script( sample_name_ , jobname , output_ , year_ )
         f.close()
@@ -123,14 +142,12 @@ def execute( sample_ , iproc_ , output_ , year_ , batch_ ):
     
 if __name__ == "__main__" :
 
-    # detect database ; make list
+    source=""
     if '/home/shoh' in os.getcwd() :
-    # my stash
         source="/media/shoh/02A1ACF427292FC0/nanov5"
     elif '/lustre' in os.getcwd() or '/homeui' in os.getcwd() :
-        # padova
         source = "/"
-    elif '/afs/cern.ch/user' in os.getcwd() :
+    elif '/afs/cern.ch/' in os.getcwd() :
         source = "/eos/cms/store/group/phys_higgs/cmshww/amassiro/HWWNano"
 
     if not os.path.exists(output)   : os.system( "mkdir -p %s" %output   )
