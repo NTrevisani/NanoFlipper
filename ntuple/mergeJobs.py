@@ -13,7 +13,7 @@ parser.add_option("-o","--output", action="store", type="string", dest="output",
 
 dataset = options.dataset
 location = options.location + "/" + dataset
-output = options.output + "/Merged_" + dataset
+output = options.output + "/" + dataset
 
 # infer samples
 megalist = os.listdir(location)
@@ -44,11 +44,6 @@ for isample in Samples :
     for iroot in rootfiles :
         if isample+"__" == iroot.split('job')[0] :
             Samples_dict[isample].append( location + "/" + iroot )
-
-#print(len(Samples_dict))
-#print(Samples_dict.keys())
-#for i in Samples_dict :
-#    print( i + " key : " , Samples_dict[i] )
 
 if not os.path.exists(output) : 
     os.system( "mkdir -p %s" %output   )
