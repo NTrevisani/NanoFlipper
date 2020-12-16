@@ -6,10 +6,6 @@ import numpy as np
 from collections import OrderedDict                                                                                                                                                      
 from array import array as arr
 
-#sys.path.append('%s/..' %os.getcwd() )
-#from analysis import *
-anaDIR='%s/..' %os.getcwd()
-
 ######
 # 1.) make nominal histogram Data/MC agreement
 # 2.) make histogram in different pt/eta bin

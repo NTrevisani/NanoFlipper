@@ -15,16 +15,20 @@ gStyle.SetPaintTextFormat(".5f")
 
 DIR = os.getcwd()
 
-from optparse import OptionParser
-usage = "usage: %prog [options]"
-parser = OptionParser(usage)
-parser.add_option("-d","--dataset", action="store", type="string", dest="dataset", default="nanov5_2016")
-parser.add_option("-n","--ntuplefolder", action="store", type="string", dest="ntuplefolder", default="%s/../ntuple/results" %DIR )
-(options, args) = parser.parse_args()
-ntuplefolder = options.ntuplefolder
-dataset= options.dataset
-year = dataset.split('_')[-1]
-ntupleDIR= "%s/%s" %( ntuplefolder , dataset )
+ntuple={
+    'nanov5_2016' : {
+        'DATA' : [ "SingleElectron.root" ],
+        'MC'   : [ "DYJetsToLL_M-50-LO_ext2.root" ]
+    },
+    'nanov5_2017' : {
+        'DATA' : [ "SingleElectron.root" ],
+        'MC'   : [ "DYJetsToLL_M-50-LO_ext1.root" ]
+    },
+    'nanov5_2018' : {
+        'DATA' : [ "EGamma.root" ],
+        'MC'   : [ "DYJetsToLL_M-50-LO.root" ]
+    }
+}
 
 variables=[ 'lep1_pt' , 'lep1_eta' , 'lep2_pt' , 'lep2_eta' , 'lep3_pt' , 'lep3_eta' , 'mll' , 'Mll' , '2d' ]
 
@@ -85,19 +89,12 @@ dataset_cfg = OrderedDict({
         'DATA_w'                   : 'METFilter_DATA*%s' %commontrig ,
         'WPs' : {
             'mvaBased'             : 'LepCut2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW*LepSF2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW'      ,
-            'mvaBased_tthmva'      : 'LepCut2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW**LepCut2l__ele_mu_HWW_ttHMVA*LepSF2l__ele_mu_HWW_ttHMVA' ,
+            'mvaBased_tthmva'      : 'LepCut2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW*LepCut2l__ele_mu_HWW_ttHMVA*LepSF2l__ele_mu_HWW_ttHMVA' ,
             'fake_mvaBased'        : 'fakeW2l_ele_mvaFall17V1Iso_WP90_mu_cut_Tight_HWWW',
             'fake_mvaBased_tthmva' : 'fakeW2l_ele_mvaFall17V1Iso_WP90_tthmva_70_mu_cut_Tight_HWWW_tthmva_80'
         }
     }
 })
-
-ptbin = OrderedDict()
-ptbin['lowpt']    = 'lep1_pt >= %s && lep1_pt < 200 && lep2_pt > %s && lep2_pt <= 20' %( triggers[commontrig][year][0] , triggers[commontrig][year][1]  )
-ptbin['highpt']   = 'lep1_pt >= %s && lep1_pt < 200 && lep2_pt > 20 && lep2_pt < 200' %( triggers[commontrig][year][0] )
-
-etabin = [ 0. , 1.4 , 2.5 ]
-#etabin = [ -2.5 , -1.4 , 0. , 1.4 , 2.5 ]
 
 from utils.helper import *
 from utils.mkroot import *
@@ -105,35 +102,41 @@ from utils.mkplot import *
 from utils.mkzfit import *
 from utils.mkflipsf import *
 
+etabin = [ 0. , 1.4 , 2.5 ]
+#etabin = [ -2.5 , -1.4 , 0. , 1.4 , 2.5 ]
+
 if __name__ == '__main__':
 
     start_time = time.time()
-    year = dataset.split('_')[-1]
-    MC = [ "DYJetsToLL_M-50-LO_ext2.root" ]
-    DATA = [ "SingleElectron.root" ] #"DoubleEG.root" ]
-    
-    MC   = map( lambda x : ntupleDIR+"/"+x , MC     )
-    DATA = map( lambda x : ntupleDIR+"/"+x , DATA  )
-
-    print( "MC   : ", MC )
-    print( "DATA : ", DATA )
-
-    # DF loaded here
-    DF= OrderedDict({
-        'MC_%s' %year   : ROOT.ROOT.RDataFrame( "flipper" , MC   ) ,
-        'DATA_%s' %year : ROOT.ROOT.RDataFrame( "flipper" , DATA )
-    })
-    
-    presel="lep1_pt > %s && lep2_pt > %s" %( triggers[commontrig][year][0] , triggers[commontrig][year][1] )
-    #presel="1==1"
-
-    info = [ dataset_cfg[year] , presel , signness , ptbin , etabin , variables ]
-    
     for idataset in [ "nanov5_2016" , "nanov5_2017" , "nanov5_2018" ] :
-        if idataset != "nanov5_2016" : continue
+        if idataset != "nanov5_2018" : continue
+        year = idataset.split('_')[-1]
+
+        ptbin = OrderedDict()
+        ptbin['lowpt']    = 'lep1_pt >= %s && lep1_pt < 200 && lep2_pt > %s && lep2_pt <= 20' %( triggers[commontrig][year][0] , triggers[commontrig][year][1]  )
+        ptbin['highpt']   = 'lep1_pt >= %s && lep1_pt < 200 && lep2_pt > 20 && lep2_pt < 200' %( triggers[commontrig][year][0] )
+
+        ntupleDIR= "%s/../ntuple/results/%s" %( DIR , idataset )
+        
+        MC   = map( lambda x : ntupleDIR+"/"+x , ntuple[idataset]['MC']   )
+        DATA = map( lambda x : ntupleDIR+"/"+x , ntuple[idataset]['DATA'] )
+        
+        print( "MC   : ", MC )
+        print( "DATA : ", DATA )
+    
+        DF= OrderedDict({
+            'MC_%s' %year   : ROOT.ROOT.RDataFrame( "flipper" , MC   ) ,
+            'DATA_%s' %year : ROOT.ROOT.RDataFrame( "flipper" , DATA )
+        })
+
+        presel="lep1_pt > %s && lep2_pt > %s" %( triggers[commontrig][year][0] , triggers[commontrig][year][1] )
+
+        info = [ dataset_cfg[year] , presel , signness , ptbin , etabin , variables ]
+    
         mkroot( idataset , DF , info , "mvaBased_tthmva" );
         mkplot( idataset , info )
         mkzfit( idataset , info )
+
     mkflipsf( info )
 
     print("--- %s seconds ---" % (time.time() - start_time))
