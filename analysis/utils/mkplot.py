@@ -16,7 +16,6 @@ def mkplot( dataset , info_ ):
     etabins  = info_[4]
     vars     = info_[5]
 
-
     rf = 'hist_%s.root'%(dataset)
                                                                                                                                                                                          
     f = ROOT.TFile.Open(rf,"READ")                                                                                                                                                       

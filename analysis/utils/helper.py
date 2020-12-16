@@ -163,18 +163,19 @@ def SaveHisto2D(histin,tokens,data=False):
     return
 pass
 
-def saveHisto1DCompare( h , h_ref , output, name , snorm=1, ratio=0, poisson=True, logy=False ):
+def saveHisto1DCompare( h , h_ref , output, name , snorm=1, ratio=1, poisson=True, logy=False ):
     HIST={}
 
-    HIST['DY'] = h
+    HIST['MC'] = h
     HIST['DATA'] = h_ref
+
     HIST['BkgSum'] = HIST['DATA'].Clone("BkgSum")
     HIST['BkgSum'].Reset("MICES")
     HIST['BkgSum'].SetFillStyle(3003)
     HIST['BkgSum'].SetFillColor(1)
     HIST['BkgSum'].SetMarkerStyle(0)
-    
-    HIST['BkgSum'].Add(HIST['DY'])
+
+    HIST['BkgSum'].Add(HIST['MC'])
 
     HIST['DATA'].SetMarkerStyle(20)
     HIST['DATA'].SetMarkerSize(1.25)
@@ -184,38 +185,38 @@ def saveHisto1DCompare( h , h_ref , output, name , snorm=1, ratio=0, poisson=Tru
     HIST['DATA'].SetLineStyle(1)
     HIST['DATA'].SetLineWidth(2)
 
-    HIST['DY'].SetFillColor(418)
-    HIST['DY'].SetFillStyle(1001)
-    HIST['DY'].SetLineColor(418)
-    HIST['DY'].SetLineStyle(1)
-    HIST['DY'].SetLineWidth(2)
+    HIST['MC'].SetFillColor(418)
+    HIST['MC'].SetFillStyle(1001)
+    HIST['MC'].SetLineColor(418)
+    HIST['MC'].SetLineStyle(1)
+    HIST['MC'].SetLineWidth(2)
 
     for i, s in enumerate(HIST):
         addOverflow(HIST[s], False) # Add overflow
 
     #Stack
     bkg = THStack('bkg', ";"+HIST['BkgSum'].GetXaxis().GetTitle()+";"+HIST['BkgSum'].GetYaxis().GetTitle())
-    bkg.Add(HIST['DY']) # ADD ALL BKG
+    bkg.Add(HIST['MC']) # ADD ALL BKG
 
     #Legend
     n=len(HIST)
     leg = TLegend(0.7, 0.9-0.05*n, 0.95, 0.9)
     leg.SetBorderSize(0)
-    leg.SetFillStyle(0) #1001 
+    leg.SetFillStyle(0) #1001
     leg.SetFillColor(0)
     leg.SetTextSize(0.03)
     leg.AddEntry(HIST['DATA'], 'Data [%.1f]' %(HIST['DATA'].Integral()), "pl")
-    leg.AddEntry(HIST['DY'], 'DY [%.1f]' %(HIST['DY'].Integral()), "f")
+    leg.AddEntry(HIST['MC'], 'mis-charged [%.1f]' %(HIST['MC'].Integral()), "f")
 
     leg.AddEntry(HIST['BkgSum'], 'BkgSum [%.1f]' %(HIST['BkgSum'].Integral()), "f")
     c1 = TCanvas("c1", HIST.values()[-1].GetXaxis().GetTitle(), 800, 800 if ratio else 600 )
 
-    #Ratio pad                                                                                                                
+    #Ratio pad
     if ratio:
         c1.Divide(1, 2)
         setTopPad(c1.GetPad(1), ratio)
         setBotPad(c1.GetPad(2), ratio)
-    
+
     c1.cd(1)
     c1.GetPad(bool(ratio)).SetTopMargin(0.06)
     c1.GetPad(bool(ratio)).SetRightMargin(0.05)
@@ -229,14 +230,14 @@ def saveHisto1DCompare( h , h_ref , output, name , snorm=1, ratio=0, poisson=Tru
     bkg.GetYaxis().SetTitleOffset(bkg.GetYaxis().GetTitleOffset()*1) #1.075
     bkg.SetMaximum((6.0 if logy else 1.5)*max(bkg.GetMaximum(), HIST['DATA'].GetBinContent(HIST['DATA'].GetMaximumBin())+HIST['DATA'].GetBinError(HIST['DATA'].GetMaximumBin())))
     bkg.SetMinimum(max(min(HIST['BkgSum'].GetBinContent(HIST['BkgSum'].GetMinimumBin()), HIST['DATA'].GetMinimum()), 5.e-1)  if logy else 0.)
-    #bkg.SetMinimum(1.0)                                                               
+    #bkg.SetMinimum(1.0)
 
     leg.Draw()
 
     setHistStyle(bkg, 1.2 if ratio else 1.1)
     setHistStyle(HIST['BkgSum'], 1.2 if ratio else 1.1)
-    
-    ########################## 
+
+    ##########################
     if ratio:
         c1.cd(2)
         err = HIST['BkgSum'].Clone("BkgErr;")
@@ -276,16 +277,16 @@ def saveHisto1DCompare( h , h_ref , output, name , snorm=1, ratio=0, poisson=Tru
 
     #if 'os' in suffix:
     #    drawRegion('Opposite Sign')
-    #elif 'ss' in suffix:
+    #if 'ss' in suffix:
     drawRegion('Same Sign')
 
     c1.Update()
 
-    c1.Print( '%s/%s.png' %(output,name) )
+    c1.Print( '%s/%s.png' %( output , name ) )
 pass
-    
+
 def SaveHisto1D(HIST, suffix , output, snorm=1, ratio=0, poisson=True, logy=False, isVal=False):
-    
+
     # only data and mc
     # SUFFIX = 2016_ss_lep1_pt
 
@@ -295,7 +296,7 @@ def SaveHisto1D(HIST, suffix , output, snorm=1, ratio=0, poisson=True, logy=Fals
     HIST[bkgsum].SetFillStyle(3003)
     HIST[bkgsum].SetFillColor(1)
     HIST[bkgsum].SetMarkerStyle(0)
-    
+
     HIST[bkgsum].Add( HIST['MC_%s'%(suffix)] )
 
     HIST['DATA_%s' %(suffix)].SetMarkerStyle(20)
@@ -317,9 +318,9 @@ def SaveHisto1D(HIST, suffix , output, snorm=1, ratio=0, poisson=True, logy=Fals
 
     #Stack
     bkg = THStack('bkg', ";"+HIST[bkgsum].GetXaxis().GetTitle()+";"+HIST[bkgsum].GetYaxis().GetTitle())
-    
+
     bkg.Add(HIST['MC_%s'%(suffix)]) # ADD ALL BKG
-        
+
     #Legend
     n=len(HIST)
     leg = TLegend(0.7, 0.9-0.05*n, 0.95, 0.9)

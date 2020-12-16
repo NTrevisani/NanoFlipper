@@ -4,7 +4,9 @@ import os, sys
 import time
 from collections import OrderedDict
 
-sys.path.append('%s/utils' %os.getcwd() )
+sys.path.append('%s/../analysis/utils' %os.getcwd() )  
+from helper import *
+from workflow import *
 
 ROOT.ROOT.EnableImplicitMT(12)
 
@@ -13,20 +15,48 @@ gROOT.SetBatch(True)
 gStyle.SetOptStat(0)
 gStyle.SetPaintTextFormat(".5f")
 
+# hard-coded variables
+def PrepareVariable( df_in , name , dataset_ , testname_ , isSF=0 ):
+    # compute with SF
+    if isSF == 1 :
+        df_in = df_in.Define( 'SF' , 'getSF( lep1_pt , lep1_eta , lep2_pt , lep2_eta , lep1_pdgId , lep2_pdgId )' ).Define( 'totalW' , 'SF*weights' )
+    # compute with charge flip mc
+    elif isSF == 2 :
+        df_in = df_in.Define( 'f_mc' , 'getFlip( lep1_pt , lep1_eta , lep2_pt , lep2_eta , 0 )' ).Define( 'totalW' , 'f_mc*weights' )
+    # compute with charge flip data
+    elif isSF == 3 :
+        df_in = df_in.Define( 'f_data' , 'getFlip( lep1_pt , lep1_eta , lep2_pt , lep2_eta , 1 )' ).Define( 'totalW' , 'f_data*weights' )
+    else:
+        if name != "DATA" : sys.exit()
+        df_in = df_in.Define( 'totalW' , 'weights' )
+        
+    h = OrderedDict() ; weight_ = 'totalW'
+    h[ name + '_mll' ]     = df_in.Histo1D( ( name + '_mll'      , '%s %s ; mll [GeV]     ; Events' %( testname_ , dataset_ ) , 30, 76.2, 106.2 ) , 'mll'      , weight_ )
+    h[ name + '_lep1_eta'] = df_in.Histo1D( ( name + '_lep1_eta' , '%s %s ; lep1_eta      ; Events' %( testname_ , dataset_ ) , 10 , -2.5 , 2.5 ) , 'lep1_eta' , weight_ )
+    h[ name + '_lep2_eta'] = df_in.Histo1D( ( name + '_lep2_eta' , '%s %s ; lep2_eta      ; Events' %( testname_ , dataset_ ) , 10 , -2.5 , 2.5 ) , 'lep2_eta' , weight_ )
+    h[ name + '_lep1_pt']  = df_in.Histo1D( ( name + '_lep1_pt'  , '%s %s ; lep1_pt [GeV] ; Events' %( testname_ , dataset_ ) , 40 , 0. , 200.  ) , 'lep1_pt'  , weight_ )
+    h[ name + '_lep2_pt']  = df_in.Histo1D( ( name + '_lep2_pt'  , '%s %s ; lep2_pt [GeV] ; Events' %( testname_ , dataset_ ) , 40 , 0. , 200.  ) , 'lep2_pt'  , weight_ )
+    h[ name + '_SF']       = df_in.Histo1D( ( name + '_SF'       , '%s %s ; SF ; Events' %( testname_ , dataset_ ) , 100 , 0. , 10.  )            , 'SF'  , weight_ )
+    h[ name + '_totalW']   = df_in.Histo1D( ( name + '_totalW'   , '%s %s ; totalW ; Events' %( testname_ , dataset_ ) , 100 , 0. , 10.  )        , 'totalW'  , weight_ )
+    return h
+pass
+
 DIR = os.getcwd()
 
-from optparse import OptionParser
-usage = "usage: %prog [options]"
-parser = OptionParser(usage)
-parser.add_option("-d","--dataset", action="store", type="string", dest="dataset", default="nanov5_2016")
-parser.add_option("-n","--ntuplefolder", action="store", type="string", dest="ntuplefolder", default="%s/../ntuple/results" %DIR )
-(options, args) = parser.parse_args()
-ntuplefolder = options.ntuplefolder
-dataset= options.dataset
-year = dataset.split('_')[-1]
-ntupleDIR= "%s/%s" %( ntuplefolder , dataset )
-
-variables=[ 'lep1_pt' , 'lep1_eta' , 'lep2_pt' , 'lep2_eta' , 'lep3_pt' , 'lep3_eta' , 'mll' , 'Mll' , '2d' ]
+ntuple={
+    'nanov5_2016' : {
+        'DATA' : [ "SingleElectron.root" ],
+        'MC'   : [ "DYJetsToLL_M-50-LO_ext2.root" ]
+    },
+    'nanov5_2017' : {
+        'DATA' : [ "SingleElectron.root" ],
+        'MC'   : [ "DYJetsToLL_M-50-LO_ext1.root" ]
+    },
+    'nanov5_2018' : {
+        'DATA' : [ "EGamma.root" ],
+        'MC'   : [ "DYJetsToLL_M-50-LO.root" ]
+    }
+}
 
 signness= OrderedDict({
     'os' : 'lep1_pdgId*lep2_pdgId == -11*11',
@@ -59,7 +89,7 @@ triggers = {
 commontrig="Trigger_sngEl"
 commonMC="SFweight2l*XSWeight*METFilter_MC*GenLepMatch2l*ptllDYW"
 
-dataset_cfg = OrderedDict({
+cfg = OrderedDict({
     '2016' : {
         'MC_w'                     : '35.92*%s' %commonMC ,
         'DATA_w'                   : 'METFilter_DATA*%s' %commontrig ,
@@ -85,70 +115,66 @@ dataset_cfg = OrderedDict({
         'DATA_w'                   : 'METFilter_DATA*%s' %commontrig ,
         'WPs' : {
             'mvaBased'             : 'LepCut2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW*LepSF2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW'      ,
-            'mvaBased_tthmva'      : 'LepCut2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW**LepCut2l__ele_mu_HWW_ttHMVA*LepSF2l__ele_mu_HWW_ttHMVA' ,
+            'mvaBased_tthmva'      : 'LepCut2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW*LepCut2l__ele_mu_HWW_ttHMVA*LepSF2l__ele_mu_HWW_ttHMVA' ,
             'fake_mvaBased'        : 'fakeW2l_ele_mvaFall17V1Iso_WP90_mu_cut_Tight_HWWW',
             'fake_mvaBased_tthmva' : 'fakeW2l_ele_mvaFall17V1Iso_WP90_tthmva_70_mu_cut_Tight_HWWW_tthmva_80'
         }
     }
 })
 
-ptbin = OrderedDict()
-ptbin['lowpt']    = 'lep1_pt >= %s && lep1_pt < 200 && lep2_pt > %s && lep2_pt <= 20' %( triggers[commontrig][year][0] , triggers[commontrig][year][1]  )
-ptbin['highpt']   = 'lep1_pt >= %s && lep1_pt < 200 && lep2_pt > 20 && lep2_pt < 200' %( triggers[commontrig][year][0] )
-
-etabin = [ 0. , 1.4 , 2.5 ]
-#etabin = [ -2.5 , -1.4 , 0. , 1.4 , 2.5 ]
-
-from utils.helper import *
-from utils.mkroot import *
-from utils.mkplot import *
-from utils.mkzfit import *
-from utils.mkflipsf import *
-
-ntuple={
-    'nanov5_2016' : {
-        'DATA' : [ "SingleElectron.root" ],
-        'MC'   : [ "DYJetsToLL_M-50-LO_ext2.root" ]
-    },
-    'nanov5_2017' : {
-        'DATA' : [ "SingleElectron.root" ],
-	'MC'   : [ "DYJetsToLL_M-50-LO_ext1.root" ]
-    },
-    'nanov5_2018' : {
-        'DATA' : [ "SingleElectron.root" ],
-	'MC'   : [ "DYJetsToLL_M-50-LO.root" ]
-    }
-}
-
 if __name__ == '__main__':
 
     start_time = time.time()
     for idataset in [ "nanov5_2016" , "nanov5_2017" , "nanov5_2018" ] :
-        year = dataset.split('_')[-1]
+        
+        year = idataset.split('_')[-1]
+        ntupleDIR= "%s/../ntuple/results/%s" %( DIR , idataset )
+
+        output= 'plots/%s' %( idataset )
+        
         MC   = map( lambda x : ntupleDIR+"/"+x , ntuple[idataset]['MC']   )
         DATA = map( lambda x : ntupleDIR+"/"+x , ntuple[idataset]['DATA'] )
         
         print( "MC   : ", MC )
         print( "DATA : ", DATA )
-
-        # DF loaded here
+    
         DF= OrderedDict({
             'MC_%s' %year   : ROOT.ROOT.RDataFrame( "flipper" , MC   ) ,
             'DATA_%s' %year : ROOT.ROOT.RDataFrame( "flipper" , DATA )
         })
-        
+
         presel="lep1_pt > %s && lep2_pt > %s" %( triggers[commontrig][year][0] , triggers[commontrig][year][1] )
-        #presel="1==1"
-        
-        info = [ dataset_cfg[year] , presel , signness , ptbin , etabin , variables ]
-        
-        if idataset != "nanov5_2016" : continue
-        mkroot( idataset , DF , info , "mvaBased_tthmva" );
-        mkplot( idataset , info )
-        mkzfit( idataset , info )
+        wp_ = "mvaBased_tthmva"
+        ROOT.loadSF2D( "../analysis/data/chargeFlip_%s_SF.root" %idataset )
+                
+        #begins
+        histo_pair = {}
+        for idf in DF :
+            # name                                                                                                                                                                                              
+            name = idf.split('_')[0]
+            print(" name : ", name )
+            # define weight                                                                                                                                                                                     
+            df = DF[idf].Define( 'weights' , '%s*%s' %( cfg[year]['%s_w'%name] , cfg[year]['WPs'][wp_] if name == 'MC' else cfg[year]['WPs'][wp_].split('*LepSF')[0] ) )
+            print( " Common weights : %s*%s" %( cfg[year]['%s_w'%name] , cfg[year]['WPs'][wp_] if name == 'MC' else cfg[year]['WPs'][wp_].split('*LepSF')[0] ) )
 
-    mkflipsf( info )
-
+            # preselection                                                                                                                                                                                      
+            df = df.Filter( presel , "Preselection : %s" %presel )
+            # SS/OS region
+            # SF (D/M) x MC_SS = DATA_SS
+            df_tmp = df.Filter( signness['ss'] , '%s selection' %signness['ss'] )
+            
+            if name == "MC" :
+                histo_pair[name] = PrepareVariable( df_tmp , name , idataset , "Scale factor method" , 1 )
+            else:
+                histo_pair[name] = PrepareVariable( df_tmp , name , idataset , "Scale factor method" )
+            ###################
+        output += output + "/SF_application"
+        if not os.path.exists(output): os.system('mkdir -p %s' %output)
+        for imc, idata in zip( histo_pair['MC'] , histo_pair['DATA'] ) :
+            #print( "imc : ", imc , " ; idata : ", idata )
+            #print( "imc : ", histo_pair['MC'][imc] , " ; idata : ", histo_pair['DATA'][idata] )
+            saveHisto1DCompare( histo_pair['MC'][imc].GetPtr() , histo_pair['DATA'][idata].GetPtr() , output , imc.split('MC_')[-1] , 0, 4, False, True if 'pt' in imc else False )
+            
     print("--- %s seconds ---" % (time.time() - start_time))
     print("--- %s minutes ---" % ( (time.time() - start_time)/60. ))
     print("--- %s hours ---" % ( (time.time() - start_time)/3600. ))
