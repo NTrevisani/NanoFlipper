@@ -105,35 +105,48 @@ from utils.mkplot import *
 from utils.mkzfit import *
 from utils.mkflipsf import *
 
+ntuple={
+    'nanov5_2016' : {
+        'DATA' : [ "SingleElectron.root" ],
+        'MC'   : [ "DYJetsToLL_M-50-LO_ext2.root" ]
+    },
+    'nanov5_2017' : {
+        'DATA' : [ "SingleElectron.root" ],
+	'MC'   : [ "DYJetsToLL_M-50-LO_ext1.root" ]
+    },
+    'nanov5_2018' : {
+        'DATA' : [ "SingleElectron.root" ],
+	'MC'   : [ "DYJetsToLL_M-50-LO.root" ]
+    }
+}
+
 if __name__ == '__main__':
 
     start_time = time.time()
-    year = dataset.split('_')[-1]
-    MC = [ "DYJetsToLL_M-50-LO_ext2.root" ]
-    DATA = [ "SingleElectron.root" ] #"DoubleEG.root" ]
-    
-    MC   = map( lambda x : ntupleDIR+"/"+x , MC     )
-    DATA = map( lambda x : ntupleDIR+"/"+x , DATA  )
-
-    print( "MC   : ", MC )
-    print( "DATA : ", DATA )
-
-    # DF loaded here
-    DF= OrderedDict({
-        'MC_%s' %year   : ROOT.ROOT.RDataFrame( "flipper" , MC   ) ,
-        'DATA_%s' %year : ROOT.ROOT.RDataFrame( "flipper" , DATA )
-    })
-    
-    presel="lep1_pt > %s && lep2_pt > %s" %( triggers[commontrig][year][0] , triggers[commontrig][year][1] )
-    #presel="1==1"
-
-    info = [ dataset_cfg[year] , presel , signness , ptbin , etabin , variables ]
-    
     for idataset in [ "nanov5_2016" , "nanov5_2017" , "nanov5_2018" ] :
+        year = dataset.split('_')[-1]
+        MC   = map( lambda x : ntupleDIR+"/"+x , ntuple[idataset]['MC']   )
+        DATA = map( lambda x : ntupleDIR+"/"+x , ntuple[idataset]['DATA'] )
+        
+        print( "MC   : ", MC )
+        print( "DATA : ", DATA )
+
+        # DF loaded here
+        DF= OrderedDict({
+            'MC_%s' %year   : ROOT.ROOT.RDataFrame( "flipper" , MC   ) ,
+            'DATA_%s' %year : ROOT.ROOT.RDataFrame( "flipper" , DATA )
+        })
+        
+        presel="lep1_pt > %s && lep2_pt > %s" %( triggers[commontrig][year][0] , triggers[commontrig][year][1] )
+        #presel="1==1"
+        
+        info = [ dataset_cfg[year] , presel , signness , ptbin , etabin , variables ]
+        
         if idataset != "nanov5_2016" : continue
         mkroot( idataset , DF , info , "mvaBased_tthmva" );
         mkplot( idataset , info )
         mkzfit( idataset , info )
+
     mkflipsf( info )
 
     print("--- %s seconds ---" % (time.time() - start_time))
