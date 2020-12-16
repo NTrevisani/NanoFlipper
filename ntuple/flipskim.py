@@ -12,7 +12,7 @@ parser.add_option("-s", "--Samples", action="append", type="string", dest="Sampl
 parser.add_option("-b","--batch", action="store_true", dest="batch", default=False)
 parser.add_option("-c","--condor", action="store_true", dest="isCondor", default=True)
 parser.add_option("-t","--test", action="store_true", dest="test", default=False)
-parser.add_option("-n","--nfile", action="store", type="int", dest="nfile", default=5)
+parser.add_option("-n","--nfile", action="store", type="int", dest="nfile", default=3)
 parser.add_option("-o","--output", action="store", type="string", dest="output", default="%s/results/" %(cwd))
                   
 (options, args) = parser.parse_args()
