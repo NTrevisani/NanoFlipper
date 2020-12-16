@@ -29,14 +29,14 @@ namespace Helper {
   template <typename T>
     void leptonID(T &mycfg){ 
     // HWW electron SF
-    mycfg.SF_files_map["electron"]["TightObjWP"]["2016"]["idSF"] = { mycfg.base + "/data/HWW_SF/egammaEffi_passingMVA80Xwp90Iso16.txt" };
-    mycfg.SF_files_map["electron"]["TightObjWP"]["2017"]["idSF"] = { mycfg.base + "/data/HWW_SF/egammaEffi_passingMVA102Xwp90isoHWWiso0p06_2017RunB.txt",
-								     mycfg.base + "/data/HWW_SF/egammaEffi_passingMVA102Xwp90isoHWWiso0p06_2017RunCD.txt",
-								     mycfg.base + "/data/HWW_SF/egammaEffi_passingMVA102Xwp90isoHWWiso0p06_2017RunE.txt",
-								     mycfg.base + "/data/HWW_SF/egammaEffi_passingMVA102Xwp90isoHWWiso0p06_2017RunF.txt"
+    mycfg.SF_files_map["electron"]["TightObjWP"]["2016"]["idSF"] = { mycfg.base + "/data/HWW_SF/egammaEffi_passingTight80XHWW.txt" };
+    mycfg.SF_files_map["electron"]["TightObjWP"]["2017"]["idSF"] = { mycfg.base + "/data/HWW_SF/egammaEffi_passingMVA102Xwp90isoHWWiso0p06_2017runB.txt",
+								     mycfg.base + "/data/HWW_SF/egammaEffi_passingMVA102Xwp90isoHWWiso0p06_2017runC.txt",
+								     mycfg.base + "/data/HWW_SF/egammaEffi_passingMVA102Xwp90isoHWWiso0p06_2017runD.txt",
+								     mycfg.base + "/data/HWW_SF/egammaEffi_passingMVA102Xwp90isoHWWiso0p06_2017runE.txt",
+								     mycfg.base + "/data/HWW_SF/egammaEffi_passingMVA102Xwp90isoHWWiso0p06_2017runF.txt"
     };
-    mycfg.SF_files_map["electron"]["TightObjWP"]["2018"]["idSF"] = { mycfg.base + "/data/HWW_SF/egammaEffi_passingMVA102Xwp90isoHWWiso0p06_2018.txt" };
-    
+    mycfg.SF_files_map["electron"]["TightObjWP"]["2018"]["idSF"] = { mycfg.base + "/data/HWW_SF/egammaEffi_passingTight102XHWW_runABCD.txt" };
     // ttHMVA electron SF
     mycfg.SF_files_map["electron"]["ttHMVA0p7"]["2016"]["ttHMVA"] = { mycfg.base + "/data/ttHMVA_SF/egammaEffi_TightHWW_ttHMVA_0p7_SFs_2016.txt" };
     mycfg.SF_files_map["electron"]["ttHMVA0p7"]["2017"]["ttHMVA"] = { mycfg.base + "/data/ttHMVA_SF/egammaEffi_TightHWW_ttHMVA_0p7_SFs_2017RunB.txt",
