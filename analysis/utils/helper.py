@@ -71,7 +71,7 @@ def drawRatio(data, bkg):
     latex.SetTextSize(0.08)
     #latex.DrawLatex(0.25, 0.85, "Data/Bkg = %.3f #pm %.3f" % (ratio, error))
     latex.DrawLatex(0.15, 0.85, "Data/Bkg = %.3f #pm %.3f" % (ratio, error))
-    print "  Ratio:\t%.3f +- %.3f" % (ratio, error)
+    print("  Ratio:\t%.3f +- %.3f" % (ratio, error) )
     return [ratio, error]
 pass
 
@@ -257,7 +257,7 @@ def saveHisto1DCompare( h , h_ref , output, name , snorm=1, ratio=0, poisson=Tru
         if 'DATA' in HIST:
             res = HIST['DATA'].Clone("Residues")
             for i in range(0, res.GetNbinsX()+1):
-		if HIST['BkgSum'].GetBinContent(i) > 0:
+                if HIST['BkgSum'].GetBinContent(i) > 0:
                     res.SetBinContent(i, res.GetBinContent(i)/HIST['BkgSum'].GetBinContent(i))
                     res.SetBinError(i, res.GetBinError(i)/HIST['BkgSum'].GetBinContent(i))
             setBotStyle(res)
@@ -285,23 +285,18 @@ def saveHisto1DCompare( h , h_ref , output, name , snorm=1, ratio=0, poisson=Tru
 pass
     
 def SaveHisto1D(HIST, suffix , output, snorm=1, ratio=0, poisson=True, logy=False, isVal=False):
-
-    #### STYLE
-    #print HIST.keys()
-    #print HIST['DATA_%s' %(suffix)]
-    #print type(HIST['DATA_%s' %(suffix)])
-    #sys.exit()
     
-    isFake = any( 'FAKE' in key for key in HIST.keys() )
+    # only data and mc
+    # SUFFIX = 2016_ss_lep1_pt
 
     bkgsum='BkgSum_%s' %(suffix)
-    HIST[bkgsum] = HIST['DATA_%s' %(suffix)].Clone("BkgSum") if 'DATA_%s' %(suffix) in HIST else HIST['DY_%s' %(suffix)].Clone("BkgSum")
+    HIST[bkgsum] = HIST['DATA_%s' %(suffix)].Clone("BkgSum") if 'DATA_%s' %(suffix) in HIST else HIST['MC_%s' %(suffix)].Clone("BkgSum")
     HIST[bkgsum].Reset("MICES")
     HIST[bkgsum].SetFillStyle(3003)
     HIST[bkgsum].SetFillColor(1)
     HIST[bkgsum].SetMarkerStyle(0)
-    for proc in [ 'DY' , 'FAKE' ] if isFake else [ 'DY' ]:
-        HIST[bkgsum].Add( HIST['%s_%s'%(proc,suffix)] )
+    
+    HIST[bkgsum].Add( HIST['MC_%s'%(suffix)] )
 
     HIST['DATA_%s' %(suffix)].SetMarkerStyle(20)
     HIST['DATA_%s' %(suffix)].SetMarkerSize(1.25)
@@ -311,27 +306,20 @@ def SaveHisto1D(HIST, suffix , output, snorm=1, ratio=0, poisson=True, logy=Fals
     HIST['DATA_%s' %(suffix)].SetLineStyle(1)
     HIST['DATA_%s' %(suffix)].SetLineWidth(2)
 
-    HIST['DY_%s' %(suffix)].SetFillColor(418)
-    HIST['DY_%s' %(suffix)].SetFillStyle(1001)
-    HIST['DY_%s' %(suffix)].SetLineColor(418)
-    HIST['DY_%s' %(suffix)].SetLineStyle(1)
-    HIST['DY_%s' %(suffix)].SetLineWidth(2)
-
-    if isFake:
-        HIST['FAKE_%s' %(suffix)].SetFillColor(921)
-        HIST['FAKE_%s' %(suffix)].SetFillStyle(1001)
-        HIST['FAKE_%s' %(suffix)].SetLineColor(921)
-        HIST['FAKE_%s' %(suffix)].SetLineStyle(1)
-        HIST['FAKE_%s' %(suffix)].SetLineWidth(2)
+    HIST['MC_%s' %(suffix)].SetFillColor(418)
+    HIST['MC_%s' %(suffix)].SetFillStyle(1001)
+    HIST['MC_%s' %(suffix)].SetLineColor(418)
+    HIST['MC_%s' %(suffix)].SetLineStyle(1)
+    HIST['MC_%s' %(suffix)].SetLineWidth(2)
 
     for i, s in enumerate(HIST):
         addOverflow(HIST[s], False) # Add overflow
 
     #Stack
     bkg = THStack('bkg', ";"+HIST[bkgsum].GetXaxis().GetTitle()+";"+HIST[bkgsum].GetYaxis().GetTitle())
-    for proc in [ 'FAKE' , 'DY' ] if isFake else [ 'DY' ]:
-        bkg.Add(HIST['%s_%s'%(proc,suffix)]) # ADD ALL BKG
-
+    
+    bkg.Add(HIST['MC_%s'%(suffix)]) # ADD ALL BKG
+        
     #Legend
     n=len(HIST)
     leg = TLegend(0.7, 0.9-0.05*n, 0.95, 0.9)
@@ -340,9 +328,9 @@ def SaveHisto1D(HIST, suffix , output, snorm=1, ratio=0, poisson=True, logy=Fals
     leg.SetFillColor(0)
     leg.SetTextSize(0.03)
     leg.AddEntry(HIST['DATA_%s' %(suffix)], 'Data [%.1f]' %(HIST['DATA_%s' %(suffix)].Integral()), "pl")
-    leg.AddEntry(HIST['DY_%s' %(suffix)], 'DY [%.1f]' %(HIST['DY_%s' %(suffix)].Integral()), "f")
+    leg.AddEntry(HIST['MC_%s' %(suffix)], 'DY [%.1f]' %(HIST['MC_%s' %(suffix)].Integral()), "f")
 
-    if isFake: leg.AddEntry(HIST['FAKE_%s' %(suffix)], 'Fake [%.1f]' %(HIST['FAKE_%s' %(suffix)].Integral()), "f")
+    #if isFake: leg.AddEntry(HIST['FAKE_%s' %(suffix)], 'Fake [%.1f]' %(HIST['FAKE_%s' %(suffix)].Integral()), "f")
 
     leg.AddEntry(HIST[bkgsum], 'BkgSum [%.1f]' %(HIST[bkgsum].Integral()), "f")
     c1 = TCanvas("c1", HIST.values()[-1].GetXaxis().GetTitle(), 800, 800 if ratio else 600 )

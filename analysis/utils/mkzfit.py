@@ -6,22 +6,22 @@ import numpy as np
 from array import array
 from math import sqrt
 
-from mkHist import ptbin, eta_bin
+#from mkHist import ptbin, eta_bin
 
 ROOT.gROOT.SetBatch(ROOT.kTRUE)
 ROOT.TH1.SetDefaultSumw2()
 
-parser = argparse.ArgumentParser(description='manual to this script')
-parser.add_argument('-p','--plot', help='make mll distribution, default is false',action='store_true', default= False)
-parser.add_argument('-f','--fit', help='fit to mll distribution, default is false',action='store_true', default= False)
-parser.add_argument('-y','--year', help='chose all jobs in this year', choices=('2016','2017','2018'), default= '2017')
-parser.add_argument('-r','--ratio', help='get ratio h_os divided by h_ss', action='store_true', default= False)
+#parser = argparse.ArgumentParser(description='manual to this script')
+#parser.add_argument('-p','--plot', help='make mll distribution, default is false',action='store_true', default= False)
+#parser.add_argument('-f','--fit', help='fit to mll distribution, default is false',action='store_true', default= False)
+#parser.add_argument('-y','--year', help='chose all jobs in this year', choices=('2016','2017','2018'), default= '2017')
+#parser.add_argument('-r','--ratio', help='get ratio h_os divided by h_ss', action='store_true', default= False)
 
-args = parser.parse_args()
+#args = parser.parse_args()
 
 zmass = '91.1876'
 
-def fit(filename,ptbin,output):
+def fit(filename,ptbin,eta_bin,output):
     print('>>>>>>>>>>>>>>>>>>>> perform fit')
     year= filename.strip('.root').strip('hist_').split('_')[-1]
     eta_bin_array = array('f', eta_bin ) #[0.,1.0,1.5,2.5])
@@ -106,7 +106,7 @@ def fit(filename,ptbin,output):
     h_ss_sub=ROOT.TH2D()
     h_os_sub=ROOT.TH2D()
     #samples=['DPS','WW_strong','FAKE','VVV','VZ','Vg','WW_EWK','TTV','DATA','DY']
-    samples=['DATA','DY']
+    samples=['DATA','MC']
     ss_plots=[]
     os_plots=[]
 
@@ -116,10 +116,10 @@ def fit(filename,ptbin,output):
         h_os=ROOT.TH2D('h_'+ptbin+'_os_'+isample,'h_'+ptbin+'_os_'+isample, len(eta_bin)-1 , eta_bin_array , len(eta_bin)-1 , eta_bin_array )
         for i in range(0,len(eta_bin)-1):
             for j in range(0,len(eta_bin)-1):
-                h_ss.SetBinContent(i+1,j+1,count['analysis_'+isample+'_'+year+'_'+ptbin+"_ss_etabin"+str(i)+"_etabin"+str(j)+"_mll"])
-                h_ss.SetBinError(i+1,j+1,count_err['analysis_'+isample+'_'+year+'_'+ptbin+"_ss_etabin"+str(i)+"_etabin"+str(j)+"_mll"])
-                h_os.SetBinContent(i+1,j+1,count['analysis_'+isample+'_'+year+'_'+ptbin+"_os_etabin"+str(i)+"_etabin"+str(j)+"_mll"])
-                h_os.SetBinError(i+1,j+1,count_err['analysis_'+isample+'_'+year+'_'+ptbin+"_os_etabin"+str(i)+"_etabin"+str(j)+"_mll"])
+                h_ss.SetBinContent( i+1 , j+1 , count    ['analysis_'+isample+'_'+year+'_ss_'+ptbin+'_etabin'+str(i)+'_etabin'+str(j)+'_mll'])
+                h_ss.SetBinError  ( i+1 , j+1 , count_err['analysis_'+isample+'_'+year+'_ss_'+ptbin+'_etabin'+str(i)+'_etabin'+str(j)+'_mll'])
+                h_os.SetBinContent( i+1 , j+1 , count    ['analysis_'+isample+'_'+year+'_os_'+ptbin+'_etabin'+str(i)+'_etabin'+str(j)+'_mll'])
+                h_os.SetBinError  ( i+1 , j+1 , count_err['analysis_'+isample+'_'+year+'_os_'+ptbin+'_etabin'+str(i)+'_etabin'+str(j)+'_mll'])
         if isample=='DATA':
             h_ss_sub=h_ss.Clone()
             h_ss_sub.SetName('h_'+ptbin+'_ss_DATASUB')
@@ -132,11 +132,11 @@ def fit(filename,ptbin,output):
         os_plots.append(h_os)
     ##???
     for i in range(0,len(ss_plots)):
-        if ss_plots[i].GetName() != 'h_'+ptbin+'_ss_DATA' and ss_plots[i].GetName() != 'h_'+ptbin+'_ss_DY' and ss_plots[i].GetName() != 'h_'+ptbin+'_ss_FAKE':
+        if ss_plots[i].GetName() != 'h_'+ptbin+'_ss_DATA' and ss_plots[i].GetName() != 'h_'+ptbin+'_ss_MC' and ss_plots[i].GetName() != 'h_'+ptbin+'_ss_FAKE':
             print "ss_plots[i] : ", ss_plots[i]
             h_ss_sub.Add(ss_plots[i],-1)
     for i in range(0,len(os_plots)):
-        if os_plots[i].GetName() != 'h_'+ptbin+'_os_DATA' and os_plots[i].GetName() != 'h_'+ptbin+'_os_DY' and ss_plots[i].GetName() != 'h_'+ptbin+'_os_FAKE':
+        if os_plots[i].GetName() != 'h_'+ptbin+'_os_DATA' and os_plots[i].GetName() != 'h_'+ptbin+'_os_MC' and ss_plots[i].GetName() != 'h_'+ptbin+'_os_FAKE':
             h_os_sub.Add(os_plots[i],-1)
     ss_plots.append(h_ss_sub)
     os_plots.append(h_os_sub)
@@ -190,19 +190,28 @@ def ratio(filename,data,ptbin,output):
     c.SaveAs( '%s/h_ratio_%s_%s_%s_mll.png'%(output,data,year,ptbin))
     pass
 
-if __name__ == '__main__':
-    for ifile in os.listdir('.'):
-        if ifile.split('_')[0] != 'hist': continue
-        name= ifile.strip('.root').strip('hist_')
-        #makdir directory
-        if not os.path.exists('plots/%s/Zmassfit' %name): os.system('mkdir -p plots/%s/Zmassfit' %name)
-        if not os.path.exists('plots/%s/Chflipfit' %name): os.system('mkdir -p plots/%s/Chflipfit' %name)
+def mkzfit( dataset , info_ ):
 
-        #for iptbin in ptbin:
-        #fit zmass
-        for iptbin in ptbin:
-            #iptbin="lowpt2"
-            fit( ifile , iptbin , 'plots/%s/Zmassfit' %name )
-            #compute ratio
-            for idata in ['DATASUB','DY']:
-                ratio( "plots/%s/Zmassfit/%s_mll/count_%s_hist_%s.root" %(name,iptbin,iptbin,name) , idata , iptbin , 'plots/%s/Chflipfit' %name )
+    cfg      = info_[0]
+    presel   = info_[1]
+    signness = info_[2]
+    ptbins   = info_[3]
+    etabins  = info_[4]
+    vars     = info_[5]
+
+    rf = 'hist_%s.root'%(dataset)
+    name = rf.strip('.root').strip('hist_')
+
+    #f = ROOT.TFile.Open( rf , "READ" )
+    output_1 = 'plots/%s/Step2_Zmassfit' %name
+    output_2 = 'plots/%s/Step3_Chflipfit' %name
+
+    if not os.path.exists(output_1): os.system('mkdir -p %s' %output_1 )
+    if not os.path.exists(output_2): os.system('mkdir -p %s' %output_2 )
+
+    for iptbin in ptbins :
+        fit( rf , iptbin , etabins , 'plots/%s/Step2_Zmassfit' %name )
+        #compute ratio 
+        for idata in [ 'DATASUB' , 'MC' ]:
+            ratio( "plots/%s/Step2_Zmassfit/%s_mll/count_%s_hist_%s.root" %(name,iptbin,iptbin,name) , idata , iptbin , 'plots/%s/Step3_Chflipfit' %name )
+pass
