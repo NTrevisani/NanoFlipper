@@ -234,15 +234,23 @@ template < typename T >
       for ( unsigned int i=0 ; i < nlep ; i++ ){
 	
 	if (TMath::Abs(pdgId[i]) == 11){
+	  
 	  if (cfg.isMC){
-	    std::list<std::string> SF_path = cfg.SF_files_map["electron"]["TightObjWP"][cfg.year]["idSF"];
+	    //std::list<std::string> SF_path = cfg.SF_files_map["electron"]["TightObjWP"][cfg.year]["idSF"];
 	    std::list<std::string> SF_path_ttHMVA = cfg.SF_files_map["electron"]["ttHMVA0p7"][cfg.year]["ttHMVA"];
-
-	    double res        = GetSF( 11, lepton_eta[i], lepton_pt[i], SF_path.size()==1 ? 0 : run_period - 1, cfg , "Id");
-	    double res_ttHMVA = GetSF( 11, lepton_eta[i], lepton_pt[i], SF_path_ttHMVA.size()==1 ? 0 : run_period - 1, cfg , "ttHMVA");
-
+	    int run_period__ = run_period ;
+	    double res_ttHMVA;
+	    if ( cfg.year.find("2017") != std::string::npos ){
+	      run_period__ = ( run_period <= 2 ) ? run_period - 1 : run_period - 2 ;
+	      //double res        = GetSF( 11, lepton_eta[i], lepton_pt[i], SF_path.size()==1 ? 0 : run_period - 1, cfg , "Id");
+	      res_ttHMVA = GetSF( 11, lepton_eta[i], lepton_pt[i], SF_path_ttHMVA.size()==1 ? 0 : run_period__ , cfg , "ttHMVA");
+	    }
+	    else{
+	      res_ttHMVA = GetSF( 11, lepton_eta[i], lepton_pt[i], SF_path_ttHMVA.size()==1 ? 0 : run_period__ - 1 , cfg , "ttHMVA");
+	    }
 	    // scale factor = HWW x ttHMVA
-	    SF_vect[i] = res * res_ttHMVA ;
+	    //SF_vect[i] = res * res_ttHMVA ;
+	    SF_vect[i] = res_ttHMVA; // unconvoluted from tight HWW
 	  }
 	  // passing cut?
 	  Cut_vect[i] = ( electron_mvaTTH[lepton_electronIdx[i]] > 0.7 ) ? 1 : 0;
@@ -279,9 +287,8 @@ template < typename T >
   df = df
     .Define( "hww_tthmva_sf_maker" , hww_tthmva_sf_maker , 
 	     { "run_period" , "Lepton_pdgId" , "Lepton_pt" , "Lepton_eta" , "Lepton_electronIdx" , "Lepton_muonIdx" , "Electron_mvaTTH" , "Muon_mvaTTH" } )
-    .Define( "HWW_WP_cut" , cfg.HWW_WP[cfg.year] )
-    .Define( "LepCut2l__ele_mu_HWW_ttHMVA" , "HWW_WP_cut*(hww_tthmva_sf_maker.first)" )
-    .Define( "LepSF2l__ele_mu_HWW_ttHMVA" , "hww_tthmva_sf_maker.second" )
+    .Define( "LepCut2l__ele_mu_HWW_ttHMVA" , "hww_tthmva_sf_maker.first" ) // unconvoluted with HWW WP
+    .Define( "LepSF2l__ele_mu_HWW_ttHMVA" , "hww_tthmva_sf_maker.second" ) // unconvoluted ttHMVA SF
     ;
   return df;
 }
