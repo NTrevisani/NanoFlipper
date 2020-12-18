@@ -58,8 +58,8 @@ if __name__ == '__main__':
 
     ################# CONDITION 
     alterMC=False
-    #commontrig="Trigger_sngEl"
-    commontrig="Trigger_dblEl"
+    commontrig="Trigger_sngEl"
+    #commontrig="Trigger_dblEl"
     commonMC="SFweight2l*XSWeight*METFilter_MC*GenLepMatch2l*ptllDYW"
     ################# CONDITION
 
