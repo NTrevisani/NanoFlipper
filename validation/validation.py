@@ -30,21 +30,6 @@ pass
 
 DIR = os.getcwd()
 
-ntuple={
-    'nanov5_2016' : {
-        'DATA' : [ "SingleElectron.root" ],
-        'MC'   : [ "DYJetsToLL_M-50-LO_ext2.root" ]
-    },
-    'nanov5_2017' : {
-        'DATA' : [ "SingleElectron.root" ],
-        'MC'   : [ "DYJetsToLL_M-50-LO_ext1.root" ]
-    },
-    'nanov5_2018' : {
-        'DATA' : [ "EGamma.root" ],
-        'MC'   : [ "DYJetsToLL_M-50-LO.root" ]
-    }
-}
-
 signness= OrderedDict({
     'os' : 'lep1_pdgId*lep2_pdgId == -11*11',
     'ss' : 'lep1_pdgId*lep2_pdgId == 11*11'
@@ -64,7 +49,7 @@ triggers = {
     'Trigger_dblEl' : {
         "2016" : [ "28" , "17" ] , # 23+5 ; 12+5
         "2017" : [ "28" , "17" ] , # 23+5 ; 12+5
-        "2018" : [ "40" , "17" ]   # 32+5 ; 12+5
+        "2018" : [ "28" , "17" ]   # 23+5 ; 12+5
     },
     'Trigger_sngEl' : {
         "2016" : [ "32" , "15" ] , # 27+5
@@ -73,43 +58,62 @@ triggers = {
     }
 }
 
-commontrig="Trigger_sngEl"
-commonMC="SFweight2l*XSWeight*METFilter_MC*GenLepMatch2l*ptllDYW*sf"
+if __name__ == '__main__':
 
-cfg = OrderedDict({
-    '2016' : {
-        'MC_w'                     : '35.92*%s' %commonMC ,
-        'DATA_w'                   : 'METFilter_DATA*%s' %commontrig ,
-        'WPs'                      : {
-            'mvaBased'             : 'LepCut2l__ele_mva_90p_Iso2016__mu_cut_Tight80x*LepSF2l__ele_mva_90p_Iso2016__mu_cut_Tight80x'       ,
-            'mvaBased_tthmva'      : 'LepCut2l__ele_mva_90p_Iso2016__mu_cut_Tight80x*LepCut2l__ele_mu_HWW_ttHMVA*LepSF2l__ele_mu_HWW_ttHMVA',
-            'fake_mvaBased'        : 'fakeW2l_ele_mva_90p_Iso2016_mu_cut_Tight80x' ,
-            'fake_mvaBased_tthmva' : 'fakeW2l_ele_mva_90p_Iso2016_tthmva_70_mu_cut_Tight80x_tthmva_80'
-        }
-    },
-    '2017' : {
-        'MC_w'                     : '41.53*%s' %commonMC ,
-        'DATA_w'                   : 'METFilter_DATA*%s' %commontrig ,
-        'WPs'                      : {
-            'mvaBased'             : 'LepCut2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW*LepSF2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW'      ,
-            'mvaBased_tthmva'      : 'LepCut2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW*LepCut2l__ele_mu_HWW_ttHMVA*LepSF2l__ele_mu_HWW_ttHMVA',
-            'fake_mvaBased'        : 'fakeW2l_ele_mvaFall17V1Iso_WP90_mu_cut_Tight_HWWW',
-            'fake_mvaBased_tthmva' : 'fakeW2l_ele_mvaFall17V1Iso_WP90_tthmva_70_mu_cut_Tight_HWWW_tthmva_80'
-        }
-    },
-    '2018' : {
-        'MC_w'                     : '59.74*%s' %commonMC ,
-        'DATA_w'                   : 'METFilter_DATA*%s' %commontrig ,
-        'WPs' : {
-            'mvaBased'             : 'LepCut2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW*LepSF2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW'      ,
-            'mvaBased_tthmva'      : 'LepCut2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW*LepCut2l__ele_mu_HWW_ttHMVA*LepSF2l__ele_mu_HWW_ttHMVA' ,
-            'fake_mvaBased'        : 'fakeW2l_ele_mvaFall17V1Iso_WP90_mu_cut_Tight_HWWW',
-            'fake_mvaBased_tthmva' : 'fakeW2l_ele_mvaFall17V1Iso_WP90_tthmva_70_mu_cut_Tight_HWWW_tthmva_80'
+    ################# CONDITION
+    alterMC=False
+    #commontrig="Trigger_sngEl"
+    commontrig="Trigger_dblEl"
+    commonMC="SFweight2l*XSWeight*METFilter_MC*GenLepMatch2l*ptllDYW*sf"
+    ################# CONDITION
+
+    ntuple={
+        'nanov5_2016' : {
+            'DATA' : [ "SingleElectron.root" , "DoubleEG.root" ],
+            'MC'   : [ "DYJetsToLL_M-50-LO_ext2.root" , "DYJetsToLL_M-50.root" ]
+        },
+        'nanov5_2017' : {
+            'DATA' : [ "SingleElectron.root" , "DoubleEG.root" ],
+            'MC'   : [ "DYJetsToLL_M-50-LO_ext1.root" , "DYJetsToLL_M-50_ext1.root" ]
+        },
+        'nanov5_2018' : {
+            'DATA' : [ "EGamma.root" ],
+            'MC'   : [ "DYJetsToLL_M-50-LO.root" , "DYJetsToLL_M-50_ext2.root" ]
         }
     }
-})
 
-if __name__ == '__main__':
+    cfg = OrderedDict({
+        '2016' : {
+            'MC_w'                     : '35.92*%s' %commonMC ,
+            'DATA_w'                   : 'METFilter_DATA*%s' %commontrig ,
+            'WPs'                      : {
+                'mvaBased'             : 'LepCut2l__ele_mva_90p_Iso2016__mu_cut_Tight80x*LepSF2l__ele_mva_90p_Iso2016__mu_cut_Tight80x'       ,
+                'mvaBased_tthmva'      : 'LepCut2l__ele_mva_90p_Iso2016__mu_cut_Tight80x*LepCut2l__ele_mu_HWW_ttHMVA*LepSF2l__ele_mu_HWW_ttHMVA',
+                'fake_mvaBased'        : 'fakeW2l_ele_mva_90p_Iso2016_mu_cut_Tight80x' ,
+                'fake_mvaBased_tthmva' : 'fakeW2l_ele_mva_90p_Iso2016_tthmva_70_mu_cut_Tight80x_tthmva_80'
+            }
+        },
+        '2017' : {
+            'MC_w'                     : '41.53*%s' %commonMC ,
+            'DATA_w'                   : 'METFilter_DATA*%s' %commontrig ,
+            'WPs'                      : {
+                'mvaBased'             : 'LepCut2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW*LepSF2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW'      ,
+                'mvaBased_tthmva'      : 'LepCut2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW*LepCut2l__ele_mu_HWW_ttHMVA*LepSF2l__ele_mu_HWW_ttHMVA',
+                'fake_mvaBased'        : 'fakeW2l_ele_mvaFall17V1Iso_WP90_mu_cut_Tight_HWWW',
+                'fake_mvaBased_tthmva' : 'fakeW2l_ele_mvaFall17V1Iso_WP90_tthmva_70_mu_cut_Tight_HWWW_tthmva_80'
+            }
+        },
+        '2018' : {
+            'MC_w'                     : '59.74*%s' %commonMC ,
+            'DATA_w'                   : 'METFilter_DATA*%s' %commontrig ,
+            'WPs' : {
+                'mvaBased'             : 'LepCut2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW*LepSF2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW'      ,
+                'mvaBased_tthmva'      : 'LepCut2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW*LepCut2l__ele_mu_HWW_ttHMVA*LepSF2l__ele_mu_HWW_ttHMVA' ,
+                'fake_mvaBased'        : 'fakeW2l_ele_mvaFall17V1Iso_WP90_mu_cut_Tight_HWWW',
+                'fake_mvaBased_tthmva' : 'fakeW2l_ele_mvaFall17V1Iso_WP90_tthmva_70_mu_cut_Tight_HWWW_tthmva_80'
+            }
+        }
+    })
 
     start_time = time.time()
     for idataset in [ "nanov5_2016" , "nanov5_2017" , "nanov5_2018" ] :
@@ -123,15 +127,29 @@ if __name__ == '__main__':
         
         # process SF
         for iroot in os.listdir(ntupleDIR) :
-            if 'DY' in iroot and 'LO' in iroot :
-                print("Processing DY sf")
-                os.system( "root -l -q \'process_SF.C( \"%s/%s\" , \"%s/%s\" , \"%s\" )\' " %( ntupleDIR , iroot , process_ntupleDIR , iroot , flipfiles )  )
+            if 'DY' in iroot :
+                if alterMC and not 'LO' in iroot :
+                    print("Processing NLO DY sf")
+                    os.system( "root -l -q \'process_SF.C( \"%s/%s\" , \"%s/%s\" , \"%s\" )\' " %( ntupleDIR , iroot , process_ntupleDIR , iroot , flipfiles )  )
+                elif not alterMC and 'LO' in iroot :
+                    print("Processing LO DY sf")
+                    os.system( "root -l -q \'process_SF.C( \"%s/%s\" , \"%s/%s\" , \"%s\" )\' " %( ntupleDIR , iroot , process_ntupleDIR , iroot , flipfiles )  )
             else:
                 print("Its data, skip")
                 os.system( "scp %s/%s %s/%s" %( ntupleDIR , iroot , process_ntupleDIR , iroot ) )
         
         MC   = map( lambda x : process_ntupleDIR+"/"+x , ntuple[idataset]['MC']   )
         DATA = map( lambda x : process_ntupleDIR+"/"+x , ntuple[idataset]['DATA'] )
+
+        #filter DATA
+        if idataset != "nanov5_2018" :
+            if commontrig == "Trigger_sngEl" : DATA = [ i for i in DATA if "SingleElectron" in i ]
+            if commontrig == "Trigger_dblEl" : DATA = [ i for i in DATA if "DoubleEG" in i ]
+        #filter MC  
+        if alterMC :
+            MC = [ i for i in MC if "LO" not in i ]
+        else :
+            MC = [ i for i in MC if "LO" in i ]
         
         print( "MC   : ", MC )
         print( "DATA : ", DATA )
@@ -142,8 +160,9 @@ if __name__ == '__main__':
         })
 
         #presel="lep1_pt > %s && lep2_pt > %s" %( triggers[commontrig][year][0] , triggers[commontrig][year][1] )
-        presel="lep1_pt > 25 && lep2_pt > 20"
+        presel="lep1_pt > 25 && lep2_pt > 20 && %s " %signness['ss']
         wp_ = "mvaBased_tthmva"
+        print( "Preselection : %s" %presel )
         #ROOT.loadSF2D( "../analysis/data/chargeFlip_%s_SF.root" %idataset )
                 
         #begins
@@ -157,10 +176,10 @@ if __name__ == '__main__':
             print( " Common weights : %s*%s" %( cfg[year]['%s_w'%name] , cfg[year]['WPs'][wp_] if name == 'MC' else cfg[year]['WPs'][wp_].split('*LepSF')[0] ) )
 
             # preselection                                                                                                                                                                                      
-            df = df.Filter( presel , "Preselection : %s" %presel )
+            df_tmp = df.Filter( presel , "Preselection : %s" %presel )
             # SS/OS region
             # SF (D/M) x MC_SS = DATA_SS
-            df_tmp = df.Filter( signness['ss'] , '%s selection' %signness['ss'] )
+            #df_tmp = df.Filter( signness['ss'] , '%s selection' %signness['ss'] )
             
             if name == "MC" :
                 histo_pair[name] = PrepareVariable( df_tmp , name , idataset , "Scale factor method" , 1 )
