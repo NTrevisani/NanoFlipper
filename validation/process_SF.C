@@ -1,7 +1,7 @@
-Float_t getValue( Float_t pt1_in , Float_t eta1_in , Float_t pt2_in , Float_t eta2_in , TH2D *mapin ){
+Float_t getSF( Float_t pt1_in , Float_t eta1_in , Float_t pt2_in , Float_t eta2_in , TH2D *mapin , Int_t Idx ){
 
-  Float_t eta_max = 2.39;
-  Float_t eta_min = -2.4;
+  Float_t eta_max = 2.49;
+  Float_t eta_min = -2.5;
   Float_t pt_max = 199.;
   Float_t pt_min = 15.;
     
@@ -14,18 +14,31 @@ Float_t getValue( Float_t pt1_in , Float_t eta1_in , Float_t pt2_in , Float_t et
   if ( eta2_in > eta_max ) eta2_in = eta_max;
   if ( pt2_in < pt_min   ) pt2_in  = pt_min;
   if ( pt2_in > pt_max   ) pt2_in  = pt_max;
-
+  
   Float_t sf1 = mapin->GetBinContent( mapin->FindBin( abs(eta1_in) , pt1_in ) );
   Float_t sf2 = mapin->GetBinContent( mapin->FindBin( abs(eta2_in) , pt2_in ) );
-  
-  return sf1*sf2;
-  
+
+  if ( Idx == 0 ) { 
+    return sf1*sf2;
+  }
+  else if ( Idx == 1 ) {
+    return sf1;
+  }
+  else if ( Idx == 2 ) {
+    return sf2;
+  }
+  else if ( Idx == 3 ) {
+    return (sf1+sf2)/2;
+  }
+  else {
+    return 0.;
+  }
 }
 
 Float_t getFlip( Float_t pt1_in , Float_t eta1_in , Float_t pt2_in , Float_t eta2_in , TH2D *mapin ) {
 
-  Float_t eta_max = 2.39;
-  Float_t eta_min = -2.4;
+  Float_t eta_max = 2.49;
+  Float_t eta_min = -2.5;
   Float_t pt_max = 199.;
   Float_t pt_min = 15.;
 
@@ -64,9 +77,12 @@ void process_SF( TString fin , TString fout , TString flip ) {
   TH2D *hdata = (TH2D*) load2D->Get("data");
 
   Float_t lep1_pt, lep2_pt, lep1_eta, lep2_eta;
-  Float_t sf , f_mc , f_data;
+  Float_t sf , sf1 , sf2 , sf3 , f_mc , f_data;
 
   TBranch *bSF       = newtree->Branch( "sf"     , &sf     , "sf/F"     );
+  TBranch *bSF1      = newtree->Branch( "sf1"     , &sf1     , "sf1/F"     );
+  TBranch *bSF2      = newtree->Branch( "sf2"     , &sf2     , "sf2/F"     );
+  TBranch *bSF3      = newtree->Branch( "sf3"     , &sf3     , "sf3/F"     );
   TBranch *bflipmc   = newtree->Branch( "f_mc"   , &f_mc   , "f_mc/F"   );
   TBranch *bflipdata = newtree->Branch( "f_data" , &f_data , "f_data/F" );
 
@@ -78,10 +94,16 @@ void process_SF( TString fin , TString fout , TString flip ) {
   Long64_t nentries = tree->GetEntries(); 
   for (Long64_t i=0;i<nentries;i++) { 
     tree->GetEntry(i); 
-    sf     = getValue( lep1_pt , lep1_eta , lep2_pt , lep2_eta , hsf   ) ;
-    f_mc   = getFlip ( lep1_pt , lep1_eta , lep2_pt , lep2_eta , hmc   ) ;
-    f_data = getFlip ( lep1_pt , lep1_eta , lep2_pt , lep2_eta , hdata ) ;
+    sf      = getSF( lep1_pt , lep1_eta , lep2_pt , lep2_eta , hsf , 0 ) ;
+    sf1     = getSF( lep1_pt , lep1_eta , lep2_pt , lep2_eta , hsf , 1 ) ;
+    sf2     = getSF( lep1_pt , lep1_eta , lep2_pt , lep2_eta , hsf , 2 ) ;
+    sf3     = getSF( lep1_pt , lep1_eta , lep2_pt , lep2_eta , hsf , 3 ) ;
+    f_mc    = getFlip ( lep1_pt , lep1_eta , lep2_pt , lep2_eta , hmc   ) ;
+    f_data  = getFlip ( lep1_pt , lep1_eta , lep2_pt , lep2_eta , hdata ) ;
     bSF->Fill();
+    bSF1->Fill();
+    bSF2->Fill();
+    bSF3->Fill();
     bflipmc->Fill();
     bflipdata->Fill();
   }

@@ -64,7 +64,8 @@ if __name__ == '__main__':
     alterMC=False
     #commontrig="Trigger_sngEl"
     commontrig="Trigger_dblEl"
-    commonMC="SFweight2l*XSWeight*METFilter_MC*GenLepMatch2l*ptllDYW*sf"
+    withSF=True
+    commonMC="SFweight2l*XSWeight*METFilter_MC*GenLepMatch2l*ptllDYW*sf3"
     ################# CONDITION
 
     ntuple={
@@ -168,14 +169,16 @@ if __name__ == '__main__':
         #begins
         histo_pair = {}
         for idf in DF :
-            # name                                                                                                                                                                                              
+            # name      
             name = idf.split('_')[0]
             print(" name : ", name )
-            # define weight                                                                                                                                                                                     
-            df = DF[idf].Define( 'weights' , '%s*%s' %( cfg[year]['%s_w'%name] , cfg[year]['WPs'][wp_] if name == 'MC' else cfg[year]['WPs'][wp_].split('*LepSF')[0] ) )
-            print( " Common weights : %s*%s" %( cfg[year]['%s_w'%name] , cfg[year]['WPs'][wp_] if name == 'MC' else cfg[year]['WPs'][wp_].split('*LepSF')[0] ) )
+            
+            # define weight
+            weight = '%s*%s' %( cfg[year]['%s_w'%name] , cfg[year]['WPs'][wp_] if name == 'MC' else cfg[year]['WPs'][wp_].split('*LepSF')[0] )
+            df = DF[idf].Define( 'weights' , weight )
+            print( " Common weights : " , weight )
 
-            # preselection                                                                                                                                                                                      
+            # preselection
             df_tmp = df.Filter( presel , "Preselection : %s" %presel )
             # SS/OS region
             # SF (D/M) x MC_SS = DATA_SS
@@ -187,7 +190,7 @@ if __name__ == '__main__':
                 histo_pair[name] = PrepareVariable( df_tmp , name , idataset , "Scale factor method" )
             ###################
             
-        output += output + "/SF_application"
+        output += output + "/SF_application_before" if not withSF else "/SF_application_after"
 	if not os.path.exists(output): os.system('mkdir -p %s' %output)
         for imc, idata in zip( histo_pair['MC'] , histo_pair['DATA'] ) :
             #print( "imc : ", imc , " ; idata : ", idata )

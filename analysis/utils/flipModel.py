@@ -1,5 +1,6 @@
 # 5x5 eta bin scheme
-#eta_bin = [ 0. , 0.5  , 1.0  , 1.5  , 2.0 , 2.5 ]
+# parameters : 5
+# eta_bin : [ 0. , 0.5  , 1.0  , 1.5  , 2.0 , 2.5 ]
 def model_5x5( i , par ):
 
      if   i == 0:  value = ( par[0] * (1-par[ 0]) + (1-par[ 0]) * par[ 0] ) / ( 1 - ( par[0] * (1-par[ 0]) + (1-par[ 0]) * par[ 0] ) )
@@ -36,6 +37,7 @@ def model_5x5( i , par ):
 pass
 
 # 4x4 eta bin scheme
+# parameters : 4
 #eta_bin = [ 0. , 1.0  , 1.5 , 2.0 , 2.5 ]
 def model_4x4( i , par ):
 
@@ -62,6 +64,9 @@ def model_4x4( i , par ):
      return value
 pass
 
+# 3x3 eta bin scheme
+# parameters : 3
+#eta_bin = [ ]
 def model_3x3( i , par ):
 
      if   i == 0:  value = ( par[0] * (1-par[ 0]) + (1-par[ 0]) * par[ 0] ) / ( 1 - ( par[0] * (1-par[ 0]) + (1-par[ 0]) * par[ 0] ) )
@@ -79,6 +84,9 @@ def model_3x3( i , par ):
      return value
 pass
 
+# 2x2 eta bin scheme
+# parameters : 2
+#eta_bin = [ 0., 1.5 , 2.5 ]
 def model_2x2( i , par ):
 
      if   i == 0:  value = ( par[0] * (1-par[ 0]) + (1-par[ 0]) * par[ 0] ) / ( 1 - ( par[0] * (1-par[ 0]) + (1-par[ 0]) * par[ 0] ) )
