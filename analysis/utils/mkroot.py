@@ -38,7 +38,7 @@ def mkVar( df_in , name_ , var_ , bins_ = None ):
         dfout = df_in.Histo1D( ( name_ , '%s ; %s [GeV] ; Events' %(name_,var_) , 40 , 0. , 200. ) , var_ , 'weights' )
     elif var_ == '2d' and bins_ is not None :
         dfout = df_in.Define('abslep1eta','abs(lep1_eta)').Define('abslep2eta','abs(lep2_eta)').Histo2D( ( name_ , '%s ; Lepton eta 1 ; Lepton eta 2 ; Events' %name_ , len(bins_)-1 , np.asarray(bins_,'d') , len(bins_)-1 , np.asarray(bins_,'d') ) , 'abslep1eta' , 'abslep2eta' , 'weights' )
-        #dfout = df_in.Histo2D( ( name_ , 'Event count ONLY %s ; Lepton eta 1 ; Lepton eta 2 ; Events' %name_ , len(bins_)-1 , np.asarray(bins_,'d') , len(bins_)-1 , np.asarray(bins_,'d') ) , 'lep1_eta' , 'lep2_eta' , 'weights' )
+        dfout = df_in.Histo2D( ( name_ , 'Event count ONLY %s ; Lepton eta 1 ; Lepton eta 2 ; Events' %name_ , len(bins_)-1 , np.asarray(bins_,'d') , len(bins_)-1 , np.asarray(bins_,'d') ) , 'lep1_eta' , 'lep2_eta' , 'weights' )
     elif var_ == 'mll' or var_ == 'Mll' :
         dfout = df_in.Histo1D( ( name_ , '%s ; %s [GeV]; Events' %(name_ , var_) , 30, 76.2, 106.2 ) , var_ , 'weights' )
     else :

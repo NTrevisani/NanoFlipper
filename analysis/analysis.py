@@ -15,21 +15,6 @@ gStyle.SetPaintTextFormat(".5f")
 
 DIR = os.getcwd()
 
-ntuple={
-    'nanov5_2016' : {
-        'DATA' : [ "SingleElectron.root" ],
-        'MC'   : [ "DYJetsToLL_M-50-LO_ext2.root" ]
-    },
-    'nanov5_2017' : {
-        'DATA' : [ "SingleElectron.root" ],
-        'MC'   : [ "DYJetsToLL_M-50-LO_ext1.root" ]
-    },
-    'nanov5_2018' : {
-        'DATA' : [ "EGamma.root" ],
-        'MC'   : [ "DYJetsToLL_M-50-LO.root" ]
-    }
-}
-
 variables=[ 'lep1_pt' , 'lep1_eta' , 'lep2_pt' , 'lep2_eta' , 'lep3_pt' , 'lep3_eta' , 'mll' , 'Mll' , '2d' ]
 
 signness= OrderedDict({
@@ -51,7 +36,7 @@ triggers = {
     'Trigger_dblEl' : {
         "2016" : [ "28" , "17" ] , # 23+5 ; 12+5
         "2017" : [ "28" , "17" ] , # 23+5 ; 12+5
-        "2018" : [ "40" , "17" ]   # 32+5 ; 12+5
+        "2018" : [ "28" , "17" ]   # 23+5 ; 12+5
     },
     'Trigger_sngEl' : {
         "2016" : [ "32" , "15" ] , # 27+5
@@ -59,42 +44,6 @@ triggers = {
         "2018" : [ "40" , "15" ]   # 35+5
     }
 }
-
-commontrig="Trigger_sngEl"
-commonMC="SFweight2l*XSWeight*METFilter_MC*GenLepMatch2l*ptllDYW"
-
-dataset_cfg = OrderedDict({
-    '2016' : {
-        'MC_w'                     : '35.92*%s' %commonMC ,
-        'DATA_w'                   : 'METFilter_DATA*%s' %commontrig ,
-        'WPs'                      : {
-            'mvaBased'             : 'LepCut2l__ele_mva_90p_Iso2016__mu_cut_Tight80x*LepSF2l__ele_mva_90p_Iso2016__mu_cut_Tight80x'       ,
-            'mvaBased_tthmva'      : 'LepCut2l__ele_mva_90p_Iso2016__mu_cut_Tight80x*LepCut2l__ele_mu_HWW_ttHMVA*LepSF2l__ele_mu_HWW_ttHMVA',
-            'fake_mvaBased'        : 'fakeW2l_ele_mva_90p_Iso2016_mu_cut_Tight80x' ,
-            'fake_mvaBased_tthmva' : 'fakeW2l_ele_mva_90p_Iso2016_tthmva_70_mu_cut_Tight80x_tthmva_80'
-        }
-    },
-    '2017' : {
-        'MC_w'                     : '41.53*%s' %commonMC ,
-        'DATA_w'                   : 'METFilter_DATA*%s' %commontrig ,
-        'WPs'                      : {
-            'mvaBased'             : 'LepCut2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW*LepSF2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW'      ,
-            'mvaBased_tthmva'      : 'LepCut2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW*LepCut2l__ele_mu_HWW_ttHMVA*LepSF2l__ele_mu_HWW_ttHMVA',
-            'fake_mvaBased'        : 'fakeW2l_ele_mvaFall17V1Iso_WP90_mu_cut_Tight_HWWW',
-            'fake_mvaBased_tthmva' : 'fakeW2l_ele_mvaFall17V1Iso_WP90_tthmva_70_mu_cut_Tight_HWWW_tthmva_80'
-        }
-    },
-    '2018' : {
-        'MC_w'                     : '59.74*%s' %commonMC ,
-        'DATA_w'                   : 'METFilter_DATA*%s' %commontrig ,
-        'WPs' : {
-            'mvaBased'             : 'LepCut2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW*LepSF2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW'      ,
-            'mvaBased_tthmva'      : 'LepCut2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW*LepCut2l__ele_mu_HWW_ttHMVA*LepSF2l__ele_mu_HWW_ttHMVA' ,
-            'fake_mvaBased'        : 'fakeW2l_ele_mvaFall17V1Iso_WP90_mu_cut_Tight_HWWW',
-            'fake_mvaBased_tthmva' : 'fakeW2l_ele_mvaFall17V1Iso_WP90_tthmva_70_mu_cut_Tight_HWWW_tthmva_80'
-        }
-    }
-})
 
 from utils.helper import *
 from utils.mkroot import *
@@ -107,19 +56,85 @@ etabin = [ 0. , 1.4 , 2.5 ]
 
 if __name__ == '__main__':
 
+    ################# CONDITION 
+    alterMC=False
+    #commontrig="Trigger_sngEl"
+    commontrig="Trigger_dblEl"
+    commonMC="SFweight2l*XSWeight*METFilter_MC*GenLepMatch2l*ptllDYW"
+    ################# CONDITION
+
+    ntuple={
+        'nanov5_2016' : {
+            'DATA' : [ "SingleElectron.root" , "DoubleEG.root" ],
+            'MC'   : [ "DYJetsToLL_M-50-LO_ext2.root" , "DYJetsToLL_M-50.root" ]
+        },
+        'nanov5_2017' : {
+            'DATA' : [ "SingleElectron.root" , "DoubleEG.root" ],
+            'MC'   : [ "DYJetsToLL_M-50-LO_ext1.root" , "DYJetsToLL_M-50_ext1.root" ]
+        },
+        'nanov5_2018' : {
+            'DATA' : [ "EGamma.root" ],
+            'MC'   : [ "DYJetsToLL_M-50-LO.root" , "DYJetsToLL_M-50_ext2.root" ]
+        }
+    }
+
+    dataset_cfg = OrderedDict({
+        '2016' : {
+            'MC_w'                     : '35.92*%s' %commonMC ,
+            'DATA_w'                   : 'METFilter_DATA*%s' %commontrig ,
+            'WPs'                      : {
+                'mvaBased'             : 'LepCut2l__ele_mva_90p_Iso2016__mu_cut_Tight80x*LepSF2l__ele_mva_90p_Iso2016__mu_cut_Tight80x'       ,
+                'mvaBased_tthmva'      : 'LepCut2l__ele_mva_90p_Iso2016__mu_cut_Tight80x*LepCut2l__ele_mu_HWW_ttHMVA*LepSF2l__ele_mu_HWW_ttHMVA',
+                'fake_mvaBased'        : 'fakeW2l_ele_mva_90p_Iso2016_mu_cut_Tight80x' ,
+                'fake_mvaBased_tthmva' : 'fakeW2l_ele_mva_90p_Iso2016_tthmva_70_mu_cut_Tight80x_tthmva_80'
+            }
+        },
+        '2017' : {
+            'MC_w'                     : '41.53*%s' %commonMC ,
+            'DATA_w'                   : 'METFilter_DATA*%s' %commontrig ,
+            'WPs'                      : {
+                'mvaBased'             : 'LepCut2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW*LepSF2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW'      ,
+                'mvaBased_tthmva'      : 'LepCut2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW*LepCut2l__ele_mu_HWW_ttHMVA*LepSF2l__ele_mu_HWW_ttHMVA',
+                'fake_mvaBased'        : 'fakeW2l_ele_mvaFall17V1Iso_WP90_mu_cut_Tight_HWWW',
+                'fake_mvaBased_tthmva' : 'fakeW2l_ele_mvaFall17V1Iso_WP90_tthmva_70_mu_cut_Tight_HWWW_tthmva_80'
+            }
+        },
+        '2018' : {
+            'MC_w'                     : '59.74*%s' %commonMC ,
+            'DATA_w'                   : 'METFilter_DATA*%s' %commontrig ,
+            'WPs' : {
+                'mvaBased'             : 'LepCut2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW*LepSF2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW'      ,
+                'mvaBased_tthmva'      : 'LepCut2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW*LepCut2l__ele_mu_HWW_ttHMVA*LepSF2l__ele_mu_HWW_ttHMVA' ,
+                'fake_mvaBased'        : 'fakeW2l_ele_mvaFall17V1Iso_WP90_mu_cut_Tight_HWWW',
+                'fake_mvaBased_tthmva' : 'fakeW2l_ele_mvaFall17V1Iso_WP90_tthmva_70_mu_cut_Tight_HWWW_tthmva_80'
+            }
+        }
+    })
+
+    ##################################
     start_time = time.time()
     for idataset in [ "nanov5_2016" , "nanov5_2017" , "nanov5_2018" ] :
-        if idataset != "nanov5_2018" : continue
         year = idataset.split('_')[-1]
-
+        
+        # pt bin
         ptbin = OrderedDict()
         ptbin['lowpt']    = 'lep1_pt >= %s && lep1_pt < 200 && lep2_pt > %s && lep2_pt <= 20' %( triggers[commontrig][year][0] , triggers[commontrig][year][1]  )
         ptbin['highpt']   = 'lep1_pt >= %s && lep1_pt < 200 && lep2_pt > 20 && lep2_pt < 200' %( triggers[commontrig][year][0] )
-
+        
         ntupleDIR= "%s/../ntuple/results/%s" %( DIR , idataset )
         
         MC   = map( lambda x : ntupleDIR+"/"+x , ntuple[idataset]['MC']   )
         DATA = map( lambda x : ntupleDIR+"/"+x , ntuple[idataset]['DATA'] )
+
+        #filter DATA
+        if idataset != "nanov5_2018" :
+            if commontrig == "Trigger_sngEl" : DATA = [ i for i in DATA if "SingleElectron" in i ]
+            if commontrig == "Trigger_dblEl" : DATA = [ i for i in DATA if "DoubleEG" in i ]
+        #filter MC
+        if alterMC : 
+            MC = [ i for i in MC if "LO" not in i ]
+        else : 
+            MC = [ i for i in MC if "LO" in i ]
         
         print( "MC   : ", MC )
         print( "DATA : ", DATA )

@@ -120,9 +120,10 @@ if __name__ == '__main__':
         flipfiles         = "%s/../analysis/data/chargeFlip_%s_SF.root" %( DIR , idataset )
         output= 'plots/%s' %( idataset )
         if not os.path.exists(process_ntupleDIR): os.system( 'mkdir -p %s' %process_ntupleDIR )
+        
         # process SF
         for iroot in os.listdir(ntupleDIR) :
-            if 'DY' in iroot:
+            if 'DY' in iroot and 'LO' in iroot :
                 print("Processing DY sf")
                 os.system( "root -l -q \'process_SF.C( \"%s/%s\" , \"%s/%s\" , \"%s\" )\' " %( ntupleDIR , iroot , process_ntupleDIR , iroot , flipfiles )  )
             else:
