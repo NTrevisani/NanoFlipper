@@ -17,4 +17,5 @@ small package for study
 
 ## validation
 small package for validating the scale factor
-- [ ] set of histogram plots.
+- [x] set of histogram plots.
+- [x] apply sf.
