@@ -19,3 +19,8 @@ small package for study
 small package for validating the scale factor
 - [x] set of histogram plots.
 - [x] apply sf.
+
+## presentation
+the study is presented at HWW meeting
+- [slide1](https://github.com/SiewYan/NanoFlipper/blob/master/slides/WHSS%20charge%20flip%20e-mu.pdf)
+- [slide2](https://github.com/SiewYan/NanoFlipper/blob/master/slides/WHSS%20charge%20flip%20study(1).pdf)
