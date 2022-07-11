@@ -105,14 +105,15 @@ def fit( p , perr ):
      emat = np.array( buf ).reshape( npar , npar )
 
      # --> provide formatted output of results
-     print "\n"
-     print "*==* MINUIT fit completed:"
-     print'fcn@minimum = %.3g'%( amin.value ) , " error code =" , ierflg.value , " status =" , icstat.value , " (if its 3, mean accurate)"
-     print " Results: \t value error corr. mat."
+     print( "\n" )
+     print( "*==* MINUIT fit completed:" )
+     print('fcn@minimum = %.3g'%( amin.value ) , " error code =" , ierflg.value , " status =" , icstat.value , " (if its 3, mean accurate)" )
+     print( " Results: \t value error corr. mat." )
      for i in range(0,npar):
-          print'%s: \t%10.3e +/- %.1e'%( name[i] , finalPar[i] , finalParErr[i] ) ,
-          for j in range (0,i): print'%+.3g'%( emat[i][j]/np.sqrt(emat[i][i])/np.sqrt(emat[j][j]) ),
-          print "\n"
+          print('%s: \t%10.3e +/- %.1e'%( name[i] , finalPar[i] , finalParErr[i] ) )
+          for j in range (0,i): 
+              print('%+.3g'%( emat[i][j]/np.sqrt(emat[i][i])/np.sqrt(emat[j][j]) ) )
+          print("\n")
 
      return [ [i,j]  for i,j in zip(finalPar , finalParErr) ]
 
@@ -128,7 +129,7 @@ def outFormat( ifile_ , eta_bin_ , ptbin , pt_bin_ , fitted_prob_ , out_ , useCs
 
     pt_lo = float(ptbin[pt_bin_].split(" && ")[-2].split(' ')[-1])
     pt_hi = float(ptbin[pt_bin_].split(" && ")[-1].split(' ')[-1])
-    print pt_bin_
+    print(pt_bin_)
 
     outfile = open( "data/chargeFlip_%s_%s_SF.txt" %( ifile_ , pt_bin_ ) if not useCsv else 'data/chargeFlip_%s_%s_SF.csv' %( ifile_ , pt_bin_ ) , "w" )
 
@@ -152,11 +153,11 @@ def outFormat( ifile_ , eta_bin_ , ptbin , pt_bin_ , fitted_prob_ , out_ , useCs
 
     with outfile as out_handler:
         if not useCsv:
-            print "Writing to txt format"
+            print("Writing to txt format")
             for listitem in fout:
                 out_handler.write( '%s\n' %listitem )
         else:
-            print "Wiriting to CSV format"
+            print("Wiriting to CSV format")
             writer = csv.writer( out_handler )
             writer.writerows( fout )
     pass
@@ -233,14 +234,14 @@ def mkSf( ifile_ , ptbin , ptbin_ , etabin_ , outcsv_=True ):
      h_data = TFile.Open("plots/%s/Step3_Chflipfit/%s_mll/ratio_DATASUB_%s_%s_mll.root" %(ifile_,ptbin_,year,ptbin_) ,"READ")
      h_mc   = TFile.Open("plots/%s/Step3_Chflipfit/%s_mll/ratio_MC_%s_%s_mll.root" %(ifile_,ptbin_,year,ptbin_) ,"READ")
      
-     print year
-     print ptbin_
+     print(year)
+     print(ptbin_)
      # here
      # fit
      fitted_prob[year]={}
      h4val[year]={}
      for ids in [ 'DATA' , 'MC' ]:
-          print ids
+          print(ids)
           h4val[year][ids] = flatten2D( h_data.Get('h2_DATASUB') if ids=='DATA' else h_mc.Get('h2_MC') )
           fitted_prob[year][ids] = fit( arr( 'f' , h4val[year][ids][0] ) , arr( 'f' , h4val[year][ids][1] ) ) # fit( value, error )
      out[year] = map( lambda x , y : [ x[0]/y[0] , sqrt( (x[1]*x[1])/(x[0]*x[0]) + (y[1]*y[1])/(y[0]*y[0]) ) ]  , fitted_prob[year]['DATA'] , fitted_prob[year]['MC'] )
@@ -294,7 +295,7 @@ def mkValidation( ifile_ , flipPro , h_val , ptbin_ , etabins_ ):
 
 def mkToy( dim , etabins_ ):
     #toy
-    print "Running on Toy"
+    print("Running on Toy")
     zA = arr( 'f' , [ random.uniform(0,0.01) for i in range(dim) ] ) ; errorzA = arr( 'f' , [ 0.0025 for i in range(dim) ] )
     zB = arr( 'f' , [ random.uniform(0,0.01) for i in range(dim) ] ) ; errorzB = arr( 'f' , [ 0.0025 for i in range(dim) ] )
 
@@ -351,6 +352,7 @@ def mkflipsf( info_ ):
                 out_handling.write( '%s\n' %listitem )
         os.system( 'cat data/fit_summary_%s.txt' %iptbin )
     # make histogram from CSV
-    for ifile in [ 'nanov5_2016' , 'nanov5_2017' , 'nanov5_2018' ] :
+    # for ifile in [ 'nanov5_2016' , 'nanov5_2017' , 'nanov5_2018' ] :
+    for ifile in [ '2018' ] :
         mk2Dfromcsv( ifile , ptbins , etabins )
 pass

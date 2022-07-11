@@ -14,23 +14,23 @@ void makeSF_muon( std::list<std::string> SF_files_map_in , std::vector<TH2D> &sf
     int mu_nbins_eta = htemp->GetNbinsX(), mu_nbins_pt = htemp->GetNbinsY();
     
     // C language allows the creation of arrays on the stack of variable length, but C ++ does not. 
-    //In C ++ the size of the arrays allocated in the stack must be known at compile time.
+    // In C ++ the size of the arrays allocated in the stack must be known at compile time.
     std::vector<double> mu_eta_bins(mu_nbins_eta+1), mu_pt_bins(mu_nbins_pt+1);
 
-    for(int k=0;k<=mu_nbins_eta;k++) { mu_eta_bins[k] = htemp->GetXaxis()->GetXbins()->At(k); }
-    for(int k=0;k<=mu_nbins_pt;k++) { mu_pt_bins[k] = htemp->GetYaxis()->GetXbins()->At(k); }
+    for(int k=0 ;k<=mu_nbins_eta; k++) { mu_eta_bins[k] = htemp->GetXaxis()->GetXbins()->At(k); }
+    for(int k=0; k<=mu_nbins_pt;  k++) { mu_pt_bins[k]  = htemp->GetYaxis()->GetXbins()->At(k); }
     
     TH2D h_SF = TH2D("", "", mu_nbins_eta, mu_eta_bins.data(), mu_nbins_pt, mu_pt_bins.data());
     //TH2D h_SF_err = TH2D("", "", mu_nbins_eta, mu_eta_bins.data(), mu_nbins_pt, mu_pt_bins.data());
     //TH2D h_SF_sys = TH2D("", "", mu_nbins_eta, mu_eta_bins.data(), mu_nbins_pt, mu_pt_bins.data());
     
     for(int i=1; i<=mu_nbins_eta;i++){
-            for(int j=1; j<=mu_nbins_pt;j++){
-              h_SF.SetBinContent(i, j, htemp->GetBinContent(i, j));
-              //h_SF_err.SetBinContent(i, j, htemp->GetBinError(i, j));
-	      //h_SF_sys.SetBinContent(i, j, 1.); // FIXME this is here as a placeholder: old SF files only have total error, in the new ones it is split
-            }
-        }
+      for(int j=1; j<=mu_nbins_pt;j++){
+	h_SF.SetBinContent(i, j, htemp->GetBinContent(i, j));
+	//h_SF_err.SetBinContent(i, j, htemp->GetBinError(i, j));
+	//h_SF_sys.SetBinContent(i, j, 1.); // FIXME this is here as a placeholder: old SF files only have total error, in the new ones it is split
+      }
+    }
     sf_nom.push_back(h_SF);
     //sf_stat.push_back(h_SF_err);
     //sf_syst.push_back(h_SF_sys);
@@ -214,16 +214,16 @@ double GetSF(int flavor, float eta, float pt, int run_period, config_t mycfg , s
 }
 
 template < typename T >
-  auto hww_tthmva_sf( T &df, config_t &cfg ){
+auto hww_tthmva_sf( T &df, config_t &cfg ){
   using namespace ROOT::VecOps;
   // lambda function
   auto hww_tthmva_sf_maker = [&cfg](
-				    const int& run_period ,
-				    const RVec<int>& pdgId ,
+				    const int&         run_period ,
+				    const RVec<int>&   pdgId ,
 				    const RVec<float>& lepton_pt ,
 				    const RVec<float>& lepton_eta ,
-				    const RVec<int>& lepton_electronIdx ,
-				    const RVec<int>& lepton_muonIdx ,
+				    const RVec<int>&   lepton_electronIdx ,
+				    const RVec<int>&   lepton_muonIdx ,
 				    const RVec<float>& electron_mvaTTH ,
 				    const RVec<float>& muon_mvaTTH
 				    )
@@ -284,13 +284,14 @@ template < typename T >
   
   std::cout<<" --> default HWW WP : "<< cfg.HWW_WP[cfg.year] <<std::endl;
   
-  df = df
-    .Define( "hww_tthmva_sf_maker" , hww_tthmva_sf_maker , 
+  auto df2 = 
+    df.
+    Define( "hww_tthmva_sf_maker" , hww_tthmva_sf_maker , 
 	     { "run_period" , "Lepton_pdgId" , "Lepton_pt" , "Lepton_eta" , "Lepton_electronIdx" , "Lepton_muonIdx" , "Electron_mvaTTH" , "Muon_mvaTTH" } )
     .Define( "LepCut2l__ele_mu_HWW_ttHMVA" , "hww_tthmva_sf_maker.first" ) // unconvoluted with HWW WP
     .Define( "LepSF2l__ele_mu_HWW_ttHMVA" , "hww_tthmva_sf_maker.second" ) // unconvoluted ttHMVA SF
     ;
-  return df;
+  return df2;
 }
 
 #endif

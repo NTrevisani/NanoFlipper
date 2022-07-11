@@ -5,26 +5,33 @@ import sys
 
 if len(sys.argv) < 3:
     print("Syntax: haddnano.py out.root input1.root input2.root ...")
+    exit
+
 ofname = sys.argv[1]
 files = sys.argv[2:]
 
+print("ofname: {}".format(ofname)) 
+print("files:  {}".format(files)) 
 
-def zeroFill(tree, brName, brObj):
-    if brObj.GetLeaf(brName).GetTypeName() != "Bool_t":
-        print("Did not expect to back fill non-boolean branches",
-              tree, brName, brObj.GetLeaf(br).GetTypeName())
-    else:
-        buff = array('B', [0])
-        b = tree.Branch(brName, buff, brName+"/O")
-        # be sure we do not trigger flushing
-        b.SetBasketSize(tree.GetEntries()*2)
-        for x in range(0, tree.GetEntries()):
-            b.Fill()
-        b.ResetAddress()
+# def zeroFill(tree, brName, brObj):
+#     if brObj.GetLeaf(brName).GetTypeName() != "Bool_t":
+#         print("Did not expect to back fill non-boolean branches",
+#               tree, brName, brObj.GetLeaf(br).GetTypeName())
+#     else:
+#         buff = array('B', [0])
+#         b = tree.Branch(brName, buff, brName+"/O")
+#         # be sure we do not trigger flushing
+#         b.SetBasketSize(tree.GetEntries()*2)
+#         for x in range(0, tree.GetEntries()):
+#             b.Fill()
+#         b.ResetAddress()
 
 
 fileHandles = []
 goFast = True
+
+print("Starting")
+
 for fn in files:
     print("Adding file", fn)
     fileHandles.append(ROOT.TFile.Open(fn))
@@ -47,8 +54,19 @@ for e in fileHandles[0].GetListOfKeys():
         obj = obj.CloneTree(-1, "fast" if goFast else "")
         branchNames = set([x.GetName() for x in obj.GetListOfBranches()])
     for fh in fileHandles[1:]:
-        otherObj = fh.GetListOfKeys().FindObject(name).ReadObj()
-        inputs.Add(otherObj)
+
+        # Let's merge only TTree objects
+        # Due to some errors in ntuple production, 
+        # some files may contain also TH1F or TH2F objects.
+        # Since no ALL files contain them, it may produce errors.
+        if isTree:
+            #print("fh: {}".format(fh))
+            otherObj = fh.GetListOfKeys().FindObject(name).ReadObj()
+            #print("Object name: {}".format(name))
+            #print("Find object by name: {}".format(fh.GetListOfKeys().FindObject(name)))
+            #print("otherObj: {}".format(otherObj))
+            inputs.Add(otherObj)
+
         if isTree and obj.GetName() == 'Events':
             otherObj.SetAutoFlush(0)
             otherBranches = set([x.GetName()

@@ -6,24 +6,25 @@ import os, sys, time
 cwd = os.getcwd()
 usage = "usage: %prog [options]"
 parser = OptionParser(usage)
-parser.add_option("-d","--dataset", action="store", type="string", dest="dataset", default="nanov5_2016")
-parser.add_option("-l","--location", action="store", type="string", dest="location", default="%s/data/filelists" %(cwd) )
-parser.add_option("-s", "--Samples", action="append", type="string", dest="Samples" , default=[])
-parser.add_option("-b","--batch", action="store_true", dest="batch", default=False)
-parser.add_option("-c","--condor", action="store_true", dest="isCondor", default=True)
-parser.add_option("-t","--test", action="store_true", dest="test", default=False)
-parser.add_option("-n","--nfile", action="store", type="int", dest="nfile", default=3)
-parser.add_option("-o","--output", action="store", type="string", dest="output", default="%s/results/" %(cwd))
+parser.add_option("-d", "--dataset",  action="store",      type="string",   dest="dataset",  default="nanov7_2016")
+parser.add_option("-l", "--location", action="store",      type="string",   dest="location", default="%s/data/filelists" %(cwd) )
+parser.add_option("-s", "--Samples",  action="append",     type="string",   dest="Samples" , default=[])
+parser.add_option("-b", "--batch",    action="store_true",                  dest="batch",    default=False)
+parser.add_option("-c", "--condor",   action="store_true",                  dest="isCondor", default=True)
+parser.add_option("-t", "--test",     action="store_true",                  dest="test",     default=False)
+parser.add_option("-n", "--nfile",    action="store",      type="int",      dest="nfile",    default=3)
+parser.add_option("-o", "--output",   action="store",      type="string",   dest="output",   default="%s/results/" %(cwd))
                   
 (options, args) = parser.parse_args()
 
-dataset = options.dataset
-Samples = options.Samples
+dataset  = options.dataset
+Samples  = options.Samples
 location = options.location + "/" + dataset
-batch = options.batch
+batch    = options.batch
 isCondor = options.isCondor
-test = options.test
-nfile = options.nfile
+test     = options.test
+nfile    = options.nfile
+
 if batch:
     output = options.output + "/batch/%s" %(dataset)
 else:
@@ -44,7 +45,22 @@ datasets={
         'lumi' : "59.74",
         'DATA_path' : 'Run2018_102X_nAODv6_Full2018v6/DATAl1loose2018v6__l2loose__l2tightOR2018v6',
         'MC_path'   : 'Autumn18_102X_nAODv6_Full2018v6/MCl1loose2018v6__MCCorr2018v6__l2loose__l2tightOR2018v6'
-    }
+    },
+    '2016' : {
+        'lumi'      : '35.867',
+        'DATA_path' : 'Run2016_102X_nAODv7_Full2016v7/DATAl1loose2016v7__l2loose__l2tightOR2016v7',
+        'MC_path'   : 'Summer16_102X_nAODv7_Full2016v7/MCl1loose2016v7__MCCorr2016v7__l2loose__l2tightOR2016v7'
+    },
+    '2017' : {
+        'lumi' : "41.53",
+        'DATA_path' : 'Run2017_102X_nAODv7_Full2017v7/DATAl1loose2017v7__l2loose__l2tightOR2017v7',
+        'MC_path'   : 'Fall2017_102X_nAODv7_Full2017v7/MCl1loose2017v7__MCCorr2017v7__l2loose__l2tightOR2017v7'
+    },
+    '2018' : {
+        'lumi' : "59.74",
+        'DATA_path' : 'Run2018_102X_nAODv7_Full2018v7/DATAl1loose2018v7__l2loose__l2tightOR2018v7',
+        'MC_path'   : 'Autumn18_102X_nAODv7_Full2018v7/MCl1loose2018v7__MCCorr2018v7__l2loose__l2tightOR2018v7'
+    },
 }
 
 def prepare( dataset_ , source_ ):

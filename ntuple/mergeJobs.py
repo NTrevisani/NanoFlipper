@@ -5,15 +5,17 @@ import os, sys, time
 cwd = os.getcwd()
 usage = "usage: %prog [options]"
 parser = OptionParser(usage)
-parser.add_option("-d","--dataset", action="store", type="string", dest="dataset", default="nanov5_2016")
-parser.add_option("-l","--location", action="store", type="string", dest="location", default="%s/results/batch" %(cwd) )
+
+parser.add_option("-d", "--dataset",  action="store", type="string", dest="dataset",  default="nanov5_2016")
+parser.add_option("-l", "--location", action="store", type="string", dest="location", default="%s/results/batch" %(cwd) )
+parser.add_option("-o", "--output",   action="store", type="string", dest="output",   default="%s/results" %(cwd))
 #parser.add_option("-s", "--Samples", action="append", type="string", dest="Samples" , default=[])
-parser.add_option("-o","--output", action="store", type="string", dest="output", default="%s/results" %(cwd))
+
 (options, args) = parser.parse_args()
 
-dataset = options.dataset
+dataset  = options.dataset
 location = options.location + "/" + dataset
-output = options.output + "/" + dataset
+output   = options.output + "/" + dataset
 
 # infer samples
 megalist = os.listdir(location)

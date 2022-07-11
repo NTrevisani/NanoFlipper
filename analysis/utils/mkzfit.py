@@ -22,13 +22,18 @@ ROOT.TH1.SetDefaultSumw2()
 zmass = '91.1876'
 
 def fit(filename,ptbin,eta_bin,output):
+
     print('>>>>>>>>>>>>>>>>>>>> perform fit')
-    year= filename.strip('.root').strip('hist_').split('_')[-1]
+    year          = filename.strip('.root').strip('hist_').split('_')[-1]
     eta_bin_array = array('f', eta_bin ) #[0.,1.0,1.5,2.5])
-    fin=ROOT.TFile.Open(filename)
-    histos=[]
-    count={}
-    count_err={}
+    fin           = ROOT.TFile.Open(filename)
+    histos        = []
+    count         = {}
+    count_err     = {}
+
+    print("Year:            {}".format(year))
+    print("Eta_bin_array:   {}".format(eta_bin_array))
+    print("Input file name: {}".format(filename))
 
     output+='/%s_mll' %ptbin
     if not os.path.exists(output): os.system('mkdir -p %s' %output )
@@ -133,7 +138,7 @@ def fit(filename,ptbin,eta_bin,output):
     ##???
     for i in range(0,len(ss_plots)):
         if ss_plots[i].GetName() != 'h_'+ptbin+'_ss_DATA' and ss_plots[i].GetName() != 'h_'+ptbin+'_ss_MC' and ss_plots[i].GetName() != 'h_'+ptbin+'_ss_FAKE':
-            print "ss_plots[i] : ", ss_plots[i]
+            print("ss_plots[i] : ", ss_plots[i])
             h_ss_sub.Add(ss_plots[i],-1)
     for i in range(0,len(os_plots)):
         if os_plots[i].GetName() != 'h_'+ptbin+'_os_DATA' and os_plots[i].GetName() != 'h_'+ptbin+'_os_MC' and ss_plots[i].GetName() != 'h_'+ptbin+'_os_FAKE':

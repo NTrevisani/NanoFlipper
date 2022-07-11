@@ -75,6 +75,18 @@ if __name__ == '__main__':
         'nanov5_2018' : {
             'DATA' : [ "EGamma.root" ],
             'MC'   : [ "DYJetsToLL_M-50-LO.root" , "DYJetsToLL_M-50_ext2.root" ]
+        },
+        '2016' : {
+            'DATA' : [ "SingleElectron.root" , "DoubleEG.root" ],
+            'MC'   : [ "DYJetsToLL_M-50-LO_ext2.root" , "DYJetsToLL_M-50.root" ]
+        },
+        '2017' : {
+            'DATA' : [ "SingleElectron.root" , "DoubleEG.root" ],
+            'MC'   : [ "DYJetsToLL_M-50-LO_ext1.root" , "DYJetsToLL_M-50_ext1.root" ]
+        },
+        '2018' : {
+            'DATA' : [ "EGamma.root" ],
+            'MC'   : [ "DYJetsToLL_M-50-LO.root" , "DYJetsToLL_M-50_ext2.root" ]
         }
     }
 
@@ -103,8 +115,8 @@ if __name__ == '__main__':
             'MC_w'                     : '59.74*%s' %commonMC ,
             'DATA_w'                   : 'METFilter_DATA*%s' %commontrig ,
             'WPs' : {
-                'mvaBased'             : 'LepCut2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW*LepSF2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW'      ,
-                'mvaBased_tthmva'      : 'LepCut2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW*LepCut2l__ele_mu_HWW_ttHMVA*LepSF2l__ele_mu_HWW_ttHMVA' ,
+                'mvaBased'             : 'LepCut2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW_tthmva_80*LepSF2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW'      ,
+                'mvaBased_tthmva'      : 'LepCut2l__ele_mvaFall17V1Iso_WP90__mu_cut_Tight_HWWW_tthmva_80*LepCut2l__ele_mu_HWW_ttHMVA*LepSF2l__ele_mu_HWW_ttHMVA' ,
                 'fake_mvaBased'        : 'fakeW2l_ele_mvaFall17V1Iso_WP90_mu_cut_Tight_HWWW',
                 'fake_mvaBased_tthmva' : 'fakeW2l_ele_mvaFall17V1Iso_WP90_tthmva_70_mu_cut_Tight_HWWW_tthmva_80'
             }
@@ -113,7 +125,8 @@ if __name__ == '__main__':
 
     ##################################
     start_time = time.time()
-    for idataset in [ "nanov5_2016" , "nanov5_2017" , "nanov5_2018" ] :
+    # for idataset in [ "nanov5_2016" , "nanov5_2017" , "nanov5_2018" ] :
+    for idataset in [ "2018" ] :
         year = idataset.split('_')[-1]
         
         # pt bin
@@ -122,12 +135,20 @@ if __name__ == '__main__':
         ptbin['highpt']   = 'lep1_pt >= %s && lep1_pt < 200 && lep2_pt > 20 && lep2_pt < 200' %( triggers[commontrig][year][0] )
         
         ntupleDIR= "%s/../ntuple/results/%s" %( DIR , idataset )
+        # ntupleDIR= "/eos/user/n/ntrevisa/charge_flip/%s" %( idataset )
         
-        MC   = map( lambda x : ntupleDIR+"/"+x , ntuple[idataset]['MC']   )
-        DATA = map( lambda x : ntupleDIR+"/"+x , ntuple[idataset]['DATA'] )
+        # MC   = map( lambda x : ntupleDIR+"/"+x , ntuple[idataset]['MC']   )
+        MC = [ntupleDIR + "/" + x for x in ntuple[idataset]['MC']]
+        print("First MC:  {}".format(ntuple[idataset]['MC']))
+        print("Second MC: {}".format(MC))
+
+        # DATA = list(map( lambda x : ntupleDIR+"/"+x , ntuple[idataset]['DATA'] ))
+        DATA = [ntupleDIR + "/" + x for x in ntuple[idataset]['DATA']]
+        print("First DATA:  {}".format(ntuple[idataset]['DATA']))
+        print("Second DATA: {}".format(DATA))
 
         #filter DATA
-        if idataset != "nanov5_2018" :
+        if idataset != "nanov5_2018" and idataset != "2018":
             if commontrig == "Trigger_sngEl" : DATA = [ i for i in DATA if "SingleElectron" in i ]
             if commontrig == "Trigger_dblEl" : DATA = [ i for i in DATA if "DoubleEG" in i ]
         #filter MC
@@ -148,8 +169,11 @@ if __name__ == '__main__':
 
         info = [ dataset_cfg[year] , presel , signness , ptbin , etabin , variables ]
     
+        print("mkroot step")
         mkroot( idataset , DF , info , "mvaBased_tthmva" );
+        print("mkplot step")
         mkplot( idataset , info )
+        print("mkzfit step")
         mkzfit( idataset , info )
 
     mkflipsf( info )
