@@ -4,6 +4,12 @@ Module to produce skimmed ntuple for charge-flip probability calculations.
 
 ### Download and install
 
+    cmsrel CMSSW_12_4_0
+
+    cd CMSSW_12_4_0/src
+
+    cmsenv
+
     git clone git@github.com:NTrevisani/NanoFlipper.git
 
 To source a recent version of ROOT (needed to use RDataFrame):
